@@ -1,0 +1,32 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme inline {
+  /* GitHub Background Colors */
+  --color-primary: #0d1117; /* Main background */
+  --color-secondary: #161b22; /* Cards, modals, sidebars */
+  --color-tertiary: #21262d; /* Hover states, disabled elements */
+
+  /* GitHub Accent Colors */
+  --color-accent: #238636; /* Primary buttons, links (GitHub green) */
+  --color-accent-hover: #2ea043; /* Hover states */
+
+  /* Additional GitHub Accents */
+  --color-accent-blue: #388bfd; /* Info, links */
+  --color-accent-blue-hover: #4493f8;
+  --color-accent-red: #f85149; /* Warnings, errors */
+  --color-accent-red-hover: #ff6b6b;
+
+  /* GitHub Text Colors */
+  --text-primary: #f0f6fc; /* Primary text */
+  --text-secondary: #8b949e; /* Secondary text */
+  --text-muted: #7d8590; /* Muted text */
+
+  /* GitHub Border Colors */
+  --color-border: #30363d; /* Main borders */
+  --color-border-focus: #388bfd; /* Focus rings */
+
+  /* buttons */
+  --color-destructive: var(--color-red-900);
+  --color-destructive-hover: var(--color-red-800);
+}

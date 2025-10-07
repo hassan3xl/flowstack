@@ -35,12 +35,12 @@ const SignupPage: React.FC = () => {
   const toast = useToast();
 
   // handle input changes
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    const { name, value, type } = e.target;
   };
 
   const passwordStrength = (password: string) => {
@@ -119,6 +119,7 @@ const SignupPage: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
               <InputField
                 icon={User}
+                field="input"
                 name="firstName"
                 placeholder="First name"
                 value={formData.firstName}
@@ -126,6 +127,7 @@ const SignupPage: React.FC = () => {
               />
               <InputField
                 icon={User}
+                field="input"
                 name="lastName"
                 placeholder="Last name"
                 value={formData.lastName}
@@ -137,6 +139,7 @@ const SignupPage: React.FC = () => {
             <InputField
               icon={Mail}
               type="email"
+              field="input"
               name="email"
               placeholder="Email address"
               value={formData.email}
@@ -147,6 +150,7 @@ const SignupPage: React.FC = () => {
             {/* Password */}
             <InputField
               icon={Lock}
+              field="input"
               type="password"
               name="password1"
               placeholder="Password"
@@ -157,6 +161,7 @@ const SignupPage: React.FC = () => {
 
             {/* Confirm password */}
             <InputField
+              field="input"
               icon={Lock}
               type="password"
               name="password2"

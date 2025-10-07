@@ -1,15 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  Plus,
-  Users,
-  CheckCircle,
-  Clock,
-  AlertCircle,
-  MoreVertical,
-  Calendar,
-} from "lucide-react";
+import { Users, CheckCircle, Clock, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { apiService } from "@/services/apiService";
 import { useToast } from "@/components/providers/ToastProvider";

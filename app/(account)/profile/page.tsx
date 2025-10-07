@@ -44,40 +44,24 @@ const ProfilePage: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [editedProfile, setEditedProfile] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  useEffect(() => {
-    const getProfile = async () => {
-      try {
-        setLoading(true);
-        const response: UserProfile = await apiService.get("api/auth/user/");
-        setProfile(response);
-        setEditedProfile(response);
-      } catch (err) {
-        setError("Failed to fetch profile");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getProfile();
-  }, []);
-
-  const handleProfileUpdate = async () => {
-    if (!editedProfile) return;
-
+  const getProfile = async () => {
     try {
-      const response = await apiService.put("api/auth/user/", editedProfile);
+      setLoading(true);
+      const response: UserProfile = await apiService.get("api/auth/user/");
       setProfile(response);
-      setIsEditing(false);
-      toast.success("Profile updated successfully!");
-    } catch (error) {
-      toast.error("Failed to update profile. Please try again.");
+    } catch (err: any) {
+      toast.error(err.detail || "an error occured");
+    } finally {
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    getProfile();
+  }, []);
 
   const handleAvatarUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -90,36 +74,11 @@ const ProfilePage: React.FC = () => {
       const formData = new FormData();
       formData.append("avatar", file);
 
-      // Create preview URL
-      const previewUrl = URL.createObjectURL(file);
-      setEditedProfile((prev) => ({ ...prev, avatar: previewUrl }));
-
       toast.success("Avatar uploaded successfully!");
     } catch (error) {
       toast.error("Failed to upload avatar. Please try again.");
     }
   };
-
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-    bio: "",
-    country: "",
-    gender: "",
-  });
-
-  const handleChange =
-    (field: string) =>
-    (
-      e: React.ChangeEvent<
-        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-      >
-    ) => {
-      const value =
-        e.target.type === "checkbox" ? e.target.checked : e.target.value;
-      setFormData((prev) => ({ ...prev, [field]: value }));
-    };
 
   return (
     <div className="min-h-screen bg-primary">
@@ -129,9 +88,7 @@ const ProfilePage: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <Image
-                src={
-                  editedProfile?.profile.avatar || "/pngs/default-avatar/png"
-                }
+                src={profile?.profile.avatar || "/pngs/default-avatar/png"}
                 className=" rounded-full"
                 height={100}
                 width={100}
@@ -140,14 +97,6 @@ const ProfilePage: React.FC = () => {
             </div>
             <div className="flex items-center space-x-4">
               <div className="relative">
-                {isEditing && (
-                  <Button
-                    onClick={() => fileInputRef.current?.click()}
-                    className="absolute -bottom-1 -right-1 bg-blue-600 p-2 rounded-full hover:bg-blue-700 transition-colors"
-                  >
-                    <Camera size={14} />
-                  </Button>
-                )}
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -157,22 +106,9 @@ const ProfilePage: React.FC = () => {
                 />
               </div>
             </div>
-            <Button
-              onClick={() => {
-                if (isEditing) {
-                  handleProfileUpdate();
-                } else {
-                  setIsEditing(true);
-                  setEditedProfile(profile);
-                }
-              }}
-            >
-              {isEditing ? (
-                <Save size={16} className="mr-2" />
-              ) : (
-                <Edit3 size={16} className="mr-2" />
-              )}
-              {isEditing ? "Save Changes" : "Edit Profile"}
+            <Button>
+              <Edit3 size={16} className="mr-2" />
+              Edit
             </Button>
           </div>
         </div>
@@ -191,56 +127,32 @@ const ProfilePage: React.FC = () => {
                 label="First Name"
                 icon={User}
                 placeholder="Enter your Firstname"
-                value={editedProfile?.profile.first_name || ""}
-                onChange={(e) =>
-                  setEditedProfile((prev) =>
-                    prev
-                      ? {
-                          ...prev,
-                          profile: {
-                            ...prev.profile,
-                            first_name: e.target.value,
-                          },
-                        }
-                      : prev
-                  )
-                }
+                value={profile?.profile.first_name || ""}
+                onChange={(e) => e}
               />
               <InputField
                 field="input"
                 label="First Name"
                 icon={User}
                 placeholder="Enter your Firstname"
-                value={editedProfile?.profile.last_name || ""}
-                onChange={(e) =>
-                  setEditedProfile((prev) =>
-                    prev
-                      ? {
-                          ...prev,
-                          profile: {
-                            ...prev.profile,
-                            last_name: e.target.value,
-                          },
-                        }
-                      : prev
-                  )
-                }
+                value={profile?.profile.last_name || ""}
+                onChange={(e) => e}
               />
               <InputField
                 field="input"
                 label="email"
                 icon={User}
                 placeholder="Enter your email address"
-                value={editedProfile?.email || ""}
-                onChange={handleChange("username")}
+                value={profile?.email || ""}
+                onChange={(e) => e}
               />
               <InputField
                 field="input"
                 label="Phone"
                 icon={User}
                 placeholder="Enter your phone number"
-                value={editedProfile?.profile.phone_number || ""}
-                onChange={handleChange("username")}
+                value={profile?.profile.phone_number || ""}
+                onChange={(e) => e}
               />
             </div>
             <div>
@@ -248,24 +160,9 @@ const ProfilePage: React.FC = () => {
                 field="textarea"
                 label="Bio"
                 placeholder="Enter your Bio"
-                value={editedProfile?.profile.bio || ""}
-                onChange={handleChange("bio")}
+                value={profile?.profile.bio || ""}
+                onChange={(e) => e}
               />
-
-              {isEditing && (
-                <div className="mt-6 flex space-x-4">
-                  <Button onClick={handleProfileUpdate}>Save Changes</Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setIsEditing(false);
-                      setEditedProfile(profile);
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              )}
             </div>
           </div>
         </div>

@@ -3,11 +3,14 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { apiService } from "@/services/apiService";
 
+interface Profile {
+  avatar: string;
+}
 interface User {
   id: string;
   email: string;
   fullname?: string;
-  avatar?: string;
+  profile: Profile;
 }
 
 interface AuthContextType {
@@ -38,23 +41,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    const userCookie = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("session_user="))
-      ?.split("=")[1];
-
-    if (userCookie) {
-      try {
-        const parsed = JSON.parse(decodeURIComponent(userCookie));
-        setUser(parsed);
-        setLoading(false);
-        return;
-      } catch (err) {
-        console.error("Invalid cookie JSON", err);
-      }
-    }
-
-    // fallback to backend if not found
     fetchUser();
   }, []);
 

@@ -86,7 +86,10 @@ const ProjectSettingsPage = () => {
   const [showAddCollaboratorModal, setShowAddCollaboratorModal] =
     useState(false);
   const [showDeleteCollaboratorModal, setShowCollaboratorDeleteModal] =
-    useState({
+    useState<{
+      isOpen: boolean;
+      userId: string | null;
+    }>({
       isOpen: false,
       userId: null,
     });

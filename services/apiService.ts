@@ -1,6 +1,9 @@
 import { getAcessToken } from "@/lib/actions";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+// development
+// const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+// productiont
+const BASE_URL = process.env.NEXT_PUBLIC_PRODUCTION_API_URL;
 
 async function fetchWithCatch(
   url: string,

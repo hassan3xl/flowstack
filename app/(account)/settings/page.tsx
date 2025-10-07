@@ -105,9 +105,6 @@ const SettingsPage: React.FC = () => {
                     </label>
                     <select
                       value={settings.theme}
-                      onChange={(e) =>
-                        setSettings({ ...settings, theme: e.target.value })
-                      }
                       className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="light">Light</option>
@@ -120,13 +117,7 @@ const SettingsPage: React.FC = () => {
                     <label className="block text-sm font-medium text-gray-700">
                       Language
                     </label>
-                    <select
-                      value={settings.language}
-                      onChange={(e) =>
-                        setSettings({ ...settings, language: e.target.value })
-                      }
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
+                    <select value={settings.language}>
                       <option value="en">English</option>
                       <option value="es">Spanish</option>
                       <option value="fr">French</option>
@@ -142,12 +133,6 @@ const SettingsPage: React.FC = () => {
                     </label>
                     <select
                       value={settings.items_per_page}
-                      onChange={(e) =>
-                        setSettings({
-                          ...settings,
-                          items_per_page: parseInt(e.target.value),
-                        })
-                      }
                       className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="5">5</option>
@@ -166,12 +151,6 @@ const SettingsPage: React.FC = () => {
                       min="1"
                       max="365"
                       value={settings.default_due_date_days}
-                      onChange={(e) =>
-                        setSettings({
-                          ...settings,
-                          default_due_date_days: parseInt(e.target.value) || 7,
-                        })
-                      }
                       className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
@@ -183,12 +162,6 @@ const SettingsPage: React.FC = () => {
                       type="checkbox"
                       id="auto_archive_completed"
                       checked={settings.auto_archive_completed}
-                      onChange={(e) =>
-                        setSettings({
-                          ...settings,
-                          auto_archive_completed: e.target.checked,
-                        })
-                      }
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                     />
                     <label
@@ -204,7 +177,7 @@ const SettingsPage: React.FC = () => {
               <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
                 <button
                   type="button"
-                  className="px-4 py-2 text-sm font-medium text-gray-700  border border-secondary bg-secondary border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 text-sm font-medium text-gray-700  bg-secondary border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Reset Changes
                 </button>
@@ -239,12 +212,6 @@ const SettingsPage: React.FC = () => {
                       <input
                         type="checkbox"
                         checked={settings.enable_email_notifications}
-                        onChange={(e) =>
-                          setSettings({
-                            ...settings,
-                            enable_email_notifications: e.target.checked,
-                          })
-                        }
                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                       />
                     </div>
@@ -261,12 +228,6 @@ const SettingsPage: React.FC = () => {
                       <input
                         type="checkbox"
                         checked={settings.enable_push_notifications}
-                        onChange={(e) =>
-                          setSettings({
-                            ...settings,
-                            enable_push_notifications: e.target.checked,
-                          })
-                        }
                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                       />
                     </div>

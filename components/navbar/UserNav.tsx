@@ -8,10 +8,9 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 const UserNav: React.FC = () => {
-  const { user, loading, refreshUser } = useAuth();
+  const { user, loading } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  console.log(" user nav", user);
   // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -53,12 +52,8 @@ const UserNav: React.FC = () => {
     );
   }
 
-  const router = useRouter();
-
   const handleLogout = async () => {
     await resetAuthCookies();
-    document.cookie = "session_user=; path=/; max-age=0; sameSite=lax"; // clear client cookie
-    router.refresh();
   };
 
   return (

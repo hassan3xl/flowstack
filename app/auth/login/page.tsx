@@ -52,16 +52,15 @@ const LoginPage: React.FC = () => {
 
       if (response.access) {
         await handleLogin(response.user.id, response.access, response.refresh);
-        toast.success("Logged in successfully!");
         await refreshUser();
+        toast.success("Logged in successfully!");
+
         router.push("/dashboard");
       } else {
-        // backend responded without access (validation errors etc.)
-        handleBackendError(response, toast);
         setErrors(response);
       }
     } catch (error: any) {
-      handleBackendError(error, toast);
+      toast.error(error.detail);
     } finally {
       setLoading(false);
     }

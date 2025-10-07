@@ -89,8 +89,8 @@ const ForgotPasswordPage = () => {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <InputField
-              icon={Mail}
               type="email"
+              field="input"
               placeholder="Enter your email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}

@@ -40,13 +40,7 @@ const UserNav: React.FC = () => {
           href="/auth/login"
           className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-accent-hover transition-colors duration-200 hover:bg-gray-700 rounded-lg"
         >
-          Login
-        </Link>
-        <Link
-          href="/auth/signup"
-          className="px-4 py-2 text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200"
-        >
-          Sign Up
+          Signin
         </Link>
       </div>
     );
@@ -99,7 +93,7 @@ const UserNav: React.FC = () => {
       </button>
 
       {isDropdownOpen && (
-        <div className="absolute right-0 mt-2 w-56 bg-secondary border border-tertiary rounded-lg shadow-lg z-50 py-1">
+        <div className="absolute right-0 mt-2 w-[160px] bg-secondary border border-tertiary rounded-lg shadow-lg z-50 py-1">
           <div className="px-4 py-3 border-b border-gray-700">
             <p className="text-sm text-gray-400">Signed in as</p>
             <p className="text-sm font-medium text-gray-200 truncate">

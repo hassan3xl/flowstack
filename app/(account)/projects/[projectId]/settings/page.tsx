@@ -237,7 +237,7 @@ const ProjectSettingsPage = () => {
   };
 
   if (loading) {
-    <Loader variant="dots" title="Loading Settings" />;
+    return <Loader variant="dots" title="Loading Settings" />;
   }
 
   if (error || !projectSettings) {

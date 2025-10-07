@@ -88,7 +88,7 @@ const ProjectsPage = () => {
           {/* ✨ Enhanced Header Section */}
           <div
             className="bg-gradient-to-r from-secondary/80 to-secondary/60 backdrop-blur-sm 
-                    rounded-xl p-6 border border-tertiary/50 shadow-lg"
+                    rounded-xl sm:p-6 p-4 border border-tertiary/50 shadow-lg"
           >
             {/* Search and Filter Controls */}
             <div className="flex flex-row gap-3">
@@ -197,9 +197,7 @@ const ProjectsPage = () => {
 
           <div>
             <div className="flex justify-between items-center gap-2 mb-4">
-              <h2 className="text-lg font-semibold text-white">
-                Your Projects
-              </h2>
+              <h2 className="text-lg font-semibold text-white">All Projects</h2>
               <div className="flex gap-2">
                 <Button variant="outline">
                   <Link className="flex" href="projects/archives/">
@@ -209,7 +207,7 @@ const ProjectsPage = () => {
                 </Button>
                 <Button onClick={() => setModalOpen(true)} className="">
                   <Plus className="w-4 h-4 mr-2" />
-                  Add Project
+                  Create
                 </Button>
               </div>
             </div>
@@ -222,11 +220,8 @@ const ProjectsPage = () => {
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center py-16 px-6">
-          <div
-            className="bg-gradient-to-br from-secondary/50 to-secondary/30 backdrop-blur-sm 
-                    rounded-2xl p-12 border border-tertiary/30 text-center max-w-lg"
-          >
+        <div className="flex flex-col items-center justify-center py-16 px-4 sm:px-6">
+          <div className="bg-gradient-to-br mx-auto rounded-xl text-center max-w-lg">
             {/* Empty State Icon */}
             <div className="w-24 h-24 mx-auto mb-6 bg-secondary rounded-full flex items-center justify-center border border-white">
               <FolderPlus className="w-12 h-12 text-white" />

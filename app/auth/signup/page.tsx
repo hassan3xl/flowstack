@@ -85,25 +85,24 @@ const SignupPage: React.FC = () => {
 
       if (response.access) {
         handleLogin(response.user.id, response.access, response.refresh);
+        toast.success("User profile created successfully");
         router.push("/dashboard");
       } else {
-        const tmpErrors: Record<string, string> = {};
-        Object.entries(response).forEach(([key, value]) => {
-          tmpErrors[key] = String(value);
-        });
-        setErrors(tmpErrors);
+        setErrors(response.error);
+        // toast.error(errors.detail);
+        console.log(errors);
       }
     } catch (err: any) {
-      toast.error(err.detail);
+      toast.error(err.email);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex bg-primaryy">
+    <div className="min-h-screen flex overflow-hidden bg-primary">
       {/* Left side form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+      <div className="w-auto mx-auto lg:w-1/2 flex items-center justify-center p-4 sm:p-8">
         <div className="w-full max-w-md">
           {/* Header */}
           <div className="mb-8">

@@ -116,7 +116,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
 
   return (
     <div
-      className="bg-secondary rounded-xl p-2 sm:p-6 border border-tertiary/50 
+      className="bg-secondary rounded-xl p-4 sm:p-6 border border-tertiary/50 
       hover:border-accent-hover/50 transition-all duration-300 hover:shadow-xl hover:shadow-black/20 
       group relative backdrop-blur-sm hover:scale-[1.02] transform"
     >

@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -51,13 +52,22 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
         <div className="flex h-full flex-col">
           {/* Sidebar header */}
           <div className="flex h-16 items-center justify-between border-b border-border px-4">
-            {isOpen && <h2 className="text-lg font-semibold">Menu</h2>}
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="p-2 hover:bg-accent rounded-md transition-colors"
             >
               {isOpen ? "←" : "→"}
             </button>
+            {isOpen && (
+              <h2 className="text-lg font-semibold">
+                <Image
+                  src="/favicon.png"
+                  height={25}
+                  width={25}
+                  alt="Menu"
+                ></Image>
+              </h2>
+            )}
           </div>
 
           {/* Sidebar content */}

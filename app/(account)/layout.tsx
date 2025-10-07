@@ -11,7 +11,6 @@ interface MainLayoutProps {
 
 export default function MainLayout({ children }: MainLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const router = useRouter();
 
   return (
     <div className="h-screen flex flex-col">
@@ -24,7 +23,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
       </nav>
 
       {/* Body (Sidebar + Main content) */}
-      <div className="flex grow relative">
+      <div className="flex mt-14 grow relative">
         <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
         <main
@@ -32,7 +31,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             isSidebarOpen ? "md:ml-64" : "md:ml-20"
           }`}
         >
-          <div className="p-6">{children}</div>
+          <div className="p-2 md:p-6">{children}</div>
         </main>
       </div>
     </div>

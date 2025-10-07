@@ -36,9 +36,6 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
   );
   const isPublic = project.visibility === "public";
 
-  console.log("Project", project);
-  console.log(isOwner, isCollaborator, isPublic);
-
   // 🔹 Navigate to settings
   const gotoSettings = () => {
     if (!isOwner) {
@@ -119,7 +116,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
 
   return (
     <div
-      className="bg-secondary rounded-xl p-6 border border-tertiary/50 
+      className="bg-secondary rounded-xl p-2 sm:p-6 border border-tertiary/50 
       hover:border-accent-hover/50 transition-all duration-300 hover:shadow-xl hover:shadow-black/20 
       group relative backdrop-blur-sm hover:scale-[1.02] transform"
     >
@@ -128,7 +125,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2">
             <h3
-              className="font-bold text-lg text-white group-hover:text-accent cursor-pointer transition-colors truncate max-w-[220px]"
+              className="font-bold text-md sm:text-lg text-white group-hover:text-accent cursor-pointer transition-colors truncate max-w-[220px]"
               title={project.title}
             >
               {project.title}
@@ -149,7 +146,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
         </div>
         <div className="flex gap-4 ">
           {isOwner || isCollaborator ? (
-            <Button onClick={handleProjectClick}>Open Project</Button>
+            <Button onClick={handleProjectClick}>Open</Button>
           ) : isPublic ? (
             <Button
               onClick={handleRequestCollaboration}

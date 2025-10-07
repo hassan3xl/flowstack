@@ -3,6 +3,7 @@
 import Link from "next/link";
 import UserNav from "./UserNav";
 import Image from "next/image";
+import { Menu } from "lucide-react";
 
 interface NavbarProps {
   onMenuToggle: () => void;
@@ -11,14 +12,16 @@ interface NavbarProps {
 
 export function Navbar({ onMenuToggle, isSidebarOpen }: NavbarProps) {
   return (
-    <nav className="border-b border-secondary ml-6 px-4">
-      <div className="flex items-center justify-between">
+    // PRIMARY CHANGE: fixed, full-width, top, and high z-index
+    <nav className="fixed top-0 left-0 right-0 z-50 w-full border-b border-secondary bg-primary/90 backdrop-blur-sm">
+      {/* Container to handle padding and max width */}
+      <div className="px-4 sm:px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          {/* Mobile menu button */}
+          {/* Mobile menu button (on the left) */}
           <button
             onClick={onMenuToggle}
-            className="p-2 hover:bg-slate-600 rounded-md md:hidden"
-            aria-label="Toggle menu"
+            className="p-2 hover:bg-secondary/50 rounded-md md:hidden text-white"
+            aria-label="Toggle mobile menu"
           >
             <svg
               className="w-5 h-5"
@@ -44,41 +47,29 @@ export function Navbar({ onMenuToggle, isSidebarOpen }: NavbarProps) {
             </svg>
           </button>
 
-          {/* Desktop toggle button */}
+          {/* Desktop sidebar toggle button (visible on md screens and up) */}
           <button
             onClick={onMenuToggle}
-            className="hidden p-2 hover:bg-slate-600 rounded-md md:block"
+            className="hidden p-2 hover:bg-secondary/50 rounded-md md:block text-white"
             aria-label="Toggle sidebar"
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
+            <Menu />
           </button>
 
-          <span className="text-xl font-bold">
-            <Link href="/" className="rounded-md p-2">
-              <Image
-                src="/logo.png"
-                width={150}
-                height={5}
-                alt="FlowStack Logo"
-                className=""
-              ></Image>
-            </Link>
-          </span>
+          {/* Logo/App Name */}
+          <Link href="/" className="rounded-md p-2">
+            <Image
+              src="/logo.png"
+              width={150}
+              height={5}
+              alt="FlowStack Logo"
+              // Adjusted class for better fitting on small screens if logo is too wide
+              className="w-32 sm:w-[150px] h-auto"
+            />
+          </Link>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center">
           <UserNav />
         </div>
       </div>

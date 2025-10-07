@@ -12,7 +12,6 @@ export function formatDate(
   if (!isoString) return "";
 
   const date = new Date(isoString);
-  if (isNaN(date.getTime())) return "";
 
   return new Intl.DateTimeFormat(
     "en-US",
@@ -20,8 +19,6 @@ export function formatDate(
       year: "numeric",
       month: "short",
       day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
     }
   ).format(date);
 }

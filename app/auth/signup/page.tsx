@@ -35,21 +35,21 @@ const SignupPage: React.FC = () => {
   const toast = useToast();
 
   // handle input changes
+  // handle input changes
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
-    const { name, value, type } = e.target;
-  };
+    // 1. Destructure necessary properties from the event target
+    const { name, value, type, checked } = e.target as HTMLInputElement;
 
-  const passwordStrength = (password: string) => {
-    let strength = 0;
-    if (password.length >= 8) strength++;
-    if (/[A-Z]/.test(password)) strength++;
-    if (/[0-9]/.test(password)) strength++;
-    if (/[^A-Za-z0-9]/.test(password)) strength++;
-    return strength;
+    // 2. Update the state based on the input's name
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      // If the field is a checkbox, use 'checked' value; otherwise, use 'value'
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

@@ -110,7 +110,7 @@ const ProjectsPage = () => {
                   onChange={() => {}}
                   className="p-3 border-accent rounded-lg"
                   options={[
-                    { label: "🗂️ All Projects", value: "all" },
+                    { label: "🗂️ All", value: "all" },
                     { label: "⚡ Active", value: "active" },
                     { label: "✅ Completed", value: "completed" },
                     { label: "⚠️ Overdue", value: "overdue" },

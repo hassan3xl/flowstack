@@ -252,13 +252,13 @@ const ProjectSettingsPage = () => {
       : 0;
 
   return (
-    <div className="min-h-screen bg-primary text-white p-4 md:p-6">
+    <div className="min-h-screen bg-primary text-white px-2 py-4 md:p-6">
       <div className="max-w-5xl mx-auto space-y-6">
         {/* Header */}
         <div className="bg-gradient-to-r from-secondary to-secondary/80 backdrop-blur-sm p-6 rounded-xl shadow-lg border border-tertiary/50">
           <div className="flex items-center gap-3 mb-2">
             <Settings className="w-8 h-8 text-blue-400" />
-            <h1 className="text-3xl font-bold">Project Settings</h1>
+            <h1 className="text-lg sm:text-3xl font-bold">Project Settings</h1>
           </div>
           <p className="text-gray-300">
             Manage your project details, collaborators, and settings
@@ -271,7 +271,7 @@ const ProjectSettingsPage = () => {
             <div className="flex justify-between items-start">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
-                  <h2 className="text-2xl font-semibold text-white">
+                  <h2 className="text-md sm:text-2xl font-semibold text-white">
                     {projectSettings.title}
                   </h2>
                   <Badge
@@ -305,10 +305,7 @@ const ProjectSettingsPage = () => {
                   </div>
                 </div>
               </div>
-              <Button
-                onClick={() => setShowEditModal(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
-              >
+              <Button onClick={() => setShowEditModal(true)}>
                 <Edit3 className="w-4 h-4 mr-2" />
                 Edit
               </Button>
@@ -408,7 +405,6 @@ const ProjectSettingsPage = () => {
                     </p>
                   </div>
                 </div>
-                <span className="text-gray-500 text-sm">Cannot modify</span>
               </div>
             </div>
 
@@ -449,29 +445,7 @@ const ProjectSettingsPage = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      {/* Role Change Dropdown */}
-                      <div className="mt-6">
-                        <InputField
-                          field="select"
-                          label=""
-                          options={[
-                            { label: "Read", value: "read" },
-                            { label: "Write", value: "write" },
-                            { label: "Manage", value: "manage" },
-                          ]}
-                          value={user.role}
-                          disabled={changingRole === sharedAccess?.id}
-                          onChange={(e) => {
-                            const newRole = e.target.value;
-                            if (sharedAccess && newRole !== user.role) {
-                              handleChangeRole(sharedAccess.id, newRole);
-                            }
-                          }}
-                          className=""
-                        />
-                      </div>
-
+                    <div className="flex flex-col items-center gap-2">
                       <Button
                         onClick={() =>
                           setShowCollaboratorDeleteModal({
@@ -492,6 +466,27 @@ const ProjectSettingsPage = () => {
                           </>
                         )}
                       </Button>
+                      {/* Role Change Dropdown */}
+                      <div className="mt-2">
+                        <InputField
+                          field="select"
+                          label=""
+                          options={[
+                            { label: "Read", value: "read" },
+                            { label: "Write", value: "write" },
+                            { label: "Manage", value: "manage" },
+                          ]}
+                          value={user.role}
+                          disabled={changingRole === sharedAccess?.id}
+                          onChange={(e) => {
+                            const newRole = e.target.value;
+                            if (sharedAccess && newRole !== user.role) {
+                              handleChangeRole(sharedAccess.id, newRole);
+                            }
+                          }}
+                          className="my-1 py-1 text-xs sm:text-sm"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>

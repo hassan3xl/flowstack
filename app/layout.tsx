@@ -19,6 +19,23 @@ export const metadata: Metadata = {
   title: "FlowStack",
   description:
     "a collaborative project management platform where teams plan, assign, and complete tasks in real time. Organize projects, manage permissions, and keep your workflow in sync — all in one sleek, dark interface.",
+  manifest: "/manifest.json",
+  themeColor: "#ffffff",
+  icons: {
+    icon: [
+      {
+        url: "/icons/android/android-launchericon-192-192.png",
+        sizes: "192x192",
+        type: "image/png",
+      },
+      {
+        url: "/icons/android/android-launchericon-512-512.png",
+        sizes: "512x512",
+        type: "image/png",
+      },
+    ],
+    apple: [{ url: "/icons/ios/180.png", sizes: "180x180", type: "image/png" }],
+  },
 };
 
 export default function RootLayout({

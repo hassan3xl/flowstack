@@ -3,7 +3,7 @@
 import Link from "next/link";
 import UserNav from "./UserNav";
 import Image from "next/image";
-import { Menu } from "lucide-react";
+import { BellIcon, Menu } from "lucide-react";
 
 interface NavbarProps {
   onMenuToggle: () => void;
@@ -70,6 +70,9 @@ export function Navbar({ onMenuToggle, isSidebarOpen }: NavbarProps) {
         </div>
 
         <div className="flex items-center">
+          <Link href="/notifications">
+            <BellIcon />
+          </Link>
           <UserNav />
         </div>
       </div>

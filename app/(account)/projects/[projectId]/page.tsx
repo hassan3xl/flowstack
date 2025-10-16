@@ -1,17 +1,19 @@
 "use client";
 
 import Loader from "@/components/Loader";
-import AddProjectCollaboratorModal from "@/components/modals/AddProjectCollaborator";
-import AddTodoItemModal from "@/components/modals/AddProjectItemModal";
 import DeleteProjectItem from "@/components/modals/DeleteProjectItem";
 import EditProjectTaskModal from "@/components/modals/EditProjectTaskModal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { formatDate } from "@/lib/utils";
+import {
+  formatDate,
+  getStatusColor,
+  getPriorityColor,
+  getVisibilityBadge,
+} from "@/lib/utils";
 import { apiService } from "@/services/apiService";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-useToast;
 import {
   Calendar,
   Clock,
@@ -23,44 +25,28 @@ import {
   Plus,
   Edit3,
   Trash2,
-  Star,
   User,
   Flag,
+  MessageCircle,
 } from "lucide-react";
 import AddProjectItemModal from "@/components/modals/AddProjectItemModal";
 import { useToast } from "@/components/providers/ToastProvider";
+import CommentComponent from "@/components/projects/CommentComponent";
+import { ProjectDetailType } from "@/lib/types";
 
-export type ProjectDetailType = {
-  id: string;
-  title: string;
-  description: string;
-  item_count: number;
-  visibility: "private" | "public" | "shared";
-  owner_email: string;
-  created_at: string;
-  shared_users: Array<{
-    id: string;
-    user_id: string;
-    fullname: string;
-    avatar: string;
-    email: string;
-    role: string;
-  }>;
-  project_items: Array<{
-    id: string;
-    completed_at?: string;
-    started_by: {
-      fullname: string;
-      avatar: string;
-    };
-    title: string;
-    description: string;
-    status: string;
-    priority: string;
-    due_date: string | null;
-    is_important: boolean;
-    created_at: string;
-  }>;
+const getStatusIcon = (status: string) => {
+  switch (status.toLowerCase()) {
+    case "completed":
+      return <CheckCircle2 className="w-4 h-4 text-green-500" />;
+    case "in progress":
+      return <PlayCircle className="w-4 h-4 text-blue-500" />;
+    case "pending":
+      return <Clock className="w-4 h-4 text-yellow-500" />;
+    case "cancelled":
+      return <XCircle className="w-4 h-4 text-red-500" />;
+    default:
+      return <AlertCircle className="w-4 h-4 text-gray-500" />;
+  }
 };
 
 const ProjectDetailPage = () => {
@@ -69,8 +55,6 @@ const ProjectDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isProjectModalOpen, setProjectModalOpen] = useState(false);
-  const router = useRouter();
-
   const [deleteModalState, setDeleteModalState] = useState({
     isOpen: false,
     itemId: "",
@@ -88,8 +72,10 @@ const ProjectDetailPage = () => {
   const [taskActionLoading, setTaskActionLoading] = useState<string | null>(
     null
   );
+  const [openCommentId, setOpenCommentId] = useState<string | null>(null);
 
   const toast = useToast();
+  const router = useRouter();
 
   const fetchProject = async () => {
     setLoading(true);
@@ -117,6 +103,11 @@ const ProjectDetailPage = () => {
     fetchProject();
     toast.success("Task deleted successfully");
   };
+
+  const handleCommentSuccess = () => {
+    fetchProject();
+    toast.success("Comment added successfully");
+  }
 
   const handleEditSuccess = () => {
     fetchProject();
@@ -155,60 +146,6 @@ const ProjectDetailPage = () => {
 
   const gotoUserProfile = (id: string) => {
     router.push(`/users/${id}`);
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "completed":
-        return <CheckCircle2 className="w-4 h-4 text-green-500" />;
-      case "in progress":
-        return <PlayCircle className="w-4 h-4 text-blue-500" />;
-      case "pending":
-        return <Clock className="w-4 h-4 text-yellow-500" />;
-      case "cancelled":
-        return <XCircle className="w-4 h-4 text-red-500" />;
-      default:
-        return <AlertCircle className="w-4 h-4 text-gray-500" />;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "completed":
-        return "bg-green-100 text-green-800 border-green-200";
-      case "in progress":
-        return "bg-blue-100 text-blue-800 border-blue-200";
-      case "pending":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "cancelled":
-        return "bg-red-100 text-red-800 border-red-200";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority.toLowerCase()) {
-      case "high":
-        return "bg-red-100 text-red-800 border-red-200";
-      case "medium":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "low":
-        return "bg-green-100 text-green-800 border-green-200";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
-
-  const getVisibilityBadge = (visibility: string) => {
-    const colors = {
-      private: "bg-red-100 text-red-800",
-      public: "bg-green-100 text-green-800",
-      shared: "bg-blue-100 text-blue-800",
-    };
-    return (
-      colors[visibility as keyof typeof colors] || "bg-gray-100 text-gray-800"
-    );
   };
 
   const updateTaskStatus = (
@@ -284,7 +221,7 @@ const ProjectDetailPage = () => {
   if (!project) return <p className="text-gray-500">Project not found.</p>;
 
   return (
-    <div className="max-w-6xl mg:mx-auto space-y-6">
+    <div className="max-w-7xl md:mx-auto space-y-6">
       {/* Project Header */}
       <div className="bg-secondary p-2 rounded-xl shadow-lg border border-tertiary/50">
         <div className="flex justify-between items-start mb-4">
@@ -346,7 +283,7 @@ const ProjectDetailPage = () => {
                 <Users className="w-4 h-4" />
                 Collaborators
               </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-2  gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-2 gap-3">
                 {project.shared_users.map((user) => (
                   <div
                     key={user.user_id}
@@ -372,7 +309,7 @@ const ProjectDetailPage = () => {
 
       {/* Tasks List */}
       <div className="min-h-screen rounded-lg bg-secondary p-2 sm:p-4 md:p-8">
-        <div className="max-w-5xl  mx-auto space-y-6">
+        <div className="max-w-5xl mx-auto space-y-6">
           {/* Section Header */}
           <div className="flex items-center gap-3 mb-8">
             <div className="p-2 bg-blue-500/10 rounded-lg">
@@ -397,133 +334,144 @@ const ProjectDetailPage = () => {
           {project.project_items?.length > 0 ? (
             <div className="space-y-4">
               {project.project_items.map((item) => (
-                <div
-                  key={item.id}
-                  className="bg-tertiary rounded-2xl border border-slate-700/50 
-                         shadow-xl hover:shadow-2xl transition-all duration-300 hover:border-slate-600/50
-                         overflow-hidden group"
-                >
-                  <div className="px-2 py-4 sm:px-6">
-                    {/* Top Row: Status & Priority Badges */}
-                    <div className="flex items-center gap-2 mb-4">
-                      <span
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
-                          item.status
-                        )}`}
-                      >
-                        {getStatusIcon(item.status)}
-                        <span className="capitalize">
-                          {item.status.replace("_", " ")}
-                        </span>
-                      </span>
-
-                      {item.priority && (
+                <div key={item.id} className="space-y-4">
+                  <div className="bg-tertiary rounded-2xl border border-slate-700/50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:border-slate-600/50 overflow-hidden group">
+                    <div className="px-2 py-4 sm:px-6">
+                      {/* Top Row: Status & Priority Badges */}
+                      <div className="flex items-center gap-2 mb-4 flex-wrap">
                         <span
-                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${getPriorityColor(
-                            item.priority
+                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+                            item.status
                           )}`}
                         >
-                          <Flag className="w-3 h-3" />
-                          <span className="capitalize">{item.priority}</span>
-                        </span>
-                      )}
-
-                      {item.due_date && (
-                        <span className="ml-auto inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-slate-700/50 text-slate-300 border border-slate-600/30">
-                          <Calendar className="w-3 h-3" />
-                          {formatDate(item.due_date)}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Title */}
-                    <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-blue-300 transition-colors">
-                      {item.title}
-                    </h3>
-
-                    {/* Description */}
-                    <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                      {item.description}
-                    </p>
-
-                    {/* Meta Information Row */}
-                    <div className="flex items-center gap-4 mb-4 pb-4 border-b border-slate-700/50">
-                      {item.started_by && item.status !== "pending" && (
-                        <div className="flex items-center gap-2 text-sm text-gray-400">
-                          <User className="w-4 h-4 text-gray-500" />
-                          <span>
-                            Started by{" "}
-                            <span className="text-white font-medium">
-                              {item.started_by.fullname}
-                            </span>
+                          {getStatusIcon(item.status)}
+                          <span className="capitalize">
+                            {item.status.replace("_", " ")}
                           </span>
-                        </div>
-                      )}
+                        </span>
 
-                      {item.status === "completed" && item.completed_at && (
-                        <div className="flex items-center gap-2 text-sm text-green-400">
-                          <CheckCircle2 className="w-4 h-4" />
-                          <span>Completed {formatDate(item.completed_at)}</span>
-                        </div>
-                      )}
-                    </div>
+                        {item.priority && (
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${getPriorityColor(
+                              item.priority
+                            )}`}
+                          >
+                            <Flag className="w-3 h-3" />
+                            <span className="capitalize">{item.priority}</span>
+                          </span>
+                        )}
 
-                    {/* Action Buttons Row */}
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => openEditModal(item.id)}
-                          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
-                                 bg-slate-700/50 hover:bg-slate-700 text-white border border-slate-600/50
-                                 hover:border-slate-500 transition-all"
-                        >
-                          <Edit3 className="w-4 h-4" />
-                          Edit
-                        </button>
-
-                        <button
-                          onClick={() => openDeleteModal(item.id)}
-                          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
-                                 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30
-                                 hover:border-red-500/50 transition-all"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                          Delete
-                        </button>
+                        {item.due_date && (
+                          <span className="ml-auto inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-slate-700/50 text-slate-300 border border-slate-600/30">
+                            <Calendar className="w-3 h-3" />
+                            {formatDate(item.due_date)}
+                          </span>
+                        )}
                       </div>
 
-                      {item.status !== "completed" && (
-                        <div className="flex items-center gap-2">
-                          {item.status !== "in_progress" && (
-                            <button
-                              onClick={() => handleStartTask(item.id)}
-                              disabled={taskActionLoading === item.id}
-                              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
-                                     bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30
-                                     hover:border-blue-500/50 transition-all disabled:opacity-50"
-                            >
-                              {taskActionLoading === item.id
-                                ? "Starting..."
-                                : "Start Task"}
-                            </button>
-                          )}
-                          {item.status === "in_progress" && (
-                            <button
-                              onClick={() => handleCompleteTask(item.id)}
-                              disabled={taskActionLoading === item.id}
-                              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
-                                                             bg-green-500 hover:bg-green-600 text-white shadow-lg shadow-green-500/20
-                                                             hover:shadow-green-500/30 transition-all disabled:opacity-50"
-                            >
-                              {taskActionLoading === item.id
-                                ? "Completing..."
-                                : "Mark Complete"}
-                            </button>
-                          )}
+                      {/* Title */}
+                      <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-blue-300 transition-colors">
+                        {item.title}
+                      </h3>
+
+                      {/* Description */}
+                      <p className="text-gray-400 text-sm leading-relaxed mb-4">
+                        {item.description}
+                      </p>
+
+                      {/* Meta Information Row */}
+                      <div className="flex items-center gap-4 mb-4 pb-4 border-b border-slate-700/50">
+                        {item.started_by && item.status !== "pending" && (
+                          <div className="flex items-center gap-2 text-sm text-gray-400">
+                            <User className="w-4 h-4 text-gray-500" />
+                            <span>
+                              Started by{" "}
+                              <span className="text-white font-medium">
+                                {item.started_by.fullname}
+                              </span>
+                            </span>
+                          </div>
+                        )}
+
+                        {item.status === "completed" && item.completed_at && (
+                          <div className="flex items-center gap-2 text-sm text-green-400">
+                            <CheckCircle2 className="w-4 h-4" />
+                            <span>
+                              {formatDate(item.completed_at)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Action Buttons Row */}
+                      <div className="flex items-center justify-between gap-3 flex-wrap">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <Button
+                            onClick={() => openEditModal(item.id)}
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-slate-700/50 hover:bg-slate-700 text-white border border-slate-600/50 hover:border-slate-500 transition-all"
+                          >
+                            <Edit3 className="w-4 h-4" />
+                          </Button>
+
+                          <Button
+                            onClick={() => openDeleteModal(item.id)}
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 hover:border-red-500/50 transition-all"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+
+                          <Button
+                            onClick={() =>
+                              setOpenCommentId(
+                                openCommentId === item.id ? null : item.id
+                              )
+                            }
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border border-purple-500/30 hover:border-purple-500/50 transition-all"
+                          >
+                            <MessageCircle className="w-4 h-4" />(
+                            {item.comments.length || 0})
+                          </Button>
                         </div>
-                      )}
+
+                        {item.status !== "completed" && (
+                          <div className="flex items-center gap-2">
+                            {item.status !== "in_progress" && (
+                              <Button
+                                onClick={() => handleStartTask(item.id)}
+                                disabled={taskActionLoading === item.id}
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:border-blue-500/50 transition-all disabled:opacity-50"
+                              >
+                                {taskActionLoading === item.id
+                                  ? "Starting..."
+                                  : "Start Task"}
+                              </Button>
+                            )}
+                            {item.status === "in_progress" && (
+                              <Button
+                                onClick={() => handleCompleteTask(item.id)}
+                                disabled={taskActionLoading === item.id}
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-green-500 hover:bg-green-600 text-white shadow-lg shadow-green-500/20 hover:shadow-green-500/30 transition-all disabled:opacity-50"
+                              >
+                                {taskActionLoading === item.id
+                                  ? "Completing..."
+                                  : "Mark Complete"}
+                              </Button>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
+
+                  {/* Comment Input Section */}
+                  <CommentComponent
+                  onSucess={handleCommentSuccess}
+                    itemId={item.id}
+                    ProjectId={projectId as string}
+                    isOpen={openCommentId === item.id}
+                    onClose={() => setOpenCommentId(null)}
+                    comments={item.comments}
+                  />
                 </div>
               ))}
             </div>
@@ -542,6 +490,7 @@ const ProjectDetailPage = () => {
           )}
         </div>
       </div>
+
       {/* Modals */}
       <DeleteProjectItem
         isOpen={deleteModalState.isOpen}

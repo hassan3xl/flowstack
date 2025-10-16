@@ -194,7 +194,7 @@ export default function Dashboard() {
 
         {recent_projects.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
-            {projects.map((project) => (
+            {projects.slice(0, 3).map((project) => (
               <ProjectCard key={project.id} project={project} />
             ))}
           </div>

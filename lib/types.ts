@@ -1,3 +1,57 @@
+
+
+type Author = {
+  fullname: string;
+  avatar: string;
+  email: string;
+};
+
+export interface Comments {
+  id: string;
+  project_item: string;
+  author: Author;
+  content: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type ProjectItem = {
+  id: string;
+  completed_at?: string;
+  started_by: {
+    fullname: string;
+    avatar: string;
+  };
+  title: string;
+  description: string;
+  status: string;
+  priority: string;
+  due_date: string | null;
+  is_important: boolean;
+  created_at: string;
+  comments: Comments[];
+};
+
+export type SharedUsers = {
+  id: string;
+  user_id: string;
+  fullname: string;
+  avatar: string;
+  email: string;
+  role: string;
+};
+export type ProjectDetailType = {
+  id: string;
+  title: string;
+  description: string;
+  item_count: number;
+  visibility: "private" | "public" | "shared";
+  owner_email: string;
+  created_at: string;
+  project_items: ProjectItem[];
+  shared_users: SharedUsers[];
+};
+
 // ===============================
 // Root Dashboard Data Type
 // ===============================

@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import BaseModal from "./BaseModal";
 import { Button } from "@/components/ui/button";
 import { InputField } from "../input/InputField";
-import { apiService } from "@/services/apiService";
-import { useToast, handleBackendError } from "../providers/ToastProvider";
+import { apiService } from "@/lib/services/apiService";
+import { useToast } from "@/providers/ToastProvider";
 
 interface AddProjectCollaboratorModalProps {
   isOpen: boolean;

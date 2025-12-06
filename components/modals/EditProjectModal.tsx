@@ -1,104 +1,124 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import BaseModal from "./BaseModal";
 import { Button } from "@/components/ui/button";
-import { InputField } from "../input/InputField";
-import { apiService } from "@/services/apiService";
-import { useToast, handleBackendError } from "../providers/ToastProvider";
+import { useToast } from "@/providers/ToastProvider";
+import { useForm } from "react-hook-form";
+import { FormInput } from "../input/formInput";
+import { ProjectType } from "@/lib/types/project.types";
+import { useUpdateproject } from "@/lib/hooks/project.hook";
 
 interface EditProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
-  projectId: string;
-  initialTitle: string;
-  initialDescription: string;
-  initialVisibility: string;
+  serverId: string;
+  project: ProjectType;
 }
-const EditProjectModal = ({
+
+interface FormData {
+  title: string;
+  description: string;
+  status: "planning" | "active" | "on_hold" | "completed" | "archived";
+}
+
+const EditProjectModal: React.FC<EditProjectModalProps> = ({
   isOpen,
   onClose,
   onSuccess,
-  projectId,
-  initialTitle,
-  initialDescription,
-  initialVisibility,
-}: EditProjectModalProps) => {
-  const [title, setTitle] = useState(initialTitle);
-  const [description, setDescription] = useState(initialDescription);
-  const [visibility, setVisibility] = useState(initialVisibility || "private");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  serverId,
+  project,
+}) => {
   const toast = useToast();
+  const { mutateAsync: updateProject, isPending: loading } = useUpdateproject();
 
-  // Reset modal fields when opening
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FormData>({
+    defaultValues: {
+      title: "",
+      description: "",
+      status: "planning",
+    },
+  });
+
+  console.log("project", project);
+
+  // ✅ Load initial project data into the form
   useEffect(() => {
-    if (isOpen) {
-      setTitle(initialTitle);
-      setDescription(initialDescription);
-      setVisibility(initialVisibility || "private");
-      setError(null);
+    if (isOpen && project) {
+      reset({
+        title: project.title,
+        description: project.description,
+        status: project.status,
+      });
     }
-  }, [isOpen, initialTitle, initialDescription, initialVisibility]);
+  }, [isOpen, project, reset]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    const payload = {
-      title,
-      description,
-      visibility,
-    };
+  const onSubmit = async (data: FormData) => {
     try {
-      await apiService.put(`api/projects/${projectId}/`, payload);
-      if (onSuccess) onSuccess();
-      toast.success("Project updated successfully!");
+      await updateProject({
+        serverId,
+        projectId: project.id,
+        projectData: data,
+      });
+
+      toast.success("Project updated successfully");
+      onSuccess?.();
       onClose();
-    } catch (err) {
-      setError("Failed to update project.");
-      handleBackendError(err, toast);
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      toast.error("Failed to update project");
     }
   };
 
   return (
     <BaseModal isOpen={isOpen} onClose={onClose} title="Edit Project">
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <InputField
+      <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+        {/* Project Name */}
+        <FormInput
+          register={register}
+          name="title"
+          placeholder="Enter a name for your project"
           required
           field="input"
           label="Project Name"
-          type="text"
-          placeholder="Enter project name"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
         />
-        <InputField
+
+        {/* Description */}
+        <FormInput
+          register={register}
+          name="description"
+          placeholder="Enter a description for your project"
           required
-          field="textarea"
-          label="Description"
-          type="text"
-          placeholder="What is this project about?"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          field="input"
+          label="Project Description"
         />
-        <InputField
-          field="select"
-          label="Who will see this project?"
-          type="text"
-          value={visibility}
-          options={[
-            { label: "Private", value: "private" },
-            { label: "Shared", value: "shared" },
-            { label: "Public", value: "public" },
-          ]}
-          onChange={(e) => setVisibility(e.target.value)}
-        />
-        {error && <p className="text-sm text-red-500">{error}</p>}
-        <div className="flex justify-end space-x-2">
+
+        {/* ✅ Status Select */}
+        <div className="space-y-1">
+          <label className="text-sm font-medium">Status</label>
+          <select
+            {...register("status", { required: true })}
+            className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            <option value="planning">Planning</option>
+            <option value="active">Active</option>
+            <option value="on_hold">On Hold</option>
+            <option value="completed">Completed</option>
+            <option value="archived">Archived</option>
+          </select>
+
+          {errors.status && (
+            <p className="text-xs text-red-500">Status is required</p>
+          )}
+        </div>
+
+        {/* Actions */}
+        <div className="flex justify-end space-x-2 pt-4">
           <Button
             type="button"
             variant="outline"

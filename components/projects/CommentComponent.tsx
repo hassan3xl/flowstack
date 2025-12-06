@@ -4,10 +4,10 @@ import React, { useEffect, useState } from "react";
 import { InputField } from "../input/InputField";
 import { Button } from "../ui/button";
 import { Edit3, Send, Trash2, X } from "lucide-react";
-import { useToast } from "../providers/ToastProvider";
 import { ProjectItem, Comments } from "@/lib/types";
-import { apiService } from "@/services/apiService";
 import { formatDate } from "@/lib/utils";
+import { useToast } from "@/providers/ToastProvider";
+import { apiService } from "@/lib/services/apiService";
 
 interface CommentComponentProps {
   itemId: string;
@@ -46,10 +46,9 @@ const CommentComponent = ({
           content: commentText,
         }
       );
-          if (onSucess) onSucess();
+      if (onSucess) onSucess();
       onClose();
       setCommentText("");
-
     } catch (error: any) {
       console.error(error);
       toast.error(error?.detail || "Failed to add comment");

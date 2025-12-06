@@ -4,95 +4,76 @@ import React, { useState } from "react";
 import BaseModal from "./BaseModal";
 import { Button } from "@/components/ui/button";
 import { InputField } from "../input/InputField";
-import { apiService } from "@/services/apiService";
-import { useToast, handleBackendError } from "../providers/ToastProvider";
+import { apiService } from "@/lib/services/apiService";
+import { useAddproject } from "@/lib/hooks/project.hook";
+import { useToast } from "@/providers/ToastProvider";
+import { useForm } from "react-hook-form";
+import { FormInput } from "../input/formInput";
 
 interface AddProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess?: () => void; // callback after successful add
+  onSuccess?: () => void;
+  serverId: string;
+}
+
+interface FormData {
+  title: string;
+  description: string;
 }
 
 const AddProjectModal: React.FC<AddProjectModalProps> = ({
   isOpen,
   onClose,
   onSuccess,
+  serverId,
 }) => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [visibility, setVisibility] = useState("private");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
   const toast = useToast();
+  const { mutateAsync: addProject, isPending: loading } = useAddproject();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FormData>();
 
+  const onSubmit = async (data: FormData) => {
     try {
-      await apiService.post("api/projects/", {
-        title,
-        description,
-        visibility,
+      await addProject({
+        projectData: data,
+        serverId,
       });
-
-      if (onSuccess) onSuccess();
-      toast.success("Project created successfully!");
+      toast.success("Project added successfully");
+      reset();
       onClose();
-      setTitle("");
-      setDescription("");
-      setVisibility("private");
-    } catch (err) {
-      setError("Failed to add project.");
-      handleBackendError(err, toast);
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      toast.error("Failed to add project");
     }
   };
 
   return (
     <BaseModal isOpen={isOpen} onClose={onClose} title="Add Todo Project">
-      <form className="space-y-4" onSubmit={handleSubmit}>
+      <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
         {/* Project Name */}
-        <InputField
+        <FormInput
+          register={register}
+          name="title"
+          placeholder="Enter a name for your project"
           required
           field="input"
           label="Project Name"
-          type="text"
-          placeholder="Enter project name"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
         />
 
         {/* Description */}
-        <InputField
+        <FormInput
+          register={register}
+          name="description"
+          placeholder="Enter a description for your project"
           required
-          field="textarea"
-          label="Description"
-          type="text"
-          placeholder="What is this project about?"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          field="input"
+          label="Project Description"
         />
-
-        {/* Visibility */}
-        <InputField
-          field="select"
-          label="Who will see this project?"
-          type="text"
-          value={visibility}
-          options={[
-            { label: "Private", value: "private" },
-            { label: "Shared", value: "shared" },
-            { label: "Public", value: "public" },
-          ]}
-          onChange={(e) => setVisibility(e.target.value)}
-        />
-
-        {/* Error */}
-        {error && <p className="text-sm text-red-500">{error}</p>}
 
         {/* Actions */}
         <div className="flex justify-end space-x-2">

@@ -1,98 +1,71 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import Image from "next/image";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Button } from "../ui/button";
+import ServersPage from "../servers/Servers";
+import { ArrowLeft, ArrowRight, ChevronLeft } from "lucide-react";
+import AddServerModal from "../servers/AddServerModal";
+import { useSidebar } from "@/contexts/SidebarContext";
+import ServerInviteModal from "../servers/ServerInviteModal";
+import { useGetServerInvites } from "@/lib/hooks/server.hooks";
 
-interface SidebarProps {
-  isOpen: boolean;
-  setIsOpen: (isOpen: boolean) => void;
-}
-
-export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
+export function Sidebar() {
   const pathname = usePathname();
+  const [openAddServerModal, setOpenAddServerModal] = useState(false);
+  const [openServerInviteModal, setOpenServerInviteModal] = useState(false);
 
-  // Close sidebar on route change for mobile
+  const { isOpen, toggleSidebar, closeSidebar } = useSidebar();
+  const { data: invites } = useGetServerInvites();
+  console.log("invites", invites);
+
+  // Auto-close sidebar on route change (mobile only)
   useEffect(() => {
-    const handleRouteChange = () => {
-      if (window.innerWidth < 768) {
-        setIsOpen(false);
-      }
-    };
-    handleRouteChange();
-  }, [pathname, setIsOpen]);
-
-  const menuItems = [
-    { href: "/dashboard", label: "Dashboard", icon: "📊" },
-    { href: "/projects", label: "Projects", icon: "📁" },
-    { href: "/settings", label: "Settings", icon: "⚙️" },
-  ];
+    if (window.innerWidth < 768) {
+      closeSidebar();
+    }
+  }, [pathname, closeSidebar]);
 
   return (
     <>
-      {/* Overlay for mobile */}
+      {/* Mobile overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 md:hidden"
-          onClick={() => setIsOpen(false)}
+          className="fixed inset-0 z-40 bg-black/40 md:hidden"
+          onClick={closeSidebar}
         />
       )}
 
-      {/* Sidebar */}
-      <div
+      {/* Sidebar panel */}
+      <aside
         className={cn(
-          "fixed left-0 top-0 z-50 h-full bg-primary border-r border-border transition-all duration-300 ease-in-out",
+          "fixed z-50 otop-0 left-0 h-full bg-background border-r border-border transition-all duration-300 ease-in-out",
           isOpen
             ? "w-64 translate-x-0"
-            : "-translate-x-full md:translate-x-0 md:w-20"
+            : "w-20 -translate-x-full md:translate-x-0 md:w-26"
         )}
       >
-        <div className="flex h-full flex-col">
-          {/* Sidebar header */}
-          <div className="flex h-16 items-center justify-between border-b border-border px-4">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="p-2 hover:bg-accent rounded-md transition-colors"
-            >
-              {isOpen ? "←" : "→"}
-            </button>
-            {isOpen && (
-              <h2 className="text-lg font-semibold">
-                <Image
-                  src="/favicon.png"
-                  height={25}
-                  width={25}
-                  alt="Menu"
-                ></Image>
-              </h2>
-            )}
-          </div>
-
-          {/* Sidebar content */}
-          <div className="flex-1 overflow-y-auto p-4">
-            <nav className="space-y-2">
-              {menuItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    "flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
-                    pathname === item.href
-                      ? "bg-accent text-accent-foreground"
-                      : "text-muted-foreground",
-                    !isOpen && "justify-center"
-                  )}
-                >
-                  <span className="text-lg">{item.icon}</span>
-                  {isOpen && <span className="ml-3">{item.label}</span>}
-                </Link>
-              ))}
-            </nav>
+        <div className="flex flex-col h-full ">
+          {/* Scrollable content */}
+          <div className="flex-1 overflow-y-auto p-3">
+            <ServersPage
+              setOpenAddServerModal={setOpenAddServerModal}
+              setOpenServerInviteModal={setOpenServerInviteModal}
+              invites={invites}
+            />
           </div>
         </div>
-      </div>
+      </aside>
+      <AddServerModal
+        isOpen={openAddServerModal}
+        onClose={() => setOpenAddServerModal(false)}
+      />
+      <ServerInviteModal
+        isOpen={openServerInviteModal}
+        onClose={() => setOpenServerInviteModal(false)}
+        invites={invites}
+      />
     </>
   );
 }

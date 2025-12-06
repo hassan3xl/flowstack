@@ -29,7 +29,7 @@ const BaseModal: React.FC<BaseModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <div
-        className={`relative w-full ${sizeClasses[size]} bg-secondary rounded-lg shadow-lg p-6`}
+        className={`relative w-full ${sizeClasses[size]} bg-card border border-border rounded-lg shadow-lg p-6`}
       >
         {/* Header */}
         <div className="flex justify-between items-center border-b pb-3">

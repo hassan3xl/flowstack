@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { ThemeProvider } from "@/components/providers/Theme-Provider";
-import { ToastProvider } from "@/components/providers/ToastProvider";
 import { ServiceWorkerRegistration } from "@/contexts/ServiceWorkerRegistration";
+import { QueryProvider } from "@/providers/QueryProviders";
+import { ThemeProvider } from "@/providers/ThemeProvider";
+import { ToastProvider } from "@/providers/ToastProvider";
+import { SidebarProvider } from "@/contexts/SidebarContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -46,15 +48,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} bg-primary text-white antialiased`}
-      >
-        <AuthProvider>
-          <ToastProvider>
-            <ServiceWorkerRegistration />
-            {children}
-          </ToastProvider>
-        </AuthProvider>
+      <body>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <QueryProvider>
+            <AuthProvider>
+              <ToastProvider>
+                <ServiceWorkerRegistration />
+                <SidebarProvider>
+                  <>{children}</>
+                </SidebarProvider>{" "}
+              </ToastProvider>
+            </AuthProvider>
+          </QueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

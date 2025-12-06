@@ -9,7 +9,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   subtitle,
   image,
 }) => (
-  <div className="hidden lg:flex lg:w-1/2 bg-primary relative overflow-hidden">
+  <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
     <div className="absolute inset-0 bg-black/20"></div>
 
     {/* Animated background elements */}

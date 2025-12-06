@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import BaseModal from "./BaseModal";
-import { apiService } from "@/services/apiService";
 import { Button } from "../ui/button";
-import { InputField } from "../input/InputField";
-import { Folder } from "lucide-react";
-import { useToast } from "../providers/ToastProvider";
+import { useToast } from "@/providers/ToastProvider";
+import { useUpdateProjectItem } from "@/lib/hooks/project.hook";
+import { useForm } from "react-hook-form";
+import { FormInput } from "../input/formInput";
 
 type ProjectItemType = {
   id: string;
@@ -14,137 +14,134 @@ type ProjectItemType = {
   title: string;
   description: string;
   status: string;
-  priority: string;
+  priority: "high" | "medium" | "low";
   due_date: string | null;
   is_important: boolean;
   created_at: string;
 };
+
 interface EditProjectTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
+  serverId: string;
   projectId: string;
   itemId: string;
   initialData: ProjectItemType | null;
 }
 
+interface FormData {
+  title: string;
+  description: string;
+  priority: "high" | "medium" | "low";
+  due_date?: string | null;
+}
+
 const EditProjectTaskModal = ({
   isOpen,
   onClose,
-  onSuccess,
+  serverId,
   projectId,
   itemId,
   initialData,
 }: EditProjectTaskModalProps) => {
-  const [title, setTitle] = useState(initialData?.title || ""); // Assuming 'description' is used as 'title' in the modal form, which seems to be the case based on your input
-  const [description, setDescription] = useState(
-    initialData?.description || ""
-  );
-  const [priority, setPriority] = useState(initialData?.priority || "medium");
-  const [dueDate, setDueDate] = useState<string | null>(
-    initialData?.due_date || null
-  );
-  const [loading, setLoading] = useState(false);
   const toast = useToast();
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FormData>({
+    defaultValues: {
+      title: "",
+      description: "",
+      priority: "medium",
+      due_date: null,
+    },
+  });
+
+  const { mutateAsync: updateProjectItem, isPending: loading } =
+    useUpdateProjectItem();
 
   useEffect(() => {
     if (isOpen && initialData) {
-      // Note: If you want to use a separate 'title' field, you'll need to update your data structure.
-      // Assuming 'description' is what you want to edit as the main text.
-      setTitle(initialData.title);
-      setDescription(initialData.description);
-      setPriority(initialData.priority);
-      // Ensure due_date is in the correct format (YYYY-MM-DD) for HTML date input
-      setDueDate(
-        initialData.due_date ? initialData.due_date.split("T")[0] : null
-      );
-    } else if (!isOpen) {
-      // Optional: Reset state when the modal closes
-      setTitle("");
-      setDescription("");
-      setPriority("medium");
-      setDueDate(null);
+      reset({
+        title: initialData.title,
+        description: initialData.description,
+        priority: initialData.priority,
+        due_date: initialData.due_date
+          ? initialData.due_date.split("T")[0]
+          : null,
+      });
     }
-  }, [isOpen, initialData]);
+  }, [isOpen, initialData, reset]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    const payload = {
-      title,
-      description,
-      priority,
-      due_date: dueDate,
-      status: "pending",
-    };
-
+  const onSubmit = async (data: FormData) => {
     try {
-      await apiService.put(
-        `api/projects/${projectId}/items/${itemId}/`,
-        payload
-      );
-      if (onSuccess) onSuccess();
+      await updateProjectItem({
+        serverId,
+        projectId,
+        itemId,
+        projectData: data,
+      });
+
+      toast.success("Task updated successfully");
       onClose();
     } catch (err: any) {
-      toast.error(err?.detail);
-    } finally {
-      setLoading(false);
+      toast.error(err?.detail || "Failed to update task");
     }
   };
 
   return (
     <BaseModal isOpen={isOpen} onClose={onClose} title="Edit Project Task">
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        {/* item title */}{" "}
-        <InputField
-          required
-          field="input"
-          label="title"
-          type="text"
-          placeholder="title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
+      <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+        {/* Title */}
+        <FormInput register={register} name="title" label="Title" required />
+
         {/* Description */}
-        <InputField
+        <FormInput
+          register={register}
+          name="description"
+          label="Description"
           required
-          field="textarea"
-          label="description"
-          type="text"
-          placeholder="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
         />
+
         {/* Priority */}
-        <InputField
-          required
-          field="select"
-          label="priority"
-          type="text"
-          value={description}
-          options={[
-            { label: "Low", value: "low" },
-            { label: "Medium", value: "medium" },
-            { label: "High", value: "high" },
-          ]}
-          onChange={(e) => setPriority(e.target.value)}
-        />
+        <div className="space-y-1">
+          <label className="text-sm font-medium">Priority</label>
+          <select
+            {...register("priority", { required: true })}
+            className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            <option value="">Select priority</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+
+          {errors.priority && (
+            <p className="text-xs text-red-500">Priority is required</p>
+          )}
+        </div>
+
         {/* Due Date */}
-        <InputField
-          field="input"
-          type="date"
-          value={dueDate || ""}
-          label="due date"
-          onChange={(e) => setDueDate(e.target.value)}
-        />
+        <div className="space-y-1">
+          <label className="text-sm font-medium">Due Date (optional)</label>
+          <input
+            type="date"
+            {...register("due_date")}
+            className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+        </div>
+
         {/* Actions */}
-        <div className="flex justify-end space-x-2">
+        <div className="flex justify-end space-x-2 pt-4">
           <Button type="button" onClick={onClose} disabled={loading}>
             Cancel
           </Button>
           <Button type="submit" disabled={loading}>
-            {loading ? "saving..." : "save"}
+            {loading ? "Saving..." : "Save"}
           </Button>
         </div>
       </form>

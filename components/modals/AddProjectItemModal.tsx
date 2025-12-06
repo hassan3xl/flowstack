@@ -1,109 +1,110 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import BaseModal from "./BaseModal";
-import { apiService } from "@/services/apiService";
 import { Button } from "../ui/button";
-import { InputField } from "../input/InputField";
-import { Folder } from "lucide-react";
-import { useToast } from "../providers/ToastProvider";
+import { useToast } from "@/providers/ToastProvider";
+import { useAddProjectItem } from "@/lib/hooks/project.hook";
+import { useForm } from "react-hook-form";
+import { FormInput } from "../input/formInput";
 
 interface AddProjectItemModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess?: () => void;
   projectId: string;
+  serverId: string;
+}
+
+interface FormData {
+  title: string;
+  description: string;
+  priority: "high" | "medium" | "low";
+  due_date?: string;
 }
 
 const AddProjectItemModal = ({
   isOpen,
   onClose,
-  onSuccess,
   projectId,
+  serverId,
 }: AddProjectItemModalProps) => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [priority, setPriority] = useState("medium");
-  const [dueDate, setDueDate] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const { mutateAsync: addProjectItem, isPending: addingItem } =
+    useAddProjectItem();
 
   const toast = useToast();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FormData>();
 
-    const payload = {
-      title,
-      description,
-      priority,
-      due_date: dueDate,
-      status: "pending",
-    };
-
+  const onSubmit = async (data: FormData) => {
     try {
-      await apiService.post(`api/projects/${projectId}/items/`, payload);
-      if (onSuccess) onSuccess();
+      await addProjectItem({
+        projectData: data,
+        serverId,
+        projectId,
+      });
+
+      toast.success("Task added successfully");
+      reset();
       onClose();
-    } catch (err: any) {
-      toast.error(err.detail);
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      toast.error("Failed to add task");
     }
   };
 
   return (
     <BaseModal isOpen={isOpen} onClose={onClose} title="Add Task to Project">
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        {/* item title */}{" "}
-        <InputField
-          required
-          field="input"
-          label="Title"
-          type="text"
-          placeholder="Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
+      <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+        {/* Title */}
+        <FormInput register={register} name="title" label="Title" required />
+
         {/* Description */}
-        <InputField
-          required
-          field="textarea"
+        <FormInput
+          register={register}
+          name="description"
           label="Description"
-          type="text"
-          placeholder="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        {/* Priority */}
-        <InputField
           required
-          field="select"
-          label="Priority"
-          type="text"
-          value={description}
-          options={[
-            { label: "Low", value: "low" },
-            { label: "Medium", value: "medium" },
-            { label: "High", value: "high" },
-          ]}
-          onChange={(e) => setPriority(e.target.value)}
         />
+
+        {/* Priority Select */}
+        <div className="space-y-1">
+          <label className="text-sm font-medium">Priority</label>
+          <select
+            {...register("priority", { required: true })}
+            className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            <option value="">Select priority</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+
+          {errors.priority && (
+            <p className="text-xs text-red-500">Priority is required</p>
+          )}
+        </div>
+
         {/* Due Date */}
-        <InputField
-          field="input"
-          type="date"
-          value={dueDate || ""}
-          label="Due date"
-          onChange={(e) => setDueDate(e.target.value)}
-        />
+        <div className="space-y-1">
+          <label className="text-sm font-medium">Due Date (optional)</label>
+          <input
+            type="date"
+            {...register("due_date")}
+            className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+        </div>
+
         {/* Actions */}
-        <div className="flex justify-end space-x-2">
-          <Button type="button" onClick={onClose} disabled={loading}>
+        <div className="flex justify-end space-x-2 pt-4">
+          <Button type="button" onClick={onClose} disabled={addingItem}>
             Cancel
           </Button>
-          <Button type="submit" disabled={loading}>
-            {loading ? "Adding..." : "Add Task"}
+          <Button type="submit" disabled={addingItem}>
+            {addingItem ? "Adding..." : "Add Task"}
           </Button>
         </div>
       </form>

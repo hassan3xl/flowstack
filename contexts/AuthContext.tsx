@@ -1,57 +1,51 @@
-// contexts/AuthContext.tsx
 "use client";
+import { resetAuthCookies } from "@/lib/actions/auth.actions";
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { apiService } from "@/services/apiService";
 
-interface Profile {
-  avatar: string;
-}
-interface User {
-  id: string;
-  email: string;
-  fullname?: string;
-  profile: Profile;
-}
+import { User } from "@/lib/types/usert.ypes";
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  refreshUser: () => Promise<void>;
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
-  refreshUser: async () => {},
+  signOut: async () => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  console.log("User", user);
   const [loading, setLoading] = useState(true);
 
-  const fetchUser = async () => {
+  useEffect(() => {
     try {
-      const res = await apiService.get("api/auth/user/");
-      setUser(res);
-    } catch {
-      setUser(null);
+      const cookies = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("session_user="));
+      if (cookies) {
+        const value = cookies.split("=")[1];
+        const parsed = JSON.parse(decodeURIComponent(value));
+        setUser(parsed);
+      }
+    } catch (err) {
+      console.error("Failed to parse session_user cookie", err);
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchUser();
   }, []);
 
+  const signOut = async () => {
+    await resetAuthCookies();
+    setUser(null);
+    window.location.href = "/"; // redirect after logout
+  };
+
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        refreshUser: fetchUser,
-      }}
-    >
+    <AuthContext.Provider value={{ user, loading, signOut }}>
       {children}
     </AuthContext.Provider>
   );

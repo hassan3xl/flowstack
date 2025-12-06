@@ -2,11 +2,11 @@
 
 import React, { useState } from "react";
 import BaseModal from "./BaseModal";
-import { apiService } from "@/services/apiService";
 import { Button } from "../ui/button";
 import { InputField } from "../input/InputField";
 import { Folder } from "lucide-react";
-import { useToast } from "../providers/ToastProvider";
+import { useToast } from "@/providers/ToastProvider";
+import { apiService } from "@/lib/services/apiService";
 
 interface DeleteProjectItemProps {
   isOpen: boolean;

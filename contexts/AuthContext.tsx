@@ -1,11 +1,10 @@
 "use client";
 import { resetAuthCookies } from "@/lib/actions/auth.actions";
+import { UserType } from "@/lib/types/user.types";
 import React, { createContext, useContext, useState, useEffect } from "react";
 
-import { User } from "@/lib/types/usert.ypes";
-
 interface AuthContextType {
-  user: User | null;
+  user: UserType | null;
   loading: boolean;
   signOut: () => Promise<void>;
 }
@@ -17,7 +16,7 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserType | null>(null);
   console.log("User", user);
   const [loading, setLoading] = useState(true);
 

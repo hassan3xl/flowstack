@@ -1,20 +1,43 @@
+"use client";
+
 import { Navbar } from "@/components/navbar/Navbar";
 import { ServerNavbar } from "@/components/navbar/ServerNavbar";
 import { ServerSidebar } from "@/components/sidebar/ServerSidebar";
+import { TransitionLoader } from "@/components/TransitionLoader";
 import { ServerContextProvider } from "@/contexts/ServerContext";
-import React, { use } from "react";
+import { useRouter } from "next/navigation";
+import React, { use, useEffect, useState } from "react";
 
-interface MainLayoutProps {
+interface ServerLayoutProps {
   children: React.ReactNode;
   params: Promise<{ serverId: string }>;
 }
 
-export default function MainLayout({ children, params }: MainLayoutProps) {
+export default function ServerLayout({ children, params }: ServerLayoutProps) {
   const resolvedParams = use(params);
   const { serverId } = resolvedParams;
+  const router = useRouter();
+  const [showTransition, setShowTransition] = useState(false);
+
+  useEffect(() => {
+    // Check if we should show transition
+    const shouldTransition = sessionStorage.getItem("showTransition");
+    if (shouldTransition === "true") {
+      setShowTransition(true);
+      sessionStorage.removeItem("showTransition");
+    }
+  }, []);
+
+  const handleTransitionComplete = () => {
+    setShowTransition(false);
+  };
 
   return (
     <ServerContextProvider serverId={serverId}>
+      <TransitionLoader
+        isActive={showTransition}
+        onComplete={handleTransitionComplete}
+      />
       <div className="bg-background text-foreground min-h-screen">
         <ServerNavbar />
 

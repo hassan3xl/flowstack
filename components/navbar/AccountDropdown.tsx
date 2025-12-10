@@ -35,7 +35,7 @@ export function AccountDropdown() {
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium leading-none">
-                      {user.profile?.first_name || "User"}
+                      {user.username || "User"}
                     </p>
                     <p className="text-xs text-muted-foreground">
                       {user.email}
@@ -51,16 +51,6 @@ export function AccountDropdown() {
                   >
                     <User className="h-4 w-4" />
                     Account
-                  </Link>
-                </DropdownMenuItem>
-
-                <DropdownMenuItem asChild>
-                  <Link
-                    href="/account/store"
-                    className="cursor-pointer flex items-center gap-2"
-                  >
-                    <User className="h-4 w-4" />
-                    My Store
                   </Link>
                 </DropdownMenuItem>
 
@@ -84,7 +74,7 @@ export function AccountDropdown() {
             </DropdownMenu>
           ) : (
             <Link
-              href="/auth/sign-in"
+              href="/auth/signin"
               className="flex items-center gap-2 border border-border p-2 rounded-full"
             >
               <User2 />

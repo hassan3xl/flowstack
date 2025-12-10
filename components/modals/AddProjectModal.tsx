@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { InputField } from "../input/InputField";
 import { apiService } from "@/lib/services/apiService";
 import { useAddproject } from "@/lib/hooks/project.hook";
-import { useToast } from "@/providers/ToastProvider";
+import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { FormInput } from "../input/formInput";
 
@@ -28,7 +28,6 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
   onSuccess,
   serverId,
 }) => {
-  const toast = useToast();
   const { mutateAsync: addProject, isPending: loading } = useAddproject();
 
   const {

@@ -11,7 +11,7 @@ import {
 } from "@/lib/hooks/server.hooks";
 import { formatDate } from "@/lib/utils";
 import { InvitesType } from "@/lib/types/server.types";
-import { useToast } from "@/providers/ToastProvider";
+import { toast } from "sonner";
 
 interface ServerInviteModalProps {
   isOpen: boolean;
@@ -24,7 +24,6 @@ const ServerInviteModal = ({
   onClose,
   invites,
 }: ServerInviteModalProps) => {
-  const toast = useToast();
   const [activeInviteId, setActiveInviteId] = useState<string | null>(null);
 
   const { mutateAsync: acceptInvite, isPending: accepting } =

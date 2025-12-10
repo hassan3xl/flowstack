@@ -3,22 +3,11 @@
 import React, { useEffect } from "react";
 import BaseModal from "./BaseModal";
 import { Button } from "../ui/button";
-import { useToast } from "@/providers/ToastProvider";
+import { toast } from "sonner";
 import { useUpdateProjectItem } from "@/lib/hooks/project.hook";
 import { useForm } from "react-hook-form";
 import { FormInput } from "../input/formInput";
-
-type ProjectItemType = {
-  id: string;
-  completed_at?: string | null;
-  title: string;
-  description: string;
-  status: string;
-  priority: "high" | "medium" | "low";
-  due_date: string | null;
-  is_important: boolean;
-  created_at: string;
-};
+import { ProjectItemType } from "@/lib/types/project.types";
 
 interface EditProjectTaskModalProps {
   isOpen: boolean;
@@ -33,7 +22,7 @@ interface EditProjectTaskModalProps {
 interface FormData {
   title: string;
   description: string;
-  priority: "high" | "medium" | "low";
+  priority: string;
   due_date?: string | null;
 }
 
@@ -45,8 +34,6 @@ const EditProjectTaskModal = ({
   itemId,
   initialData,
 }: EditProjectTaskModalProps) => {
-  const toast = useToast();
-
   const {
     register,
     handleSubmit,

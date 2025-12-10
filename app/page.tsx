@@ -21,6 +21,7 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -60,10 +61,7 @@ export default function LandingPage() {
               onClick={navigate}
               className="flex items-center space-x-2"
             >
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <Zap className="w-6 h-6 text-primary-foreground" />
-              </div>
-              <span className="text-2xl font-bold">TeamSync</span>
+              <Image src="/logo.png" height={200} width={200} alt="logo" />
             </Button>
 
             {/* Desktop Menu */}
@@ -522,7 +520,7 @@ export default function LandingPage() {
   );
 }
 
-function FeatureCard({ icon, title, description }) {
+function FeatureCard({ icon, title, description }: { [key: string]: any }) {
   return (
     <div className="bg-card p-6 rounded-lg border hover:shadow-lg transition group">
       <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition">
@@ -534,7 +532,7 @@ function FeatureCard({ icon, title, description }) {
   );
 }
 
-function StepCard({ number, title, description }) {
+function StepCard({ number, title, description }: { [key: string]: any }) {
   return (
     <div className="relative">
       <div className="text-center">
@@ -548,7 +546,15 @@ function StepCard({ number, title, description }) {
   );
 }
 
-function PricingCard({ name, price, description, features, highlighted }) {
+function PricingCard({
+  name,
+  price,
+  description,
+  features,
+  highlighted,
+}: {
+  [key: string]: any;
+}) {
   return (
     <div
       className={`bg-card rounded-lg border p-8 ${
@@ -578,7 +584,7 @@ function PricingCard({ name, price, description, features, highlighted }) {
         Get Started
       </button>
       <ul className="space-y-3">
-        {features.map((feature, index) => (
+        {features.map(({ feature, index }: { [key: string]: any }) => (
           <li key={index} className="flex items-start space-x-3">
             <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
             <span className="text-sm">{feature}</span>

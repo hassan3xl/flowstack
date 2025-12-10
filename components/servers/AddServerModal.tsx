@@ -16,14 +16,14 @@ interface AddServerModalProps {
   onClose: () => void;
 }
 
-interface ServerData {
+interface FormData {
   name: string;
   description: string;
   server_type: "pubic" | "private";
 }
 
 const AddServerModal = ({ isOpen, onClose }: AddServerModalProps) => {
-  const [view, setView] = useState("main"); // "main", "create", "join"
+  const [view, setView] = useState("main");
   const [inviteLink, setInviteLink] = useState("");
   const router = useRouter();
 
@@ -31,16 +31,15 @@ const AddServerModal = ({ isOpen, onClose }: AddServerModalProps) => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+  } = useForm<FormData>();
 
   const { mutateAsync: createServer, isPending } = useCreateServer();
 
-  const handleCreateServer = (data: ServerData) => {
-    createServer(data, {
-      onSuccess: () => {
-        setView("main");
-      },
-    });
+  const onSubmit = async (data: FormData) => {
+    try {
+      await createServer({ serverData: data });
+      onClose();
+    } catch (error) {}
   };
 
   const handleJoinServer = () => {
@@ -49,7 +48,8 @@ const AddServerModal = ({ isOpen, onClose }: AddServerModalProps) => {
   };
 
   const handleBrowsePublicServers = () => {
-    router.push("/communities");
+    onClose();
+    router.push("/communities/explore/");
   };
 
   const renderMainView = () => (
@@ -106,7 +106,7 @@ const AddServerModal = ({ isOpen, onClose }: AddServerModalProps) => {
         ← Back
       </button>
 
-      <form onSubmit={handleSubmit(handleCreateServer)} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="flex justify-center mb-6">
           <div className="p-4 rounded-full bg-blue-100 dark:bg-blue-900/50">
             <Hash className="w-12 h-12 text-blue-600 dark:text-blue-400" />
@@ -181,7 +181,7 @@ const AddServerModal = ({ isOpen, onClose }: AddServerModalProps) => {
 
         <InputField
           label="Invite Link"
-          placeholder="https://discord.gg/example or example123"
+          placeholder=""
           value={inviteLink}
           onChange={(e) => setInviteLink(e.target.value)}
         />
@@ -195,7 +195,6 @@ const AddServerModal = ({ isOpen, onClose }: AddServerModalProps) => {
             Cancel
           </Button>
           <Button
-            variant="primary"
             onClick={handleJoinServer}
             className="flex-1"
             disabled={!inviteLink.trim()}

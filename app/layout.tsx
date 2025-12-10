@@ -5,18 +5,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ServiceWorkerRegistration } from "@/contexts/ServiceWorkerRegistration";
 import { QueryProvider } from "@/providers/QueryProviders";
 import { ThemeProvider } from "@/providers/ThemeProvider";
-import { ToastProvider } from "@/providers/ToastProvider";
 import { SidebarProvider } from "@/contexts/SidebarContext";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "FlowStack",
@@ -52,12 +42,11 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <QueryProvider>
             <AuthProvider>
-              <ToastProvider>
-                <ServiceWorkerRegistration />
-                <SidebarProvider>
-                  <>{children}</>
-                </SidebarProvider>{" "}
-              </ToastProvider>
+              <ServiceWorkerRegistration />
+              <SidebarProvider>
+                <Toaster richColors position="top-right" />
+                <>{children}</>
+              </SidebarProvider>{" "}
             </AuthProvider>
           </QueryProvider>
         </ThemeProvider>

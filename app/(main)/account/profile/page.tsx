@@ -20,7 +20,7 @@ import {
   Upload,
 } from "lucide-react";
 import { InputField } from "@/components/input/InputField";
-import { useToast } from "@/providers/ToastProvider";
+import { toast } from "sonner";
 import { apiService } from "@/lib/services/apiService";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -40,7 +40,6 @@ interface UserProfile {
 }
 
 const ProfilePage: React.FC = () => {
-  const toast = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [loading, setLoading] = useState(true);
@@ -116,7 +115,7 @@ const ProfilePage: React.FC = () => {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="lg:col-span-2">
-          <div className="text-white rounded-xl shadow-sm p-6">
+          {/* <div className="text-white rounded-xl shadow-sm p-6">
             <h2 className="text-xl font-semibold mb-6 text-gray-200">
               Personal Information
             </h2>
@@ -164,7 +163,7 @@ const ProfilePage: React.FC = () => {
                 onChange={(e) => e}
               />
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

@@ -5,7 +5,7 @@ import BaseModal from "./BaseModal";
 import { Button } from "../ui/button";
 import { InputField } from "../input/InputField";
 import { Folder } from "lucide-react";
-import { useToast } from "@/providers/ToastProvider";
+import { toast } from "sonner";
 import { apiService } from "@/lib/services/apiService";
 
 interface DeleteProjectModalProps {
@@ -24,8 +24,6 @@ const DeleteCollaboratorModal = ({
   userId,
 }: DeleteProjectModalProps) => {
   const [loading, setLoading] = useState(false);
-
-  const toast = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

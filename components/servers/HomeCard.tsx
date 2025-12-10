@@ -1,30 +1,34 @@
 "use client";
 
+import { useSidebar } from "@/contexts/SidebarContext";
+import { Home } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export default function HomeCard() {
   const router = useRouter();
+  const { isOpen } = useSidebar();
 
   return (
     <div
       onClick={() => router.push(`/home`)}
-      className="border rounded-lg p-1 shadow-sm hover:shadow-md bg-red-800 cursor-pointer transition"
+      className="border rounded-lg p-1 shadow-sm hover:shadow-md bg-muted/50 cursor-pointer transition"
     >
       <div className="flex items-center gap-4">
         {/* Icon */}
-        <div className="w-16 h-16 flex-shrink-0">
-          <Image
-            src="/homeIcon.png"
-            alt="message icon"
-            width={64}
-            height={64}
-            className="rounded-lg object-cover w-full h-full"
-            unoptimized
-          />
+        <div className="w-16 h-16 items-center flex-shrink-0">
+          <Home size={60} />
         </div>
 
         {/* Text */}
+        <div className="flex flex-col md:hidden">
+          {isOpen && (
+            <div>
+              <p>Home</p>
+              <p>coming soon</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

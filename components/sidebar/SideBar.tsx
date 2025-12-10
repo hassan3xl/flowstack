@@ -20,13 +20,6 @@ export function Sidebar() {
   const { data: invites } = useGetServerInvites();
   console.log("invites", invites);
 
-  // Auto-close sidebar on route change (mobile only)
-  useEffect(() => {
-    if (window.innerWidth < 768) {
-      closeSidebar();
-    }
-  }, [pathname, closeSidebar]);
-
   return (
     <>
       {/* Mobile overlay */}
@@ -40,19 +33,20 @@ export function Sidebar() {
       {/* Sidebar panel */}
       <aside
         className={cn(
-          "fixed z-50 otop-0 left-0 h-full bg-background border-r border-border transition-all duration-300 ease-in-out",
+          "fixed z-50 otop-0 left-0 h-full bg-sidebar border-r border-border transition-all duration-300 ease-in-out",
           isOpen
-            ? "w-64 translate-x-0"
-            : "w-20 -translate-x-full md:translate-x-0 md:w-26"
+            ? "w-full sm:w-27 translate-x-0"
+            : "w-27 -translate-x-full md:translate-x-0 md:w-26"
         )}
       >
         <div className="flex flex-col h-full ">
           {/* Scrollable content */}
-          <div className="flex-1 overflow-y-auto p-3">
+          <div className="flex-1 p-3">
             <ServersPage
               setOpenAddServerModal={setOpenAddServerModal}
               setOpenServerInviteModal={setOpenServerInviteModal}
               invites={invites}
+              isOpen={isOpen}
             />
           </div>
         </div>

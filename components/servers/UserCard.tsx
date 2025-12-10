@@ -1,10 +1,12 @@
 "use client";
 
+import { useSidebar } from "@/contexts/SidebarContext";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export default function UserCard() {
   const router = useRouter();
+  const { isOpen } = useSidebar();
 
   return (
     <div
@@ -25,6 +27,14 @@ export default function UserCard() {
         </div>
 
         {/* Text */}
+        <div className="flex flex-col md:hidden">
+          {isOpen && (
+            <div>
+              <p>Home</p>
+              <p>coming soon</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

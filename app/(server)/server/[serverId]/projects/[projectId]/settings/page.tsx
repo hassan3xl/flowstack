@@ -18,14 +18,17 @@ import {
   Clock,
   Crown,
   Settings,
+  User,
+  ShieldCheck,
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import Loader from "@/components/Loader";
 import DeleteCollaboratorModal from "@/components/modals/DeleteCollaboratorModal";
-import { useToast } from "@/providers/ToastProvider";
+import { toast } from "sonner";
 import { useGetProject } from "@/lib/hooks/project.hook";
 import { useServer } from "@/contexts/ServerContext";
+import { formatDate } from "@/lib/utils";
 
 const ProjectSettingsPage = () => {
   const [showAddCollaboratorModal, setShowAddCollaboratorModal] =
@@ -42,7 +45,7 @@ const ProjectSettingsPage = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const router = useRouter();
-  const toast = useToast();
+
   const params = useParams();
   const { projectId } = params;
   const { serverId } = useServer();
@@ -52,22 +55,6 @@ const ProjectSettingsPage = () => {
     projectId as string
   );
 
-  const HandleSuccessAddCollab = () => {
-    setShowAddCollaboratorModal(false);
-  };
-
-  const handleDeleteCollaboratorSuccess = () => {
-    toast.success("Collaborator removed successfully");
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
   if (loading) {
     return <Loader variant="dots" title="Loading Settings" />;
   }
@@ -76,12 +63,15 @@ const ProjectSettingsPage = () => {
     return;
   }
 
-  // const completionRate =
-  //   project.item_count > 0
-  //     ? Math.round(
-  //         (project.completed_count / project.item_count) * 100
-  //       )
-  //     : 0;
+  const handleUpdateRole = (collaboratorId: string, newRole: string) => {
+    console.log(`Updating ${collaboratorId} to ${newRole}`);
+    // Add your fetch/axios logic here
+  };
+
+  const handleRemoveCollaborator = (collaboratorId: string) => {
+    console.log(`Removing ${collaboratorId}`);
+    // Add your delete logic here
+  };
 
   return (
     <div className="min-h-screen">
@@ -159,7 +149,7 @@ const ProjectSettingsPage = () => {
             </div>
             <div className="bg-accent p-4 rounded-lg border border-border text-center">
               <div className="text-3xl font-bold text-purple-400">
-                {/* {project.shared_users.length} */}
+                {project.collaborators.length}
               </div>
               <div className="text-sm text-gray-400 mt-1 flex items-center justify-center gap-1">
                 <Users className="w-3 h-3" />
@@ -177,13 +167,11 @@ const ProjectSettingsPage = () => {
                 <Users className="w-6 h-6 text-purple-400" />
                 <h2 className="text-xl font-semibold">Collaborators</h2>
                 <Badge className="bg-purple-100 text-purple-800">
-                  {/* {project.shared_users.length + 1} */}
+                  {project.collaborators.length + 1}
                 </Badge>
               </div>
               <Button
                 onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
                   setShowAddCollaboratorModal(true);
                 }}
                 className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
@@ -194,33 +182,58 @@ const ProjectSettingsPage = () => {
             </div>
           </div>
 
-          <div className="p-6 space-y-3">
-            {/* Owner */}
-            <div className="bg-gradient-to-r from-yellow-600/10 to-orange-600/10 p-4 rounded-lg border border-yellow-600/30">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3 flex-1">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white font-bold">
-                    <Crown className="w-5 h-5" />
+          <div className="space-y-3">
+            {project.collaborators.map((collab) => (
+              <div
+                key={collab.id}
+                className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-zinc-900/50 border border-zinc-800 p-4 rounded-xl gap-4 hover:border-yellow-600/30 transition-colors"
+              >
+                {/* Left Side: User Info */}
+                <div className="flex items-center gap-3">
+                  {/* Avatar Placeholder */}
+                  <div className="h-10 w-10 rounded-full bg-yellow-600/20 flex items-center justify-center text-yellow-500">
+                    <User size={20} />
                   </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-white">
-                        {project?.created_by}
-                      </span>
-                      <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200 flex items-center gap-1">
-                        <Crown className="w-3 h-3" />
-                        Owner
-                      </Badge>
-                    </div>
+
+                  <div>
+                    <p className="font-semibold text-white">
+                      {collab?.user?.username || "Unknown User"}
+                    </p>
                     <p className="text-sm text-gray-400">
-                      Full access & control
+                      {collab?.user?.email}
                     </p>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            {/* Shared Users */}
+                {/* Right Side: Actions */}
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                  {/* Role Selector (Update Role) */}
+                  <div className="relative flex-1 sm:flex-none">
+                    <ShieldCheck className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400 pointer-events-none" />
+                    <select
+                      defaultValue={collab.permission}
+                      onChange={(e) =>
+                        handleUpdateRole(collab.id, e.target.value)
+                      }
+                      className="pl-9 pr-8 py-2 w-full sm:w-32 bg-zinc-950 border border-zinc-700 rounded-lg text-sm text-gray-300 focus:ring-2 focus:ring-yellow-600 focus:border-transparent outline-none appearance-none cursor-pointer hover:bg-zinc-900"
+                    >
+                      <option value="VIEWER">Viewer</option>
+                      <option value="EDITOR">Editor</option>
+                      {/* <option value="ADMIN">Admin</option> */}
+                    </select>
+                  </div>
+
+                  {/* Remove Button */}
+                  <button
+                    onClick={() => handleRemoveCollaborator(collab.id)}
+                    className="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors border border-transparent hover:border-red-500/20"
+                    title="Remove User"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -312,16 +325,17 @@ const ProjectSettingsPage = () => {
       <AddProjectCollaboratorModal
         isOpen={showAddCollaboratorModal}
         projectId={projectId as string}
+        serverId={serverId}
         onClose={() => setShowAddCollaboratorModal(false)}
-        onSuccess={HandleSuccessAddCollab}
       />
+
       <DeleteProjectModal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         projectId={projectId as string}
       />
 
-      <DeleteCollaboratorModal
+      {/* <DeleteCollaboratorModal
         isOpen={showDeleteCollaboratorModal.isOpen}
         onClose={() =>
           setShowCollaboratorDeleteModal({ isOpen: false, userId: null })
@@ -329,7 +343,7 @@ const ProjectSettingsPage = () => {
         projectId={projectId as string}
         userId={showDeleteCollaboratorModal.userId}
         onSuccess={handleDeleteCollaboratorSuccess}
-      />
+      /> */}
       <EditProjectModal
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}

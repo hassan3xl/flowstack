@@ -14,16 +14,13 @@ export default function MainLayout({ children }: MainLayoutProps) {
   return (
     <div className="bg-background text-foreground min-h-screen">
       {/* Navbar - fixed at top */}
-      <Navbar
-        onMenuToggle={() => setIsSidebarOpen(!isSidebarOpen)}
-        isSidebarOpen={isSidebarOpen}
-      />
+      <Navbar />
 
       {/* Container for sidebar and main content */}
       <div className="flex pt-16">
         {/* Sidebar - starts below navbar */}
         <div className="fixed left-0 top-12 h-[calc(100vh-4rem)]">
-          <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+          <Sidebar />
         </div>
 
         {/* Main content area */}

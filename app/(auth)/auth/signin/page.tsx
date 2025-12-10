@@ -7,7 +7,7 @@ import { handleLogin } from "@/lib/actions/auth.actions";
 import { apiService } from "@/lib/services/apiService";
 import { useForm } from "react-hook-form";
 import { FormInput } from "@/components/input/formInput";
-import { useToast } from "@/providers/ToastProvider";
+import { toast } from "sonner";
 
 type FormValues = {
   email: string;
@@ -17,7 +17,6 @@ type FormValues = {
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
 
-  const toast = useToast();
   const {
     register,
     handleSubmit,
@@ -40,14 +39,11 @@ export default function LoginPage() {
 
         // Small delay to show the toast before redirect
         setTimeout(() => {
-          window.location.href = "/";
+          window.location.href = "/home";
         }, 1000);
       } else {
         toast.error("Login failed!");
       }
-    } catch (error: any) {
-      console.log("Login error:", error);
-      toast.success("Login error!");
     } finally {
       setIsLoading(false);
       reset();
@@ -134,7 +130,7 @@ export default function LoginPage() {
           <p className="text-sm text-muted-foreground">
             Don't have an account?{" "}
             <Link
-              href="/auth/sign-up"
+              href="/auth/signup"
               className="text-primary font-medium hover:underline"
             >
               Sign up

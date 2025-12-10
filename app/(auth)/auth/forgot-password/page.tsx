@@ -90,20 +90,14 @@ const ForgotPasswordPage = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <InputField
               type="email"
-              field="input"
               placeholder="Enter your email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
 
-            <Button
-              type="submit"
-              loading={loading}
-              icon={<ArrowRight />}
-              className="w-full"
-            >
-              Send Reset Link
+            <Button type="submit" className="w-full">
+              {loading ? "Sending..." : "Send Reset Link"}
             </Button>
           </form>
 

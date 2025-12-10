@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import BaseModal from "./BaseModal";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/providers/ToastProvider";
+import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { FormInput } from "../input/formInput";
 import { ProjectType } from "@/lib/types/project.types";
@@ -30,7 +30,6 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
   serverId,
   project,
 }) => {
-  const toast = useToast();
   const { mutateAsync: updateProject, isPending: loading } = useUpdateproject();
 
   const {

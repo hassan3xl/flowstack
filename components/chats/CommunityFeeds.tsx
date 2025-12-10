@@ -20,12 +20,15 @@ export default function CommunityFeeds() {
   const { data: feeds } = useGetFeed();
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
+    <div className="mbg-zinc-50 dark:bg-zinc-950">
       {/* Header */}
 
       {/* Main Content */}
-      <div className="max-w-5xl mx-auto ">
+      <div className="max-w-7xl mx-auto ">
         <div className="flex flex-col gap-4">
+          {feeds?.length === 0 && (
+            <p className="">No feeds found, join a community</p>
+          )}
           {feeds?.map((post: any) => (
             <FeedsCard key={post.id} post={post} />
           ))}

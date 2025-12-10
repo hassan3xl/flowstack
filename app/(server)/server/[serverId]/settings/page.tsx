@@ -1,35 +1,28 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Edit3,
   UserPlus,
   Users,
   Calendar,
   CheckCircle2,
-  Crown,
   Settings,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import Loader from "@/components/Loader";
-import { useToast } from "@/providers/ToastProvider";
+import { toast } from "sonner";
 import { useServer } from "@/contexts/ServerContext";
 import { useGetServer } from "@/lib/hooks/server.hooks";
+import { formatDate } from "@/lib/utils";
+import InviteServerMember from "@/components/modals/InviteServerMember";
 
 const ServerSettingsPage = () => {
   const { serverId } = useServer();
 
-  const { data: server, isLoading: loading } = useGetServer(serverId as string);
+  const { data: server, isLoading: loading } = useGetServer(serverId);
+  const [openInviteModal, setOpenInviteModal] = useState(false);
   console.log("server", server);
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
 
   if (loading) {
     return <Loader variant="dots" title="Loading Settings" />;
@@ -60,7 +53,7 @@ const ServerSettingsPage = () => {
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
                   <h2 className="text-md sm:text-2xl font-semibold text-white">
-                    {server.title}
+                    {server.name}
                   </h2>
                 </div>
                 <p className="text-gray-300 leading-relaxed mb-4">
@@ -72,7 +65,7 @@ const ServerSettingsPage = () => {
                     <span>Created: {formatDate(server.created_at)}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span>By: {server.created_by}</span>
+                    {/* <span>Owner: {server.owner.email}</span> */}
                   </div>
                 </div>
               </div>
@@ -84,36 +77,6 @@ const ServerSettingsPage = () => {
           </div>
 
           {/* server Stats */}
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6">
-            <div className="bg-accent p-4 rounded-lg border border-border text-center">
-              <div className="text-3xl font-bold text-blue-400">
-                {server.item_count}
-              </div>
-              <div className="text-sm text-gray-400 mt-1 flex items-center justify-center gap-1">
-                <CheckCircle2 className="w-3 h-3" />
-                Total Tasks
-              </div>
-            </div>
-            <div className="bg-accent p-4 rounded-lg border border-border text-center">
-              <div className="text-3xl font-bold text-green-400">
-                {server.completed_count}
-              </div>
-              <div className="text-sm text-gray-400 mt-1">Completed</div>
-              <div className="text-xs text-green-400 mt-1">
-                {/* {completionRate}% done */}
-              </div>
-            </div>
-          </div>
-          <div className="bg-accent p-4 rounded-lg border border-border text-center">
-            <div className="text-3xl font-bold text-purple-400">
-              {/* {server.shared_users.length} */}
-            </div>
-            <div className="text-sm text-gray-400 mt-1 flex items-center justify-center gap-1">
-              <Users className="w-3 h-3" />
-              Collaborators
-            </div>
-          </div>
         </div>
       </div>
 
@@ -125,7 +88,10 @@ const ServerSettingsPage = () => {
               <Users className="w-6 h-6 text-purple-400" />
               <h2 className="text-xl font-semibold">Members</h2>
             </div>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200">
+            <Button
+              onClick={() => setOpenInviteModal(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+            >
               <UserPlus className="w-4 h-4 mr-2" />
               Invite
             </Button>
@@ -149,6 +115,11 @@ const ServerSettingsPage = () => {
           </div>
         </div>
       </div>
+      <InviteServerMember
+        isOpen={openInviteModal}
+        onClose={() => setOpenInviteModal(false)}
+        serverId={serverId}
+      />
     </div>
   );
 };

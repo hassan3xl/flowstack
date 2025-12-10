@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { serverApi } from "../api/server.api";
+import { ServerType } from "../types/server.types";
 
 export function useGetServers() {
   return useQuery({
@@ -17,9 +18,18 @@ export function useGetPublicServers() {
 
 // GET A SINGLE SERVER
 export function useGetServer(serverId: string) {
-  return useQuery({
+  return useQuery<ServerType>({
     queryKey: ["server", serverId],
     queryFn: () => serverApi.getServer(serverId),
+    enabled: !!serverId,
+  });
+}
+
+// GET A SINGLE SERVER MEMBERS
+export function useGetServerMembers(serverId: string) {
+  return useQuery({
+    queryKey: ["server-members", serverId],
+    queryFn: () => serverApi.getServerMembers(serverId),
     enabled: !!serverId,
   });
 }
@@ -62,7 +72,24 @@ export const useCreateServer = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (serverData) => serverApi.createServer(serverData),
+    mutationFn: (serverData: any) => serverApi.createServer(serverData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["servers"] });
+    },
+  });
+};
+
+export const useInviteUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      inviteData,
+      serverId,
+    }: {
+      inviteData: any;
+      serverId: string;
+    }) => serverApi.inviteUserToServer(inviteData, serverId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["servers"] });
     },

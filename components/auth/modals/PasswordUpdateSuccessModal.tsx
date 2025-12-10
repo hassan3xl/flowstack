@@ -33,9 +33,7 @@ const PasswordUpdateSuccessModal: React.FC<
             with your new password.
           </p>
 
-          <Button icon={<ArrowRight />} className="w-full">
-            Continue to Sign In
-          </Button>
+          <Button className="w-full">Continue to Sign In</Button>
 
           <p className="text-sm text-gray-500 mt-4">
             Redirecting automatically in 3 seconds...

@@ -3,7 +3,7 @@
 import React from "react";
 import BaseModal from "./BaseModal";
 import { Button } from "../ui/button";
-import { useToast } from "@/providers/ToastProvider";
+import { toast } from "sonner";
 import { useAddProjectItem } from "@/lib/hooks/project.hook";
 import { useForm } from "react-hook-form";
 import { FormInput } from "../input/formInput";
@@ -30,8 +30,6 @@ const AddProjectItemModal = ({
 }: AddProjectItemModalProps) => {
   const { mutateAsync: addProjectItem, isPending: addingItem } =
     useAddProjectItem();
-
-  const toast = useToast();
 
   const {
     register,

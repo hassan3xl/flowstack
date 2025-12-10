@@ -2,14 +2,8 @@ import { apiService } from "../services/apiService";
 
 export const serverApi = {
   createServer: async (serverData: any) => {
-    try {
-      const res = await apiService.post("/servers/", serverData);
-      return res;
-      console.log("res", res);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      throw error;
-    }
+    const res = await apiService.post("/servers/", serverData);
+    return res;
   },
   getServers: async () => {
     try {
@@ -17,7 +11,7 @@ export const serverApi = {
       return res;
       console.log("res", res);
     } catch (error) {
-      console.error("Error fetching products:", error);
+      console.error("Error fetching servers:", error);
       throw error;
     }
   },
@@ -27,7 +21,7 @@ export const serverApi = {
       return res;
       console.log("res", res);
     } catch (error) {
-      console.error("Error fetching products:", error);
+      console.error("Error fetching servers:", error);
       throw error;
     }
   },
@@ -40,6 +34,9 @@ export const serverApi = {
       console.error("Error fetching server invites:", error);
       throw error;
     }
+  },
+  inviteUserToServer: async (inviteData: string, serverId: string) => {
+    return apiService.post(`/servers/${serverId}/invite/`, inviteData);
   },
 
   acceptServerInvites: async (inviteId: string) => {
@@ -67,94 +64,12 @@ export const serverApi = {
       const res = await apiService.get(`/servers/${serverId}/`);
       return res;
     } catch (error) {
-      console.error("Error fetching products:", error);
+      console.error("Error fetching servers:", error);
       throw error;
     }
   },
-
-  UpdateStoreStatus: async () => {
-    try {
-      const res = await apiService.post("/store/toggle-status/");
-      console.log("store details", res);
-      return res;
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      throw error;
-    }
-  },
-
-  UpdateStoreLogo: async (formData: FormData) => {
-    const res = await apiService.post("/store/upload-logo/", formData);
-    return res;
-  },
-
-  getProductsCategory: async () => {
-    try {
-      const res = await apiService.get("/categories/");
-      console.log("categories", res);
-      return res;
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      throw error;
-    }
-  },
-
-  AddProduct: async (data: any) => {
-    try {
-      const res = await apiService.post("/products/", data);
-      return res;
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      throw error;
-    }
-  },
-  AddProductFeature: async (data: any) => {
-    try {
-      const res = await apiService.post("/products/", data);
-      return res;
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      throw error;
-    }
-  },
-  EditProduct: async (productId: string | number, data: FormData | any) => {
-    const res = await apiService.patch(`/products/${productId}/`, data);
-    return res.data;
-  },
-
-  DeleteProduct: async (productId: string) => {
-    try {
-      const res = await apiService.delete(`/products/${productId}/`);
-      return res;
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      throw error;
-    }
-  },
-};
-
-export const specificationApi = {
-  // GET product specifications
-  getSpecifications: async (productId: string) => {
-    const res = await apiService.get(`/products/${productId}/specifications/`);
-    return res;
-  },
-
-  // add specs
-  addSpecifications: async (productId: string, data: any) => {
-    const res = await apiService.post(
-      `/products/${productId}/specifications/`,
-      data
-    );
-    return res;
-  },
-
-  // UPDATE product specifications
-  updateSpecifications: async (productId: string, data: any) => {
-    const res = await apiService.patch(
-      `/products/${productId}/specifications/`,
-      data
-    );
+  getServerMembers: async (serverId: string) => {
+    const res = await apiService.get(`/servers/${serverId}/members/`);
     return res;
   },
 };

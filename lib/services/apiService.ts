@@ -1,10 +1,12 @@
+import { toast } from "sonner";
 import { getAccessToken } from "../actions/auth.actions";
+import { extractApiError } from "../utils/api-error";
 
 // development
-export const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+// export const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // productiont
-// const BASE_URL = process.env.NEXT_PUBLIC_PRODUCTION_API_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_PRODUCTION_API_URL;
 
 async function fetchWithCatch(
   url: string,
@@ -13,28 +15,32 @@ async function fetchWithCatch(
   try {
     const response = await fetch(`${BASE_URL}${url}`, options);
 
-    // For 204 No Content
     if (response.status === 204) {
       return { detail: "No Content" };
     }
 
-    // Try to parse response (could be error JSON)
     let data: any = null;
     const contentType = response.headers.get("content-type");
+
     if (contentType && contentType.includes("application/json")) {
       data = await response.json();
     }
 
+    if (response.status === 401) {
+      window.location.href = "/auth/signin/";
+    }
+
     if (!response.ok) {
-      // If error, throw data so caller .catch gets it
-      throw data || { detail: response.statusText };
+      throw {
+        status: response.status,
+        data: data || { detail: response.statusText },
+      };
     }
 
     return data;
-  } catch (error) {
-    // Network/parsing errors
-    console.log(error);
-
+  } catch (error: any) {
+    const message = extractApiError(error);
+    toast.error(message);
     throw error;
   }
 }

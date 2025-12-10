@@ -1,12 +1,20 @@
-type CommentsType = {
+import { UserType } from "./user.types";
+
+type CollaboratorsType = {
   id: string;
-  comment: string;
-  author: string;
+  permission: "read" | "write";
+  user: UserType;
+};
+
+export type CommentsType = {
+  id: string;
+  content: string;
+  author: UserType;
   created_at: string;
   created_by: string;
 };
 
-type ProjectItemType = {
+export type ProjectItemType = {
   id: string;
   project_id: string;
   title: string;
@@ -24,12 +32,6 @@ type ProjectItemType = {
   status: string;
 };
 
-interface SharedUsersType {
-  id: string;
-  user_id: string;
-  avatar: string;
-  fullname: string;
-}
 export type ProjectType = {
   id: string;
   title: string;
@@ -42,5 +44,5 @@ export type ProjectType = {
   created_at: string;
   created_by: string;
   completed_count: number;
-  shared_users: SharedUsersType[];
+  collaborators: CollaboratorsType[];
 };

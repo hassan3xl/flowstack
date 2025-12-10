@@ -20,7 +20,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import { apiService } from "@/lib/services/apiService";
 import { ProjectType } from "@/lib/types/project.types";
-import { useToast } from "@/providers/ToastProvider";
+import { toast } from "sonner";
+import { useServer } from "@/contexts/ServerContext";
 
 interface ProjectCardProps {
   project: ProjectType;
@@ -29,9 +30,8 @@ interface ProjectCardProps {
 
 const ProjectCard = ({ project, serverId }: ProjectCardProps) => {
   const router = useRouter();
-  const { user } = useAuth();
-  const toast = useToast();
-  console.log("serverId", serverId);
+
+  const { userRole } = useServer();
 
   // 🔹 Handle "Open Project" or "Request Collaboration"
   const handleProjectClick = () => {
@@ -73,8 +73,7 @@ const ProjectCard = ({ project, serverId }: ProjectCardProps) => {
   return (
     <div
       className="bg-card rounded-xl p-4 sm:p-6 border border-border
-      hover:border-accent-hover/50 transition-all duration-300 hover:shadow-xl hover:shadow-black/20 
-      group relative backdrop-blur-sm hover:scale-[1.02] transform"
+      hover:border-accent-hover/50 transition-all duration-300 "
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
@@ -101,6 +100,15 @@ const ProjectCard = ({ project, serverId }: ProjectCardProps) => {
           )}
         </div>
         <div className="flex gap-4 ">
+          {!["owner", "admin"].includes(userRole as string) && (
+            <Button
+              variant="outline"
+              size={"sm"}
+              // onClick={() => apiService.requestCollaboration(project.id)}
+            >
+              Request
+            </Button>
+          )}
           <Button size={"sm"} onClick={projectSettings}>
             <Settings2Icon />
           </Button>
@@ -160,21 +168,21 @@ const ProjectCard = ({ project, serverId }: ProjectCardProps) => {
       <div className="flex items-center justify-between pt-2 border-t border-tertiary/30">
         {/* Collaborators */}
         <div className="flex items-center gap-2">
-          {project.shared_users && project.shared_users.length > 0 && (
+          {project.collaborators && project.collaborators.length > 0 && (
             <div className="flex -space-x-2">
-              {project.shared_users.slice(0, 3).map((collaborator) => (
+              {project.collaborators.slice(0, 3).map((collaborator) => (
                 <div
                   key={collaborator.id}
-                  className="w-8 h-8 rounded-full bg-slate-700 border-2 border-secondary 
-                          flex items-center justify-center text-xs font-medium text-primary 
-                          overflow-hidden ring-2 ring-blue-500/20 hover:ring-blue-500/50 
-                          transition-all transform hover:scale-110"
-                  title={`${collaborator.fullname}`}
+                  className="w-8 h-8 rounded-full bg-muted/30 border-2 border-border 
+                          flex items-center justify-center text-xs font-medium
+                          overflow-hidden
+                          "
+                  title={`${collaborator.user.username}`}
                 >
-                  {collaborator.avatar ? (
+                  {collaborator.user.avatar ? (
                     <img
-                      src={collaborator.avatar}
-                      alt={`${collaborator.fullname}`}
+                      src={collaborator.user.avatar}
+                      alt={`${collaborator.user.username}`}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -186,37 +194,18 @@ const ProjectCard = ({ project, serverId }: ProjectCardProps) => {
                   )}
                 </div>
               ))}
-              {project.shared_users.length > 3 && (
+              {project.collaborators.length > 3 && (
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-blue-700 border-2 border-secondary flex items-center justify-center text-xs font-bold text-primary ring-2 ring-blue-500/20">
-                  +{project.shared_users.length - 3}
+                  +{project.collaborators.length - 3}
                 </div>
               )}
             </div>
           )}
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Calendar className="w-4 h-4" />
-            <span>{formatDate(project.created_at)}</span>
-          </div>
         </div>
 
-        {/* Status */}
-        <div className="flex items-center gap-2">
-          {completionPercentage === 100 ? (
-            <Badge className="bg-green-500/20 text-green-300 border-green-500/30">
-              <CheckCircle2 className="w-3 h-3 mr-1" />
-              Complete
-            </Badge>
-          ) : completionPercentage > 0 ? (
-            <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30">
-              <Clock className="w-3 h-3 mr-1" />
-              In Progress
-            </Badge>
-          ) : (
-            <Badge className="bg-gray-500/20 text-muted-foreground border-gray-500/30">
-              <AlertTriangle className="w-3 h-3 mr-1" />
-              Not Started
-            </Badge>
-          )}
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Calendar className="w-4 h-4" />
+          <span>{formatDate(project.created_at)}</span>
         </div>
       </div>
     </div>

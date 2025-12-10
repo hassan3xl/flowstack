@@ -17,12 +17,14 @@ interface ServerPageProps {
   setOpenAddServerModal: (open: boolean) => void;
   setOpenServerInviteModal: (open: boolean) => void;
   invites: InvitesType[];
+  isOpen: boolean;
 }
 
 export default function ServersPage({
   setOpenAddServerModal,
   setOpenServerInviteModal,
   invites,
+  isOpen,
 }: ServerPageProps) {
   const { data: servers, isLoading } = useGetServers();
 
@@ -47,14 +49,14 @@ export default function ServersPage({
       {/* MAIN CONTENT */}
       <div>
         {/* Private Servers */}
-        <div className="grid grid-cols-1 w-20 gap-5">
+        <div className="flex flex-col w-full md:w-18 gap-2 mt-4">
           <HomeCard />
           <MessageCard />
         </div>
         <hr className="py-2 mt-6" />
 
         {servers?.length > 0 && (
-          <div className="grid grid-cols-1 w-20 gap-5 mt-4">
+          <div className="flex flex-col w-full md:w-18 gap-2 mt-4">
             {servers.map((server: any) => (
               <div
                 key={server.id}
@@ -70,7 +72,7 @@ export default function ServersPage({
       {hoveredServer &&
         createPortal(
           <div
-            className="absolute left-28 w-80 p-4 rounded-lg shadow-xl bg-gray-900 border border-gray-800 z-50"
+            className="absolute left-28 w-80 p-4 rounded-lg shadow-xl bg-accent border border-border z-50"
             style={{ top: hoverPosition || 0 }}
           >
             <HoverInfo server={hoveredServer} />
@@ -79,8 +81,8 @@ export default function ServersPage({
         )}
 
       {/* PINNED USER CARD AT BOTTOM */}
-      <div className="mt-auto pb-4">
-        <div className="grid grid-cols-1 w-20 gap-5">
+      <div className="mt-auto py-4">
+        <div className="flex flex-col w-full md:w-18 gap-2 mt-4">
           <Button
             onClick={() => setOpenServerInviteModal(true)}
             size={"sm"}

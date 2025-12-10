@@ -56,6 +56,27 @@ export const useUpdateproject = () => {
   });
 };
 
+export function useAddProjectCollab() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      collabData,
+      serverId,
+      projectId,
+    }: {
+      collabData: any;
+      serverId: string;
+      projectId: string;
+    }) => projectApi.addProjectCollab(collabData, serverId, projectId),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: ["project"] });
+    },
+  });
+}
+
 export function useAddProjectItem() {
   const queryClient = useQueryClient();
 
@@ -100,152 +121,88 @@ export function useUpdateProjectItem() {
   });
 }
 
-// // --------------------------------------
-// // GET PRODUCT IMAGES
-// // --------------------------------------
-// export function useGetProductImages(productId: string) {
-//   return useQuery({
-//     queryKey: ["product-images", productId],
-//     queryFn: () => productApi.getProductImages(productId),
-//     enabled: !!productId,
-//   });
-// }
+export const useDeleteProjectItem = () => {
+  const queryClient = useQueryClient();
 
-// // --------------------------------------
-// // DELETE PRODUCT IMAGE
-// // --------------------------------------
-// export const useDeleteProductImage = () => {
-//   const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      serverId,
+      projectId,
+      itemId,
+    }: {
+      serverId: string;
+      projectId: string;
+      itemId: string;
+    }) => projectApi.deleteProjectItem(serverId, projectId, itemId),
 
-//   return useMutation({
-//     mutationFn: async ({
-//       productId,
-//       imageId,
-//     }: {
-//       productId: string;
-//       imageId: string;
-//     }) => productApi.DeleteProductImage(productId, imageId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: ["project"] });
+    },
+  });
+};
 
-//     onSuccess: (_, variables) => {
-//       queryClient.invalidateQueries({
-//         queryKey: ["product", variables.productId],
-//       });
-//       queryClient.invalidateQueries({
-//         queryKey: ["product-images", variables.productId],
-//       });
-//     },
-//   });
-// };
+export const useStartTask = () => {
+  const queryClient = useQueryClient();
 
-// // --------------------------------------
-// // UPLOAD PRODUCT IMAGE
-// // MUST SEND FORMDATA
-// // --------------------------------------
-// export const useUploadProductImage = () => {
-//   const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      serverId,
+      projectId,
+      taskId,
+    }: {
+      serverId: string;
+      projectId: string;
+      taskId: string;
+    }) => projectApi.startTask(serverId, projectId, taskId),
 
-//   return useMutation({
-//     mutationFn: async ({
-//       productId,
-//       formData,
-//     }: {
-//       productId: string;
-//       formData: FormData;
-//     }) => productApi.AddProductImage(productId, formData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: ["project"] });
+    },
+  });
+};
 
-//     onSuccess: (_, variables: any) => {
-//       queryClient.invalidateQueries({
-//         queryKey: ["product", variables.productId],
-//       });
-//       queryClient.invalidateQueries({
-//         queryKey: ["product-images", variables.productId],
-//       });
-//     },
-//   });
-// };
+export const useCompleteTask = () => {
+  const queryClient = useQueryClient();
 
-// // --------------------------------------
-// // SET PRIMARY IMAGE
-// // --------------------------------------
-// export const useSetPrimaryImage = () => {
-//   const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      serverId,
+      projectId,
+      taskId,
+    }: {
+      serverId: string;
+      projectId: string;
+      taskId: string;
+    }) => projectApi.completeTask(serverId, projectId, taskId),
 
-//   return useMutation({
-//     mutationFn: async ({
-//       productId,
-//       imageId,
-//     }: {
-//       productId: string;
-//       imageId: string;
-//     }) => productApi.SetPrimaryImage(productId, imageId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: ["project"] });
+    },
+  });
+};
 
-//     onSuccess: (_, variables) => {
-//       queryClient.invalidateQueries({
-//         queryKey: ["product", variables.productId],
-//       });
-//       queryClient.invalidateQueries({
-//         queryKey: ["product-images", variables.productId],
-//       });
-//     },
-//   });
-// };
+export const useCommentTask = () => {
+  const queryClient = useQueryClient();
 
-// // --------------------------------------
-// // GET PRODUCT CATEGORIES
-// // --------------------------------------
-// export function useGetProductsCategories() {
-//   return useQuery({
-//     queryKey: ["categories"],
-//     queryFn: productApi.getProductsCategory,
-//   });
-// }
+  return useMutation({
+    mutationFn: ({
+      serverId,
+      projectId,
+      itemId,
+      commentData,
+    }: {
+      serverId: string;
+      projectId: string;
+      itemId: string;
+      commentData: any;
+    }) => projectApi.commentTask(serverId, projectId, itemId, commentData),
 
-// // --------------------------------------
-// // ADD PRODUCT FEATURE  (FIXED)
-// // --------------------------------------
-// export const useAddProductFeature = () => {
-//   const queryClient = useQueryClient();
-
-//   return useMutation({
-//     mutationFn: async (data: any) => productApi.AddProductFeature(data),
-
-//     onSuccess: (_, variables) => {
-//       queryClient.invalidateQueries({
-//         queryKey: ["product", variables.productId],
-//       });
-//     },
-//   });
-// };
-
-// // --------------------------------------
-// // EDIT PRODUCT
-// // --------------------------------------
-// export const useEditProduct = () => {
-//   const queryClient = useQueryClient();
-
-//   return useMutation({
-//     mutationFn: async (productData: any) =>
-//       productApi.EditProduct(productData.id, productData),
-
-//     onSuccess: (_, productData) => {
-//       queryClient.invalidateQueries({ queryKey: ["products"] });
-//       queryClient.invalidateQueries({ queryKey: ["product", productData.id] });
-//     },
-//   });
-// };
-
-// // --------------------------------------
-// // DELETE PRODUCT
-// // --------------------------------------
-// export const useDeleteProduct = () => {
-//   const queryClient = useQueryClient();
-
-//   return useMutation({
-//     mutationFn: async (productId: string) =>
-//       productApi.DeleteProduct(productId),
-
-//     onSuccess: () => {
-//       queryClient.invalidateQueries({ queryKey: ["products"] });
-//     },
-//   });
-// };
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: ["project"] });
+    },
+  });
+};

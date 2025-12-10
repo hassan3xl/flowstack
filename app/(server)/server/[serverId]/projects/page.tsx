@@ -4,10 +4,9 @@ import { InputField } from "@/components/input/InputField";
 import Loader from "@/components/Loader";
 import AddProjectModal from "@/components/modals/AddProjectModal";
 import ProjectCard from "@/components/projects/ProjectCard";
-import { useToast } from "@/providers/ToastProvider";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useGetProjects } from "@/lib/hooks/project.hook";
-import { ProjectType } from "@/lib/types/project.types";
 import { Archive, FolderPlus, Plus, Search } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
@@ -18,7 +17,7 @@ interface ProjectPageProps {}
 
 const ProjectPage = ({}: ProjectPageProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { serverId } = useServer();
+  const { serverId, userRole } = useServer();
   const { data: projects, isLoading } = useGetProjects(serverId);
 
   if (isLoading) {
@@ -112,13 +111,15 @@ const ProjectPage = ({}: ProjectPageProps) => {
             </p>
 
             {/* Call to Action */}
-            <Button
-              onClick={() => setIsModalOpen(true)}
-              className="shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 text-lg px-8 py-3"
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              Create Your First Project
-            </Button>
+            {userRole !== "member" && (
+              <Button
+                onClick={() => setIsModalOpen(true)}
+                className="shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 text-lg px-8 py-3"
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                Create Your First Project
+              </Button>
+            )}
           </div>
         </div>
       )}

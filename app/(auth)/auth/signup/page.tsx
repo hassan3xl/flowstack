@@ -8,7 +8,8 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import HeroSection from "@/components/auth/HeroSection";
 import { apiService } from "@/lib/services/apiService";
-import { useToast } from "@/providers/ToastProvider";
+import { toast } from "sonner";
+
 import { handleLogin } from "@/lib/actions/auth.actions";
 import { FormInput } from "@/components/input/formInput";
 import { useState } from "react";
@@ -31,7 +32,6 @@ const SignupPage = () => {
   } = useForm<SignupForm>();
 
   const router = useRouter();
-  const toast = useToast();
   const [loading, setLoading] = useState(false);
 
   const password1 = watch("password1");
@@ -66,8 +66,6 @@ const SignupPage = () => {
       } else {
         toast.error("Registration failed");
       }
-    } catch (err: any) {
-      toast.error(err?.email || "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -96,7 +94,6 @@ const SignupPage = () => {
                 placeholder="First name"
                 register={register}
                 rules={{ required: "First name is required" }}
-                error={errors.first_name?.message}
               />
 
               <FormInput
@@ -105,7 +102,6 @@ const SignupPage = () => {
                 placeholder="Last name"
                 register={register}
                 rules={{ required: "Last name is required" }}
-                error={errors.last_name?.message}
               />
             </div>
 
@@ -123,7 +119,6 @@ const SignupPage = () => {
                   message: "Enter a valid email",
                 },
               }}
-              error={errors.email?.message}
             />
 
             {/* Password */}
@@ -134,7 +129,6 @@ const SignupPage = () => {
               placeholder="Password"
               register={register}
               rules={{ required: "Password is required" }}
-              error={errors.password1?.message}
             />
 
             {/* Confirm Password */}
@@ -146,10 +140,9 @@ const SignupPage = () => {
               register={register}
               rules={{
                 required: "Please confirm your password",
-                validate: (value) =>
+                validate: (value: any) =>
                   value === password1 || "Passwords do not match",
               }}
-              error={errors.password2?.message}
             />
 
             {/* Agree to terms */}
@@ -178,13 +171,15 @@ const SignupPage = () => {
             )}
 
             {/* Submit */}
-            <Button
-              type="submit"
-              loading={loading}
-              icon={<ArrowRight />}
-              className="w-full"
-            >
-              Create Account
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+                  <span>Loading...</span>
+                </div>
+              ) : (
+                "Sign up"
+              )}
             </Button>
           </form>
 

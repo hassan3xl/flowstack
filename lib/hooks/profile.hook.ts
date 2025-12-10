@@ -1,9 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Profile } from "../types/usert.ypes";
 import { profileApi } from "../api/profile.api";
+import { ProfilePType } from "../types/user.types";
 
 export function useGetProfile() {
-  return useQuery<Profile>({
+  return useQuery<ProfilePType>({
     queryKey: ["profile"],
     queryFn: profileApi.getProfile,
   });

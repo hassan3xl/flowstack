@@ -1,6 +1,6 @@
 "use client";
 
-import { useToast } from "@/providers/ToastProvider";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { apiService } from "@/lib/services/apiService";
@@ -31,7 +31,7 @@ const ProjectArchivesPage = () => {
     id: string;
     action: "restore" | "delete";
   } | null>(null);
-  const toast = useToast();
+
   const router = useRouter();
 
   const fetchArchives = async () => {
@@ -83,7 +83,11 @@ const ProjectArchivesPage = () => {
         {archivedProjects.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2">
             {archivedProjects.map((project) => (
-              <ProjectCard project={project} key={project.id} />
+              <ProjectCard
+                serverId="asasa"
+                project={project}
+                key={project.id}
+              />
             ))}
           </div>
         ) : (

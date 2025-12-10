@@ -1,21 +1,27 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { InputField } from "../input/InputField";
+import React from "react";
 import { Button } from "../ui/button";
 import { Edit3, Send, Trash2, X } from "lucide-react";
-import { ProjectItem, Comments } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
-import { useToast } from "@/providers/ToastProvider";
-import { apiService } from "@/lib/services/apiService";
+import { toast } from "sonner";
+import { useCommentTask } from "@/lib/hooks/project.hook";
+import { FormInput } from "../input/formInput";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { CommentsType } from "@/lib/types/project.types";
+
+type FormData = {
+  content: string;
+};
 
 interface CommentComponentProps {
-  itemId: string;
-  comments: Comments[];
   onClose: () => void;
-  onSucess?: () => void;
+  comments: CommentsType[];
   isOpen: boolean;
-  ProjectId: string;
+
+  itemId: string;
+  projectId: string;
+  serverId: string;
 }
 
 const CommentComponent = ({
@@ -23,37 +29,38 @@ const CommentComponent = ({
   onClose,
   isOpen,
   itemId,
-  ProjectId,
-  onSucess,
+  projectId,
+  serverId,
 }: CommentComponentProps) => {
-  console.log("commentssmsmsms", comments);
-  const [loading, setLoading] = useState(false);
-  const [commentText, setCommentText] = useState("");
-  const toast = useToast();
-  console.log("ProjectId", ProjectId);
-  console.log("itemId", itemId);
+  // 1. Hook Integration
+  const { mutateAsync: postComment, isPending } = useCommentTask();
 
-  const handleSubmit = async () => {
-    if (!commentText.trim()) return;
-    setLoading(true);
+  // 2. RHF Setup
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { errors },
+  } = useForm<FormData>();
 
+  // Watch the comment field to disable button if empty
+  const commentValue = watch("content");
+
+  // 3. Submit Handler
+  const onSubmit = async (data: FormData) => {
     try {
-      const response = await apiService.post(
-        // `api/projects/${ProjectId}/items/${itemId}/comments/`,
-        `api/projects/${itemId}/comments/`,
-
-        {
-          content: commentText,
-        }
-      );
-      if (onSucess) onSucess();
-      onClose();
-      setCommentText("");
+      await postComment({
+        serverId,
+        projectId,
+        itemId,
+        commentData: data,
+      });
+      toast.success("Comment added successfully");
+      reset();
     } catch (error: any) {
       console.error(error);
       toast.error(error?.detail || "Failed to add comment");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -61,32 +68,34 @@ const CommentComponent = ({
 
   return (
     <div className="ml-14 space-y-4">
-      {/* Comment Input (always visible) */}
-      <div className="flex flex-col">
-        <InputField
+      {/* 4. Form Section (Only wraps the input) */}
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
+        <FormInput
+          name="content"
+          register={register}
           field="textarea"
-          value={commentText}
-          onChange={(e) => setCommentText(e.target.value)}
-          error={""}
-          success={""}
           placeholder="Write a comment..."
           rows={3}
         />
 
         <div className="flex justify-end gap-2 mt-2">
-          <Button onClick={onClose}>
-            <X className="w-4 h-4" /> Cancel
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onClose}
+            disabled={isPending}
+          >
+            <X className="w-4 h-4 mr-2" /> Cancel
           </Button>
 
-          <Button
-            disabled={loading || !commentText.trim()} // ✅ disable if loading or empty
-            onClick={handleSubmit}
-          >
-            <Send className="w-4 h-4" /> Post
+          <Button type="submit" disabled={isPending || !commentValue?.trim()}>
+            <Send className="w-4 h-4 mr-2" />
+            {isPending ? "Posting..." : "Post"}
           </Button>
         </div>
-      </div>
+      </form>
 
+      {/* 5. Comments List Section (Outside the form) */}
       <div className="space-y-3">
         {comments.length > 0 &&
           comments.map((comment) => (
@@ -97,7 +106,7 @@ const CommentComponent = ({
               <div className="flex justify-between">
                 <div>
                   <p className="text-sm text-white font-medium">
-                    {comment.author.fullname}
+                    {comment.author.username}
                   </p>
                   <p className="text-gray-400 text-xs">
                     {formatDate(comment.created_at)}
@@ -107,14 +116,19 @@ const CommentComponent = ({
 
               <p className="text-gray-300 text-sm mt-2">{comment.content}</p>
 
-              {/* ✅ Always show buttons under each comment */}
               <div className="mt-2 flex gap-2">
-                <Button className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-slate-700/50 hover:bg-slate-700 text-white border border-slate-600/50 hover:border-slate-500 transition-all">
-                  <Edit3 className="w-4 h-4" />
+                <Button
+                  size="sm"
+                  className="inline-flex items-center gap-2 px-3 py-1 rounded-lg text-xs font-medium bg-slate-700/50 hover:bg-slate-700 text-white border border-slate-600/50 hover:border-slate-500 transition-all"
+                >
+                  <Edit3 className="w-3 h-3" />
                 </Button>
 
-                <Button className="bg-red-500/10 text-red-400 hover:bg-red-500/20">
-                  <Trash2 className="w-4 h-4" />
+                <Button
+                  size="sm"
+                  className="bg-red-500/10 text-red-400 hover:bg-red-500/20 px-3 py-1 h-8"
+                >
+                  <Trash2 className="w-3 h-3" />
                 </Button>
               </div>
             </div>

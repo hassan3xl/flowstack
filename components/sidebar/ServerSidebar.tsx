@@ -10,12 +10,10 @@ import {
   MessageCircleCodeIcon,
   Settings2,
   Text,
+  Users,
 } from "lucide-react";
-import Document from "next/document";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
 import { Button } from "../ui/button";
 import { useSidebar } from "@/contexts/SidebarContext";
 import { useServer } from "@/contexts/ServerContext";
@@ -25,7 +23,9 @@ export function ServerSidebar() {
   const pathname = usePathname();
   const { isOpen, closeSidebar, toggleSidebar } = useSidebar();
 
-  const { serverId } = useServer();
+  const { serverId, userRole, isAdminOrOwner } = useServer();
+
+  // Helper boolean to check permissions
 
   const menuItems = [
     {
@@ -68,15 +68,20 @@ export function ServerSidebar() {
       name: "Team",
       label: "Team",
       href: `/server/${serverId}/team`,
-      icon: <Home />,
+      icon: <Users />,
     },
     {
       name: "Settings",
-      label: "Dashboard",
+      label: "Settings",
       href: `/server/${serverId}/settings`,
       icon: <Settings2 />,
+      // 1. Add a flag here to hide this if the user is not admin/owner
+      hidden: !isAdminOrOwner,
     },
   ];
+
+  // 2. Filter the items before mapping
+  const visibleItems = menuItems.filter((item) => !item.hidden);
 
   return (
     <>
@@ -97,7 +102,7 @@ export function ServerSidebar() {
             : "w-20 -translate-x-full md:translate-x-0 md:w-26"
         )}
       >
-        <div className="flex flex-col h-full mt-10">
+        <div className="flex flex-col h-full mt-16 md:mt-10">
           <div className="md:flex h-16 hidden items-center justify-between px-4">
             <Button
               onClick={toggleSidebar}
@@ -120,7 +125,8 @@ export function ServerSidebar() {
           {/* ServerSidebar content */}
           <div className="flex-1 overflow-y-auto px-4">
             <nav className="space-y-2">
-              {menuItems.map((item) => (
+              {/* 3. Map over visibleItems instead of menuItems */}
+              {visibleItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}

@@ -1,4 +1,4 @@
-export interface Profile {
+export interface ProfilePType {
   id: string;
   avatar: string;
   first_name: string;
@@ -9,11 +9,10 @@ export interface Profile {
   email_notifications: boolean;
 }
 
-export interface User {
+export interface UserType {
   id: string;
   email: string;
   fullname?: string;
   username: string;
-  // profile?: Profile;
-  // avatar?: string;
+  avatar?: string;
 }

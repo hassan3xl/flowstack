@@ -22,15 +22,15 @@ const ServerDetails = () => {
           },
           {
             title: "Active Projects",
-            value: server?.active_projects || 0,
+            value: server?.total_projects || 0,
           },
           {
             title: "Active Members",
-            value: server?.active_projects || 0,
+            value: server?.total_projects || 0,
           },
           {
             title: "Active Projects",
-            value: server?.active_projects || 0,
+            value: server?.total_projects || 0,
           },
         ]}
       />

@@ -3,10 +3,7 @@ import { getAccessToken } from "../actions/auth.actions";
 import { extractApiError } from "../utils/api-error";
 
 // development
-// export const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-
-// productiont
-const BASE_URL = process.env.NEXT_PUBLIC_PRODUCTION_API_URL;
+export const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 async function fetchWithCatch(
   url: string,

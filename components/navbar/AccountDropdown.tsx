@@ -13,13 +13,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { resetAuthCookies } from "@/lib/actions/auth.actions";
+import { toast } from "sonner";
 
 export function AccountDropdown() {
   const { user, loading } = useAuth();
 
+  const [loggingOut, setLoggingOut] = useState(false);
+
   const handleLogout = async () => {
-    await resetAuthCookies();
+    setLoggingOut(true);
+    await fetch("/api/logout", { method: "POST" });
+    toast.success("You have been logged out.");
+    window.location.href = "/";
   };
 
   return (
@@ -66,8 +71,11 @@ export function AccountDropdown() {
 
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem className="cursor-pointer text-red-600 focus:text-red-600 flex items-center gap-2">
-                  <LogOut onClick={handleLogout} className="h-4 w-4" />
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="cursor-pointer text-red-600 focus:text-red-600 flex items-center gap-2"
+                >
+                  <LogOut className="h-4 w-4" />
                   Sign Out
                 </DropdownMenuItem>
               </DropdownMenuContent>

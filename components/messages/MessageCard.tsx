@@ -21,7 +21,7 @@ export default function MessageCard() {
         </div>
 
         {/* Text */}
-        <div className="flex flex-col w-full md:hidden">
+        <div className="flex flex-col w-full sm:hidden">
           {isOpen && (
             <div>
               <p>Home</p>

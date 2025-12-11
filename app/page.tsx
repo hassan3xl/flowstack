@@ -61,7 +61,13 @@ export default function LandingPage() {
               onClick={navigate}
               className="flex items-center space-x-2"
             >
-              <Image src="/logo.png" height={200} width={200} alt="logo" />
+              <Image
+                src="/logo.png"
+                height={200}
+                width={200}
+                alt="logo"
+                className="h-8 w-auto sm:h-12"
+              />
             </Button>
 
             {/* Desktop Menu */}
@@ -78,24 +84,30 @@ export default function LandingPage() {
               >
                 How it Works
               </a>
-              <a
-                href="#pricing"
-                className="text-muted-foreground hover:text-foreground transition"
-              >
-                Pricing
-              </a>
-              <Link
-                href="/auth/signin/"
-                className="px-4 py-2 text-sm border rounded-md hover:bg-accent transition"
-              >
-                Sign In
-              </Link>
-              <Link
-                href="/auth/signup/"
-                className="px-4 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition"
-              >
-                Get Started
-              </Link>
+
+              {user ? (
+                <Link
+                  href="/home"
+                  className="px-4 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition"
+                >
+                  Proceed
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/auth/signin"
+                    className="px-4 py-2 text-sm border rounded-md hover:bg-accent transition"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/auth/signup"
+                    className="px-4 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition"
+                  >
+                    Get Started
+                  </Link>
+                </>
+              )}
             </div>
 
             {/* Mobile Menu Button */}
@@ -128,24 +140,30 @@ export default function LandingPage() {
               >
                 How it Works
               </a>
-              <a
-                href="#pricing"
-                className="block py-2 text-muted-foreground hover:text-foreground"
-              >
-                Pricing
-              </a>
-              <Link
-                href={"/auth/signin"}
-                className="w-full px-4 py-2 text-sm border rounded-md hover:bg-accent"
-              >
-                Sign In
-              </Link>
-              <Link
-                href={"/auth/signup"}
-                className="w-full px-4 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-              >
-                Get Started
-              </Link>
+
+              {user ? (
+                <Link
+                  href="/home"
+                  className="w-full px-4 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+                >
+                  Proceed
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/auth/signin"
+                    className="w-full px-4 py-2 text-sm border rounded-md hover:bg-accent"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/auth/signup"
+                    className="w-full px-4 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+                  >
+                    Get Started
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}
@@ -173,18 +191,22 @@ export default function LandingPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-              <button className="w-full sm:w-auto px-8 py-4 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition flex items-center justify-center space-x-2 group">
-                <span>Start Free Trial</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition" />
-              </button>
-              <button className="w-full sm:w-auto px-8 py-4 border rounded-lg font-semibold hover:bg-accent transition">
-                Watch Demo
-              </button>
+              {user ? (
+                <button
+                  onClick={() => router.push("/home")}
+                  className="w-full sm:w-auto px-8 py-4 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition"
+                >
+                  Proceed
+                </button>
+              ) : (
+                <button
+                  onClick={() => router.push("/auth/signin")}
+                  className="w-full sm:w-auto px-8 py-4 border rounded-lg font-semibold hover:bg-accent transition"
+                >
+                  Get Started
+                </button>
+              )}
             </div>
-
-            <p className="mt-6 text-sm text-muted-foreground">
-              No credit card required • Free 14-day trial • Cancel anytime
-            </p>
           </div>
 
           {/* Hero Image/Dashboard Preview */}
@@ -198,7 +220,7 @@ export default function LandingPage() {
                   <div className="w-3 h-3 rounded-full bg-green-500"></div>
                 </div>
                 <div className="flex-1 text-center text-xs text-muted-foreground">
-                  teamsync.app
+                  flowstack.app
                 </div>
               </div>
               <div className="aspect-video bg-gradient-to-br from-muted to-accent flex items-center justify-center">
@@ -264,7 +286,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              How TeamSync Works
+              How flowstack Works
             </h2>
             <p className="text-xl text-muted-foreground">
               Get your team up and running in minutes
@@ -299,7 +321,7 @@ export default function LandingPage() {
               Trusted by teams worldwide
             </h2>
             <p className="text-muted-foreground">
-              Join thousands of teams already using TeamSync
+              Join thousands of teams already using flowstack
             </p>
           </div>
 
@@ -320,29 +342,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="bg-gradient-to-r from-primary to-blue-600 rounded-2xl p-12 text-primary-foreground">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Ready to transform your team?
-            </h2>
-            <p className="text-xl mb-8 opacity-90">
-              Join thousands of teams already using TeamSync to collaborate
-              better
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-              <button className="w-full sm:w-auto px-8 py-4 bg-white text-primary rounded-lg font-semibold hover:bg-gray-100 transition">
-                Start Free Trial
-              </button>
-              <button className="w-full sm:w-auto px-8 py-4 border-2 border-white text-white rounded-lg font-semibold hover:bg-white/10 transition">
-                Schedule Demo
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Footer */}
       <footer className="bg-muted py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -352,7 +351,7 @@ export default function LandingPage() {
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                   <Zap className="w-5 h-5 text-primary-foreground" />
                 </div>
-                <span className="text-xl font-bold">TeamSync</span>
+                <span className="text-xl font-bold">flowstack</span>
               </div>
               <p className="text-muted-foreground text-sm">
                 The complete workspace for modern teams
@@ -435,7 +434,7 @@ export default function LandingPage() {
 
           <div className="border-t pt-8 flex flex-col md:flex-row justify-between items-center">
             <p className="text-sm text-muted-foreground mb-4 md:mb-0">
-              © 2024 TeamSync. All rights reserved.
+              © 2025 flowstack. All rights reserved.
             </p>
             <div className="flex space-x-6">
               <a

@@ -27,7 +27,7 @@ export default function UserCard() {
         </div>
 
         {/* Text */}
-        <div className="flex flex-col md:hidden">
+        <div className="flex flex-col sm:hidden">
           {isOpen && (
             <div>
               <p>Home</p>

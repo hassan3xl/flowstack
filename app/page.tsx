@@ -320,62 +320,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing */}
-      <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Simple, transparent pricing
-            </h2>
-            <p className="text-xl text-muted-foreground">
-              Start free, scale as you grow
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <PricingCard
-              name="Free"
-              price="$0"
-              description="Perfect for small teams getting started"
-              features={[
-                "Up to 10 team members",
-                "5 projects",
-                "Basic task management",
-                "1GB storage",
-                "Community support",
-              ]}
-            />
-            <PricingCard
-              name="Pro"
-              price="$12"
-              description="For growing teams that need more"
-              features={[
-                "Unlimited team members",
-                "Unlimited projects",
-                "Advanced workflows",
-                "50GB storage",
-                "Priority support",
-                "Custom integrations",
-              ]}
-              highlighted
-            />
-            <PricingCard
-              name="Enterprise"
-              price="Custom"
-              description="For organizations with advanced needs"
-              features={[
-                "Everything in Pro",
-                "Unlimited storage",
-                "Advanced security",
-                "SSO & SAML",
-                "Dedicated support",
-                "Custom contract",
-              ]}
-            />
-          </div>
-        </div>
-      </section>
-
       {/* CTA Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
@@ -542,55 +486,6 @@ function StepCard({ number, title, description }: { [key: string]: any }) {
         <h3 className="text-xl font-semibold mb-2">{title}</h3>
         <p className="text-muted-foreground">{description}</p>
       </div>
-    </div>
-  );
-}
-
-function PricingCard({
-  name,
-  price,
-  description,
-  features,
-  highlighted,
-}: {
-  [key: string]: any;
-}) {
-  return (
-    <div
-      className={`bg-card rounded-lg border p-8 ${
-        highlighted ? "ring-2 ring-primary shadow-xl scale-105" : ""
-      }`}
-    >
-      {highlighted && (
-        <div className="bg-primary text-primary-foreground text-sm font-semibold px-3 py-1 rounded-full inline-block mb-4">
-          Most Popular
-        </div>
-      )}
-      <h3 className="text-2xl font-bold mb-2">{name}</h3>
-      <div className="mb-4">
-        <span className="text-4xl font-bold">{price}</span>
-        {price !== "Custom" && (
-          <span className="text-muted-foreground">/month</span>
-        )}
-      </div>
-      <p className="text-muted-foreground mb-6">{description}</p>
-      <button
-        className={`w-full py-3 rounded-lg font-semibold mb-6 transition ${
-          highlighted
-            ? "bg-primary text-primary-foreground hover:bg-primary/90"
-            : "border hover:bg-accent"
-        }`}
-      >
-        Get Started
-      </button>
-      <ul className="space-y-3">
-        {features.map(({ feature, index }: { [key: string]: any }) => (
-          <li key={index} className="flex items-start space-x-3">
-            <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-            <span className="text-sm">{feature}</span>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }

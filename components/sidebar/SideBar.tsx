@@ -16,9 +16,8 @@ export function Sidebar() {
   const [openAddServerModal, setOpenAddServerModal] = useState(false);
   const [openServerInviteModal, setOpenServerInviteModal] = useState(false);
 
-  const { isOpen, toggleSidebar, closeSidebar } = useSidebar();
+  const { isOpen, closeSidebar } = useSidebar();
   const { data: invites } = useGetServerInvites();
-  console.log("invites", invites);
 
   return (
     <>

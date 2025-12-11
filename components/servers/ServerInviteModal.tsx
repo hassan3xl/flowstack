@@ -37,8 +37,6 @@ const ServerInviteModal = ({
       await acceptInvite(inviteId);
       toast.success("Invitation accepted");
       onClose(); // ✅ CLOSE MODAL AFTER SUCCESS
-    } catch (err: any) {
-      toast.error("Failed to accept invitation");
     } finally {
       setActiveInviteId(null);
     }
@@ -69,9 +67,9 @@ const ServerInviteModal = ({
       size="md"
     >
       <div className="space-y-4">
-        {pendingInvites && pendingInvites.length > 0 ? (
+        {pendingInvites && pendingInvites?.length > 0 ? (
           <div className="grid grid-cols-1 gap-4">
-            {pendingInvites.map((invite) => (
+            {pendingInvites?.map((invite) => (
               <div
                 key={invite.id}
                 className="flex flex-col border-b py-4 gap-4"

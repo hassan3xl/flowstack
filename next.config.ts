@@ -3,7 +3,8 @@ import withPWA from "next-pwa";
 
 const isDev = process.env.NODE_ENV === "development";
 
-const baseConfig: NextConfig = {
+const config: NextConfig = {
+  // No turbopack config needed unless customizing behavior
   images: {
     remotePatterns: [
       {
@@ -15,23 +16,21 @@ const baseConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "flowstack-backend.onrender.com",
-        port: "",
         pathname: "/**",
       },
     ],
   },
+
   eslint: {
     ignoreDuringBuilds: true,
   },
+
   reactStrictMode: true,
-  swcMinify: true,
 };
 
-const nextConfig = withPWA({
+export default withPWA({
   dest: "public",
   disable: isDev,
   register: true,
   skipWaiting: true,
-})(baseConfig as any);
-
-export default nextConfig;
+})(config as any);

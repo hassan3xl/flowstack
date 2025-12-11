@@ -13,7 +13,6 @@ export const metadata: Metadata = {
   description:
     "a collaborative project management platform where teams plan, assign, and complete tasks in real time. Organize projects, manage permissions, and keep your workflow in sync — all in one sleek, dark interface.",
   manifest: "/manifest.json",
-  themeColor: "#ffffff",
   icons: {
     icon: [
       {
@@ -29,6 +28,10 @@ export const metadata: Metadata = {
     ],
     apple: [{ url: "/icons/ios/180.png", sizes: "180x180", type: "image/png" }],
   },
+};
+
+export const viewport = {
+  themeColor: "#000000",
 };
 
 export default function RootLayout({

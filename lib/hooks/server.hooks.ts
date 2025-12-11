@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { serverApi } from "../api/server.api";
 import { ServerType } from "../types/server.types";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function useGetServers() {
   return useQuery({
@@ -36,9 +37,11 @@ export function useGetServerMembers(serverId: string) {
 
 // GET  SERVER INVITES
 export function useGetServerInvites() {
+  const { user } = useAuth();
   return useQuery({
     queryKey: ["server-invites"],
     queryFn: () => serverApi.getServerInvites(),
+    enabled: !!user,
   });
 }
 

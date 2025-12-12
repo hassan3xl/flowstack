@@ -46,6 +46,7 @@ export function Sidebar() {
               setOpenServerInviteModal={setOpenServerInviteModal}
               invites={invites}
               isOpen={isOpen}
+              closeSidebar={closeSidebar}
             />
           </div>
         </div>

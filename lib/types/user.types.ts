@@ -1,12 +1,18 @@
+export interface ProfileUserType {
+  id: string;
+  email: string;
+}
+
 export interface ProfilePType {
   id: string;
   avatar: string;
   first_name: string;
   last_name: string;
+  full_name: string;
+  username: string;
   bio: string;
   phone_number: string;
-  timezone: string;
-  email_notifications: boolean;
+  user: ProfileUserType;
 }
 
 export interface UserType {

@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { FormInput } from "../input/formInput";
 import { useCreateServer } from "@/lib/hooks/server.hooks";
+import { toast } from "sonner";
 
 interface AddServerModalProps {
   isOpen: boolean;
@@ -19,7 +20,7 @@ interface AddServerModalProps {
 interface FormData {
   name: string;
   description: string;
-  server_type: "pubic" | "private";
+  server_type: "public" | "private";
 }
 
 const AddServerModal = ({ isOpen, onClose }: AddServerModalProps) => {
@@ -37,7 +38,8 @@ const AddServerModal = ({ isOpen, onClose }: AddServerModalProps) => {
 
   const onSubmit = async (data: FormData) => {
     try {
-      await createServer({ serverData: data });
+      await createServer(data);
+      toast.success("Server created successfully");
       onClose();
     } catch (error) {}
   };
@@ -116,14 +118,15 @@ const AddServerModal = ({ isOpen, onClose }: AddServerModalProps) => {
         <FormInput
           name="name"
           label="Server Name"
-          placeholder="Enter a name for your server"
           register={register}
+          placeholder="Enter a name for your server"
           errors={errors}
           type="text"
         />
 
         <FormInput
           name="description"
+          field="textarea"
           label="Server Description (Optional)"
           placeholder="Enter a description for your server"
           register={register}
@@ -134,14 +137,17 @@ const AddServerModal = ({ isOpen, onClose }: AddServerModalProps) => {
         <div>
           <label className="block mb-2 font-medium">Server Type</label>
           <select
-            {...register("server_type", { required: true })}
-            className="w-full bg-neutral-800 border border-neutral-600 rounded p-3"
+            {...register("server_type", {
+              required: "Server type is required",
+            })}
+            className="w-full bg-neutral-800 border border-neutral-600 rounded-lg p-2"
           >
-            <option value="public">Public</option>
             <option value="private">Private</option>
+            <option value="public">Public</option>
           </select>
+
           {errors.server_type && (
-            <p className="text-red-500 text-sm">Server type is required</p>
+            <p className="text-red-500 text-sm">{errors.server_type.message}</p>
           )}
         </div>
 

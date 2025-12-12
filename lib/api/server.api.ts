@@ -6,24 +6,12 @@ export const serverApi = {
     return res;
   },
   getServers: async () => {
-    try {
-      const res = await apiService.get("/servers/");
-      return res;
-      console.log("res", res);
-    } catch (error) {
-      console.error("Error fetching servers:", error);
-      throw error;
-    }
+    const res = await apiService.get("/servers/");
+    return res;
   },
   getPublicServers: async () => {
-    try {
-      const res = await apiService.get("/servers/public_servers/");
-      return res;
-      console.log("res", res);
-    } catch (error) {
-      console.error("Error fetching servers:", error);
-      throw error;
-    }
+    const res = await apiService.get("/servers/public_servers/");
+    return res;
   },
   getServerInvites: async () => {
     try {

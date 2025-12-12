@@ -60,7 +60,6 @@ export function Navbar() {
           <div className="flex gap-4 items-center">
             <MessagesDropdown />
             <NotificationDropdown />
-            <AccountDropdown />
           </div>
         </div>
       </div>

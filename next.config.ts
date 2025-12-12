@@ -8,15 +8,10 @@ const config: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: "http",
-        hostname: "localhost",
-        port: "8000",
-        pathname: "/**",
-      },
-      {
         protocol: "https",
-        hostname: "flowstack-backend.onrender.com",
-        pathname: "/**",
+        hostname: "res.cloudinary.com",
+        // Optional: If you want to restrict to certain paths (usually not needed for Cloudinary)
+        // pathname: '/dfu8qswfh/**',
       },
     ],
   },

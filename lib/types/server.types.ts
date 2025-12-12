@@ -1,4 +1,11 @@
-export type MembersType = {};
+import { UserType } from "./user.types";
+
+export type MembersType = {
+  id: string;
+  user: UserType;
+  role: string;
+  joined_at: string;
+};
 
 export type ServerType = {
   id: string;

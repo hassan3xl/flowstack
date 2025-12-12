@@ -24,6 +24,7 @@ async function fetchWithCatch(
     }
 
     if (response.status === 401) {
+      // Optional: Add logic to clear local storage if needed
       window.location.href = "/auth/signin/";
     }
 
@@ -42,6 +43,39 @@ async function fetchWithCatch(
   }
 }
 
+// Helper to construct headers and body dynamically
+async function createRequestOptions(method: string, data?: any) {
+  const token = await getAccessToken();
+
+  const headers: HeadersInit = {
+    Accept: "application/json",
+  };
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  let body: BodyInit | undefined;
+
+  // Check if data is FormData (for images/files)
+  if (data instanceof FormData) {
+    // DO NOT set Content-Type header for FormData.
+    // The browser automatically sets it to "multipart/form-data" with the correct boundary.
+    body = data;
+  } else if (data) {
+    // For standard objects, use JSON
+    headers["Content-Type"] = "application/json";
+    body = JSON.stringify(data);
+  }
+
+  return {
+    method,
+    credentials: "include" as RequestCredentials,
+    headers,
+    body,
+  };
+}
+
 export const apiService = {
   get: async function (url: string): Promise<any> {
     const token = await getAccessToken();
@@ -55,6 +89,7 @@ export const apiService = {
       },
     });
   },
+
   postWithoutToken: async function (url: string, data: any): Promise<any> {
     return fetchWithCatch(url, {
       method: "POST",
@@ -66,66 +101,22 @@ export const apiService = {
     });
   },
 
+  // Now handles both JSON and FormData automatically
   post: async function (url: string, data?: any): Promise<any> {
-    const token = await getAccessToken();
-
-    const options: RequestInit = {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    };
-
-    // Only add body if data is provided
-    if (data !== undefined) {
-      options.body = JSON.stringify(data);
-    }
-
+    const options = await createRequestOptions("POST", data);
     return fetchWithCatch(url, options);
   },
 
-  postFormData: async function (url: string, formData: FormData): Promise<any> {
-    const token = await getAccessToken();
-
-    return fetchWithCatch(url, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
-    });
-  },
-
+  // Now handles both JSON and FormData automatically
   put: async function (url: string, data: any): Promise<any> {
-    const token = await getAccessToken();
-    return fetchWithCatch(url, {
-      method: "PUT",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(data),
-    });
+    const options = await createRequestOptions("PUT", data);
+    return fetchWithCatch(url, options);
   },
+
+  // Now handles both JSON and FormData automatically
   patch: async function (url: string, data: any): Promise<any> {
-    const token = await getAccessToken();
-    return fetchWithCatch(url, {
-      method: "PATCH",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(data),
-    });
+    const options = await createRequestOptions("PATCH", data);
+    return fetchWithCatch(url, options);
   },
 
   delete: async function (url: string): Promise<any> {

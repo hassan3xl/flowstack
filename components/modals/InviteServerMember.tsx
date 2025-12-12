@@ -44,9 +44,7 @@ const InviteServerMember: React.FC<InviteServerMemberProps> = ({
       toast.success("invite has sent to the user");
       reset();
       onClose();
-    } catch {
-      // ✅ NO NEED TO HANDLE ANYTHING HERE
-    }
+    } catch {}
   };
 
   return (
@@ -56,10 +54,11 @@ const InviteServerMember: React.FC<InviteServerMemberProps> = ({
         <FormInput
           register={register}
           name="email"
-          placeholder="Enter a name for your project"
+          placeholder="Enter user email"
           required
-          field="input"
-          label="Project Name"
+          errors={errors}
+          type="email"
+          label="User Email"
         />
 
         {/* role */}

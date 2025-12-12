@@ -8,16 +8,18 @@ import { createPortal } from "react-dom";
 import HomeCard from "./HomeCard";
 import UserCard from "./UserCard";
 import { Button } from "../ui/button";
-import { PlusIcon } from "lucide-react";
+import { LogOut, PlusIcon } from "lucide-react";
 import AddServerModal from "./AddServerModal";
 import { formatDate } from "@/lib/utils";
 import { InvitesType } from "@/lib/types/server.types";
+import { toast } from "sonner";
 
 interface ServerPageProps {
   setOpenAddServerModal: (open: boolean) => void;
   setOpenServerInviteModal: (open: boolean) => void;
   invites: InvitesType[];
   isOpen: boolean;
+  closeSidebar: () => void;
 }
 
 export default function ServersPage({
@@ -25,6 +27,7 @@ export default function ServersPage({
   setOpenServerInviteModal,
   invites,
   isOpen,
+  closeSidebar,
 }: ServerPageProps) {
   const { data: servers, isLoading } = useGetServers();
 
@@ -95,7 +98,11 @@ export default function ServersPage({
             Invites
           </Button>
           <Button
-            onClick={() => setOpenAddServerModal(true)}
+            onClick={() => {
+              closeSidebar();
+
+              setOpenAddServerModal(true);
+            }}
             size={"sm"}
             variant={"outline"}
           >

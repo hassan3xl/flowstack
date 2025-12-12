@@ -19,7 +19,7 @@ interface FormData {
   title: string;
   description: string;
   priority: "high" | "medium" | "low";
-  due_date?: string;
+  due_date?: string | null;
 }
 
 const AddProjectItemModal = ({
@@ -39,9 +39,14 @@ const AddProjectItemModal = ({
   } = useForm<FormData>();
 
   const onSubmit = async (data: FormData) => {
+    const payload = { ...data };
+
+    if (!payload.due_date) {
+      payload.due_date = null;
+    }
     try {
       await addProjectItem({
-        projectData: data,
+        projectData: payload,
         serverId,
         projectId,
       });
@@ -49,22 +54,29 @@ const AddProjectItemModal = ({
       toast.success("Task added successfully");
       reset();
       onClose();
-    } catch (error) {
-      toast.error("Failed to add task");
-    }
+    } catch (error) {}
   };
 
   return (
     <BaseModal isOpen={isOpen} onClose={onClose} title="Add Task to Project">
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
         {/* Title */}
-        <FormInput register={register} name="title" label="Title" required />
+        <FormInput
+          register={register}
+          name="title"
+          label="Title"
+          type="text"
+          placeholder="Enter a title for your task"
+          required
+        />
 
         {/* Description */}
         <FormInput
           register={register}
           name="description"
           label="Description"
+          field="textarea"
+          placeholder="Enter a description for your task"
           required
         />
 

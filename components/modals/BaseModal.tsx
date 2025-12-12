@@ -1,6 +1,7 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 
 interface BaseModalProps {
@@ -24,12 +25,41 @@ const BaseModal: React.FC<BaseModalProps> = ({
   children,
   size = "md",
 }) => {
-  if (!isOpen) return null;
+  const [mounted, setMounted] = useState(false);
+  const overlayRef = useRef<HTMLDivElement>(null);
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+  // Ensure DOM is ready (avoids SSR portal errors)
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
+
+  // Close on ESC key
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onClose]);
+
+  // Close on outside click
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (e.target === overlayRef.current) onClose();
+  };
+
+  if (!mounted || !isOpen) return null;
+
+  return createPortal(
+    <div
+      ref={overlayRef}
+      onMouseDown={handleOverlayClick}
+      className="fixed inset-0 z-[9999] flex items-center justify-center
+                bg-black/40 backdrop-blur-sm transition-opacity animate-fadeIn"
+    >
       <div
-        className={`relative w-full ${sizeClasses[size]} bg-card border border-border rounded-lg shadow-lg p-6`}
+        className={`relative w-full ${sizeClasses[size]} bg-card border border-border 
+                    rounded-lg shadow-lg p-6 transform animate-scaleIn`}
       >
         {/* Header */}
         <div className="flex justify-between items-center border-b pb-3">
@@ -42,10 +72,11 @@ const BaseModal: React.FC<BaseModalProps> = ({
           </button>
         </div>
 
-        {/* Content */}
+        {/* Body */}
         <div className="mt-4">{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body // Safe because mounted ensures browser environment
   );
 };
 

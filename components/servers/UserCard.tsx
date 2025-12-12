@@ -10,7 +10,7 @@ export default function UserCard() {
 
   return (
     <div
-      onClick={() => router.push(`/home`)}
+      onClick={() => router.push(`/account`)}
       className="border rounded-lg p-1 shadow-sm hover:shadow-md bg-yellow-800 cursor-pointer transition"
     >
       <div className="flex items-center gap-4">

@@ -7,11 +7,15 @@ import { useRouter } from "next/navigation";
 
 export default function HomeCard() {
   const router = useRouter();
-  const { isOpen } = useSidebar();
+  const { isOpen, closeSidebar } = useSidebar();
 
   return (
     <div
-      onClick={() => router.push(`/home`)}
+      onClick={() => {
+        closeSidebar();
+
+        router.push(`/home`);
+      }}
       className="border rounded-lg p-1 shadow-sm hover:shadow-md bg-muted/50 cursor-pointer transition"
     >
       <div className="flex items-center gap-4">

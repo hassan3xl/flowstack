@@ -7,11 +7,14 @@ import { useRouter } from "next/navigation";
 
 export default function MessageCard() {
   const router = useRouter();
-  const { isOpen } = useSidebar();
+  const { isOpen, closeSidebar } = useSidebar();
 
   return (
     <div
-      onClick={() => router.push(`/chats`)}
+      onClick={() => {
+        closeSidebar();
+        router.push(`/chats`);
+      }}
       className="border rounded-lg p-1 shadow-sm hover:shadow-md bg-accent/50 cursor-pointer transition"
     >
       <div className="flex items-center gap-4">

@@ -36,7 +36,7 @@ export const TransitionLoader = ({
         <div className="relative w-32 h-32 mx-auto mb-8">
           <div
             className="absolute inset-0 border-4 border-white/30 rounded-full animate-spin"
-            style={{ animationDuration: "3s" }}
+            style={{ animationDuration: "5s" }}
           ></div>
           <div className="absolute inset-2 border-4 border-white/50 rounded-full animate-pulse"></div>
           <div className="absolute inset-0 flex items-center justify-center">
@@ -46,9 +46,7 @@ export const TransitionLoader = ({
             </div>
           </div>
         </div>
-        <h2 className="text-3xl font-bold text-white mb-2">
-          Switching to Server
-        </h2>
+        <h2 className="text-3xl font-bold text-white mb-2">Loading Server</h2>
         <p className="text-white/80 text-lg">Preparing your workspace...</p>
         <div className="w-64 h-2 bg-white/20 rounded-full mx-auto mt-6 overflow-hidden">
           <div className="h-full bg-white rounded-full animate-[loading_2s_ease-in-out]"></div>

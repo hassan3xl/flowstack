@@ -25,11 +25,11 @@ export default function HomeCard() {
         </div>
 
         {/* Text */}
-        <div className="flex flex-col sm:hidden">
+        <div className="flex flex-col md:hidden">
           {isOpen && (
             <div>
               <p>Home</p>
-              <p>coming soon</p>
+              <p>get your feeds and so on ....</p>
             </div>
           )}
         </div>

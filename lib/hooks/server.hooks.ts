@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { serverApi } from "../api/server.api";
 import { ServerType } from "../types/server.types";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 export function useGetServers() {
   return useQuery({
@@ -44,6 +45,45 @@ export function useGetServerInvites() {
     enabled: !!user,
   });
 }
+
+export const useUploadServerImage = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      serverId,
+      formData,
+    }: {
+      serverId: string;
+      formData: FormData;
+    }) => serverApi.uploadServerIcon(serverId, formData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["servers"] });
+      queryClient.invalidateQueries({ queryKey: ["server"] });
+      toast.success("Icon uploaded successfully!");
+    },
+  });
+};
+
+interface UpdateRolePayload {
+  serverId: string;
+  userId: string;
+  role: string;
+}
+
+export const useUpdateMemberRole = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ serverId, userId, role }: UpdateRolePayload) => {
+      return await serverApi.updateMemberRole(serverId, userId, role);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["serverMembers"] });
+      toast.success("Role updated successfully");
+    },
+  });
+};
 
 export const useAcceptServerInvites = () => {
   const queryClient = useQueryClient();

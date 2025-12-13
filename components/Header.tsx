@@ -26,8 +26,9 @@ const StatCard = ({ title, value, icon, trend }: StatCardData) => {
     <div className="bg-card rounded-xl p-6 shadow-sm border border-border hover:shadow-md hover:border-ring transition-all">
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <p className="text-sm font-medium text-primary mb-1">{title}</p>
           <h3 className="text-2xl font-bold text-foreground">{value}</h3>
+
+          <p className="text-sm font-medium text-primary mb-1">{title}</p>
           {trend && (
             <p
               className={`text-sm mt-2 flex items-center gap-1 ${

@@ -48,7 +48,8 @@ export default function RootLayout({
               <ServiceWorkerRegistration />
               <SidebarProvider>
                 <Toaster richColors position="top-right" />
-                <>{children}</>
+                <div id="app-root">{children}</div>
+                <div id="sidebar-root" />
               </SidebarProvider>{" "}
             </AuthProvider>
           </QueryProvider>

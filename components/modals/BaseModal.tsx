@@ -76,7 +76,7 @@ const BaseModal: React.FC<BaseModalProps> = ({
         <div className="mt-4">{children}</div>
       </div>
     </div>,
-    document.body // Safe because mounted ensures browser environment
+    document.body
   );
 };
 

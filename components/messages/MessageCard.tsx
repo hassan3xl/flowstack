@@ -24,11 +24,11 @@ export default function MessageCard() {
         </div>
 
         {/* Text */}
-        <div className="flex flex-col w-full sm:hidden">
+        <div className="flex flex-col w-full md:hidden">
           {isOpen && (
             <div>
-              <p>Home</p>
-              <p>coming soon</p>
+              <p>Chats</p>
+              <p>get your chats and so on ....</p>
             </div>
           )}
         </div>

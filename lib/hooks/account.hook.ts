@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { accountApi } from "../api/account.api";
+import { toast } from "sonner";
 
 export const useGetAccount = () => {
   return useQuery({
@@ -21,6 +22,7 @@ export const useUpdateProfile = () => {
     mutationFn: (data: any) => accountApi.updateProfile(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
+      toast.success("Profile updated successfully");
     },
   });
 };
@@ -31,6 +33,7 @@ export const useUploaadAvatar = () => {
     mutationFn: (data: any) => accountApi.uploadAvatar(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
+      toast.success("Avatar uploaded successfully!");
     },
   });
 };

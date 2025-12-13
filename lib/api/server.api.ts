@@ -14,14 +14,17 @@ export const serverApi = {
     return res;
   },
   getServerInvites: async () => {
-    try {
-      const res = await apiService.get("/servers/invites/received/");
-      return res;
-      console.log("res", res);
-    } catch (error) {
-      console.error("Error fetching server invites:", error);
-      throw error;
-    }
+    const res = await apiService.get("/servers/invites/received/");
+    return res;
+  },
+  uploadServerIcon: async (serverId: string, formData: FormData) => {
+    return apiService.patch(`/servers/${serverId}/icon/`, formData);
+  },
+
+  updateMemberRole: async (serverId: string, userId: string, role: string) => {
+    return apiService.post(`/servers/${serverId}/${userId}/role/`, {
+      role: role,
+    });
   },
   inviteUserToServer: async (inviteData: string, serverId: string) => {
     return apiService.post(`/servers/${serverId}/invite/`, inviteData);

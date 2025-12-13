@@ -43,7 +43,7 @@ export function AccountDropdown() {
                       {user.username || "User"}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {user.email}
+                      {user.user.email}
                     </p>
                   </div>
                 </DropdownMenuLabel>

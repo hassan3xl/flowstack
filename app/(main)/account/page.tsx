@@ -28,7 +28,6 @@ import { toast } from "sonner";
 const sidebarNavItems = [
   { title: "Profile", icon: User, id: "profile" },
   { title: "Account", icon: Settings, id: "account" },
-  { title: "Billing", icon: CreditCard, id: "billing" },
   { title: "Notifications", icon: Bell, id: "notifications" },
 ];
 
@@ -64,7 +63,6 @@ const SidebarNav = ({ items, activeTab, setActiveTab }: any) => {
           {item.title}
         </Button>
       ))}
-      <Separator className="my-4 hidden lg:block" />
       <Button
         variant="ghost"
         onClick={handleLogout}
@@ -82,11 +80,10 @@ const ProfileForm = () => {
   const updateProfile = useUpdateProfile();
   const uploadAvatar = useUploaadAvatar();
 
-  const { register, handleSubmit, setValue } = useForm<ProfileForm>();
+  const { register, handleSubmit } = useForm<ProfileForm>();
 
   if (isLoading) return <div>Loading...</div>;
 
-  // Patch JSON payload for non-file fields
   const onUpdateProfile = (data: ProfileForm) => {
     const payload = {
       first_name: data.first_name,
@@ -96,19 +93,17 @@ const ProfileForm = () => {
     };
 
     updateProfile.mutateAsync(payload);
-    toast.success("Profile updated successfully");
   };
 
   // Handle only avatar file upload
   const onAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    console.log("file", file);
 
     const formData = new FormData();
     formData.append("avatar", file);
-
     uploadAvatar.mutate(formData);
-    toast.success("Avatar uploaded successfully!");
   };
 
   return (

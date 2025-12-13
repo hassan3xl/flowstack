@@ -32,9 +32,9 @@ export function Sidebar() {
       {/* Sidebar panel */}
       <aside
         className={cn(
-          "fixed z-50 otop-0 left-0 h-full bg-sidebar border-r border-border transition-all duration-300 ease-in-out",
+          "fixed z-[999999] left-0 h-full bg-sidebar border-r border-border transition-all duration-300 ease-in-out",
           isOpen
-            ? "w-full sm:w-27 translate-x-0"
+            ? "w-full sm:w-120 md:w-26 translate-x-0"
             : "w-27 -translate-x-full md:translate-x-0 md:w-26"
         )}
       >

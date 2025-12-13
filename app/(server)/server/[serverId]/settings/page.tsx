@@ -20,9 +20,15 @@ import {
 import React, { useEffect, useState } from "react";
 import Loader from "@/components/Loader";
 import { useServer } from "@/contexts/ServerContext";
-import { useGetServer } from "@/lib/hooks/server.hooks";
+import {
+  useGetServer,
+  useUpdateMemberRole,
+  useUploadServerImage,
+} from "@/lib/hooks/server.hooks";
 import { formatDate } from "@/lib/utils";
 import InviteServerMember from "@/components/modals/InviteServerMember";
+import Image from "next/image";
+import Header from "@/components/Header";
 
 // Dummy data for new features
 const dummyPendingInvites = [
@@ -59,9 +65,22 @@ const ServerSettingsPage = () => {
   const [openInviteModal, setOpenInviteModal] = useState(false);
   const [activeTab, setActiveTab] = useState("members");
 
-  const handleRoleChange = ({ memberId, newRole }: any) => {
-    console.log(`Changing role for member ${memberId} to ${newRole}`);
-    // API call would go here
+  const { mutateAsync: uploadIcon } = useUploadServerImage();
+
+  const handleUploadIcon = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    console.log("file", file);
+
+    const formData = new FormData();
+    formData.append("icon", file);
+    uploadIcon({ serverId, formData });
+  };
+
+  const { mutate: updateRole } = useUpdateMemberRole();
+
+  const handleRoleChange = (memberId: string, newRole: string) => {
+    updateRole({ serverId, userId: memberId, role: newRole });
   };
 
   const handleSuspendMember = (memberId: any) => {
@@ -90,90 +109,86 @@ const ServerSettingsPage = () => {
   return (
     <div className="min-h-screen">
       <div className="space-y-6">
-        {/* Header */}
-        <div className="bg-card p-6 rounded-xl shadow-lg border border-border">
-          <div className="flex items-center gap-3 mb-2">
-            <Settings className="w-8 h-8 text-primary" />
-            <h1 className="text-lg sm:text-3xl font-bold">Server Settings</h1>
-          </div>
-          <p className="text-muted-foreground">
-            Manage your Server details, members, and more
-          </p>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-card p-5 rounded-xl border border-border shadow-lg hover:shadow-xl transition-shadow">
-            <div className="flex items-center justify-between mb-2">
-              <Users className="w-5 h-5 text-blue-500" />
-              <span className="text-2xl font-bold">
-                {dummyStats.totalMembers}
-              </span>
-            </div>
-            <p className="text-sm text-muted-foreground">Total Members</p>
-          </div>
-
-          <div className="bg-card p-5 rounded-xl border border-border shadow-lg hover:shadow-xl transition-shadow">
-            <div className="flex items-center justify-between mb-2">
-              <Activity className="w-5 h-5 text-green-500" />
-              <span className="text-2xl font-bold">
-                {dummyStats.activeToday}
-              </span>
-            </div>
-            <p className="text-sm text-muted-foreground">Active Today</p>
-          </div>
-
-          <div className="bg-card p-5 rounded-xl border border-border shadow-lg hover:shadow-xl transition-shadow">
-            <div className="flex items-center justify-between mb-2">
-              <MessageSquare className="w-5 h-5 text-purple-500" />
-              <span className="text-2xl font-bold">
-                {dummyStats.totalMessages}
-              </span>
-            </div>
-            <p className="text-sm text-muted-foreground">Total Messages</p>
-          </div>
-
-          <div className="bg-card p-5 rounded-xl border border-border shadow-lg hover:shadow-xl transition-shadow">
-            <div className="flex items-center justify-between mb-2">
-              <Mail className="w-5 h-5 text-yellow-500" />
-              <span className="text-2xl font-bold">
-                {dummyStats.pendingInvites}
-              </span>
-            </div>
-            <p className="text-sm text-muted-foreground">Pending Invites</p>
-          </div>
-        </div>
-
         {/* Project Information Card */}
         <div className="bg-card rounded-xl border border-border shadow-lg overflow-hidden">
           <div className="p-6 border-b border-border">
-            <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <h2 className="text-md sm:text-2xl font-semibold">
-                    {server.name}
-                  </h2>
-                  <span className="px-3 py-1 bg-green-500/10 text-green-500 text-xs font-medium rounded-full border border-green-500/20">
-                    Active
-                  </span>
+            <div className="flex flex-col justify-between items-start gap-4">
+              <div className="flex gap-4">
+                <div className="sppace-y-4">
+                  <Image
+                    src={server.icon}
+                    alt="Server Icon"
+                    width={100}
+                    height={100}
+                    className="rounded-lg"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      document.getElementById("avatarInput")?.click()
+                    }
+                    type="button"
+                  >
+                    Change Icon
+                  </Button>
+                  <input
+                    id="avatarInput"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleUploadIcon}
+                  />{" "}
                 </div>
-                <p className="text-muted-foreground leading-relaxed mb-4">
-                  {server.description}
-                </p>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    <span>Created: {formatDate(server.created_at)}</span>
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h2 className="text-md sm:text-2xl font-semibold">
+                      {server.name}
+                    </h2>
+                  </div>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    {server.description}
+                  </p>
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4" />
+                      <span>Created: {formatDate(server.created_at)}</span>
+                    </div>
                   </div>
                 </div>
               </div>
-              <Button size="sm">
-                <Edit3 className="w-4 h-4 mr-2" />
-                Edit
-              </Button>
+              <div className="bg-card/10 w-full">
+                <Button size={"sm"}>Edit</Button>
+              </div>
             </div>
           </div>
         </div>
+
+        {/* Stats Grid */}
+        <Header
+          stats={[
+            {
+              title: "Total Members",
+              value: dummyStats.totalMembers,
+              icon: <Users className="w-5 h-5" />,
+            },
+            {
+              title: "Pending Invites",
+              value: dummyStats.pendingInvites,
+              icon: <Mail className="w-5 h-5" />,
+            },
+            {
+              title: "Active Today",
+              value: dummyStats.activeToday,
+              icon: <Activity className="w-5 h-5" />,
+            },
+            {
+              title: "Total Messages",
+              value: dummyStats.totalMessages,
+              icon: <MessageSquare className="w-5 h-5" />,
+            },
+          ]}
+        />
 
         {/* Tabs Section */}
         <div className="bg-card rounded-xl border border-border shadow-lg overflow-hidden">
@@ -260,6 +275,9 @@ const ServerSettingsPage = () => {
                         <select
                           className="px-3 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                           defaultValue={member.role}
+                          onChange={(e) =>
+                            handleRoleChange(member.id, e.target.value)
+                          }
                         >
                           <option value="member">Member</option>
                           <option value="moderator">Moderator</option>

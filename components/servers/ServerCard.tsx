@@ -57,7 +57,7 @@ export default function ServerCard({ server }: ServerCardProps) {
         </div>
 
         {/* Text Content */}
-        <div className="flex flex-col sm:hidden">
+        <div className="flex flex-col md:hidden">
           {isOpen && (
             <div>
               <p className="font-medium">{server.name}</p>

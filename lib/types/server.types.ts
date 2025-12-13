@@ -11,6 +11,7 @@ export type ServerType = {
   id: string;
   name: string;
   description: string;
+  icon: string;
   total_projects: number; // dummy will be removed
   created_at: string;
   user_role: "admin" | "member" | "moderator" | "owner";

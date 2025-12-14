@@ -18,7 +18,7 @@ interface ServerCardProps {
 
 export default function ServerCard({ server }: ServerCardProps) {
   const router = useRouter();
-  const { isOpen } = useSidebar();
+  const { isOpen, closeSidebar } = useSidebar();
 
   // Helper to get the first letter safely
   const firstLetter = server.name ? server.name.charAt(0).toUpperCase() : "?";
@@ -27,6 +27,7 @@ export default function ServerCard({ server }: ServerCardProps) {
     // Store transition state
     sessionStorage.setItem("showTransition", "true");
     router.push(`/server/${server.id}`);
+    closeSidebar();
   };
 
   return (

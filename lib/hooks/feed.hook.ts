@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { feedApi } from "../api/feed.api";
+import { toast } from "sonner";
 
 export function useGetFeed() {
   return useQuery({
@@ -14,6 +15,25 @@ export function useGetServerFeeds(serverId: string) {
     queryFn: () => feedApi.getServerFeeds(serverId),
   });
 }
+
+export const useCreateFeed = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      feedData,
+      serverId,
+    }: {
+      feedData: { content: string };
+      serverId: string;
+    }) => feedApi.createFeed(serverId, feedData),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["feeds"] });
+      toast.success("Feed created successfully!");
+    },
+  });
+};
 
 // export function useGetPublicfeeds() {
 //   return useQuery({

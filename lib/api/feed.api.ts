@@ -1,16 +1,6 @@
 import { apiService } from "../services/apiService";
 
 export const feedApi = {
-  AddPost: async (serverData: any) => {
-    try {
-      const res = await apiService.post("/feeds/", serverData);
-      return res;
-      console.log("res", res);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      throw error;
-    }
-  },
   getFeeds: async () => {
     try {
       const res = await apiService.get("/feeds/");
@@ -23,15 +13,18 @@ export const feedApi = {
   },
 
   getServerFeeds: async (serverId: string) => {
-    try {
-      const res = await apiService.get(`/feeds/${serverId}/feeds/`);
-      return res;
-      console.log("res", res);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      throw error;
-    }
+    const res = await apiService.get(`/feeds/server/${serverId}/`);
+    return res;
   },
+
+  createFeed: async (serverId: string, data: { content: string }) => {
+    const res = await apiService.post(
+      `/feeds/server/${serverId}/create/`,
+      data
+    );
+    return res;
+  },
+
   getPublicfeeds: async () => {
     try {
       const res = await apiService.get("/servers/public_servers/");

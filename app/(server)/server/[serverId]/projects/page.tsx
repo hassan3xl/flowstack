@@ -12,6 +12,7 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import { useServer } from "@/contexts/ServerContext";
+import { Input } from "@/components/ui/input";
 
 interface ProjectPageProps {}
 
@@ -73,12 +74,11 @@ const ProjectPage = ({}: ProjectPageProps) => {
                 </Button>
               </div>
               <div>
-                <InputField
+                <Input
                   placeholder="Search"
                   className="w-full mx-auto "
-                  icon={Search}
                   type="search"
-                />
+                ></Input>
               </div>
             </div>
 

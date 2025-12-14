@@ -11,8 +11,8 @@ export default function MainLayout({ children }: MainLayoutProps) {
     <div className="bg-background text-foreground min-h-screen">
       <Navbar />
 
-      <div className="flex pt-16">
-        <div className="fixed left-0 top-12 h-[calc(100vh-4rem)]">
+      <div className="flex pt-12">
+        <div className="left-0 top-12 h-[calc(100vh-4rem)]">
           <Sidebar />
         </div>
 

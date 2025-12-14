@@ -52,7 +52,7 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
   };
 
   return (
-    <BaseModal isOpen={isOpen} onClose={onClose} title="Add Todo Project">
+    <BaseModal isOpen={isOpen} onClose={onClose} title="Add a Project">
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
         {/* Project Name */}
         <FormInput

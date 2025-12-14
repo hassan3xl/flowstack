@@ -21,10 +21,8 @@ export const serverApi = {
     return apiService.patch(`/servers/${serverId}/icon/`, formData);
   },
 
-  updateMemberRole: async (serverId: string, userId: string, role: string) => {
-    return apiService.post(`/servers/${serverId}/${userId}/role/`, {
-      role: role,
-    });
+  updateMemberRole: async (serverId: string, userId: string, data: any) => {
+    return apiService.post(`/servers/${serverId}/${userId}/role/`, data);
   },
   inviteUserToServer: async (inviteData: string, serverId: string) => {
     return apiService.post(`/servers/${serverId}/invite/`, inviteData);

@@ -9,6 +9,7 @@ import { useServer } from "@/contexts/ServerContext";
 import { useGetServer } from "@/lib/hooks/server.hooks";
 import { Button } from "../ui/button";
 import { ServerAccountDropdown } from "./ServerAccountDropdown";
+import { NotificationDropdown } from "./NotificationDropdown";
 
 interface ServerNavbarProps {
   server: any;
@@ -21,7 +22,7 @@ export function ServerNavbar({ server }: ServerNavbarProps) {
     <nav className="fixed top-0 left-0 border-b right-0 z-50">
       <div className="w-full">
         <div className="flex justify-between h-12 bg-sidebar px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-          <div className="flex gap-4">
+          <div className="flex mt-1">
             <Button
               onClick={toggleSidebar}
               className="hover:bg-muted rounded-md md:hidden text-white"
@@ -42,13 +43,10 @@ export function ServerNavbar({ server }: ServerNavbarProps) {
           <div className="p-2 hidden md:block">{server?.name}</div>
 
           <div className="flex gap-4 items-center">
-            <span className="pb-1 hidden md:block">{server?.user_role}</span>
-            <Link href="/notifications">
-              <Bell size={16} />
-            </Link>
-            <div className="md:hidden">
-              <ServerAccountDropdown />
-            </div>
+            <span className="pb-1 text-sm hidden md:block">
+              {server?.user_role}
+            </span>
+            <NotificationDropdown />
           </div>
         </div>
       </div>

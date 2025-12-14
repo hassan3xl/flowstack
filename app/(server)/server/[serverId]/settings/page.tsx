@@ -66,6 +66,7 @@ const ServerSettingsPage = () => {
   const [activeTab, setActiveTab] = useState("members");
 
   const { mutateAsync: uploadIcon } = useUploadServerImage();
+  const { mutate: updateRole } = useUpdateMemberRole();
 
   const handleUploadIcon = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -77,10 +78,8 @@ const ServerSettingsPage = () => {
     uploadIcon({ serverId, formData });
   };
 
-  const { mutate: updateRole } = useUpdateMemberRole();
-
-  const handleRoleChange = (memberId: string, newRole: string) => {
-    updateRole({ serverId, userId: memberId, role: newRole });
+  const handleRoleChange = (memberId: string, role: string) => {
+    updateRole({ serverId: serverId, userId: memberId, data: { role } });
   };
 
   const handleSuspendMember = (memberId: any) => {
@@ -276,7 +275,7 @@ const ServerSettingsPage = () => {
                           className="px-3 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                           defaultValue={member.role}
                           onChange={(e) =>
-                            handleRoleChange(member.id, e.target.value)
+                            handleRoleChange(member.user.id, e.target.value)
                           }
                         >
                           <option value="member">Member</option>

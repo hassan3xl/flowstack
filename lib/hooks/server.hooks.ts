@@ -68,18 +68,21 @@ export const useUploadServerImage = () => {
 interface UpdateRolePayload {
   serverId: string;
   userId: string;
-  role: string;
+  data: any;
 }
 
 export const useUpdateMemberRole = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ serverId, userId, role }: UpdateRolePayload) => {
-      return await serverApi.updateMemberRole(serverId, userId, role);
+    mutationFn: async ({ serverId, userId, data }: UpdateRolePayload) => {
+      return await serverApi.updateMemberRole(serverId, userId, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["serverMembers"] });
+      queryClient.invalidateQueries({ queryKey: ["server"] });
+      queryClient.invalidateQueries({ queryKey: ["servers"] });
+
       toast.success("Role updated successfully");
     },
   });

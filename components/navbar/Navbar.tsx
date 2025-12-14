@@ -30,7 +30,7 @@ export function Navbar() {
             {!isOpen && (
               <button
                 onClick={toggleSidebar}
-                className="p-2 hover:bg-muted rounded-md md:hidden text-white"
+                className="hover:bg-muted rounded-md md:hidden text-white"
                 aria-label="Toggle mobile menu"
               >
                 <MenuIcon />
@@ -39,7 +39,7 @@ export function Navbar() {
             {isOpen && (
               <button
                 onClick={closeSidebar}
-                className="p-2 hover:bg-muted rounded-md md:hidden text-white"
+                className="hover:bg-muted rounded-md md:hidden text-white"
                 aria-label="Toggle mobile menu"
               >
                 <X />

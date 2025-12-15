@@ -64,8 +64,8 @@ function FormInput<T extends FieldValues>({
       : success
       ? "border-green-500 bg-green-50 dark:bg-green-950/20"
       : focused
-      ? "border-ring bg-muted ring-2 ring-ring/10 shadow-sm"
-      : "border-input bg-input/40 hover:border-ring/50";
+      ? "border-ring bg-background/60 ring-2 ring-ring/10 shadow-sm"
+      : "border-input bg-background hover:border-ring/50";
     const disabledState = disabled ? "opacity-50 cursor-not-allowed" : "";
     return `${base} ${state} ${disabledState}`;
   };

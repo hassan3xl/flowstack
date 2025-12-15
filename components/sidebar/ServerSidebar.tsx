@@ -49,11 +49,6 @@ export function ServerSidebar({ server }: ServerSidebarProps) {
           href: `/server/${serverId}/feeds`,
           icon: <Activity size={20} />,
         },
-        {
-          label: "Chats",
-          href: `/server/${serverId}/chats`,
-          icon: <MessageCircleCode size={20} />,
-        },
       ],
     },
     {
@@ -63,11 +58,6 @@ export function ServerSidebar({ server }: ServerSidebarProps) {
           label: "Projects",
           href: `/server/${serverId}/projects`,
           icon: <Laptop size={20} />,
-        },
-        {
-          label: "Boards",
-          href: `/server/${serverId}/boards`,
-          icon: <LayoutDashboard size={20} />,
         },
         {
           label: "Documents",
@@ -80,8 +70,8 @@ export function ServerSidebar({ server }: ServerSidebarProps) {
       groupLabel: "Management",
       items: [
         {
-          label: "Team",
-          href: `/server/${serverId}/team`,
+          label: "Members",
+          href: `/server/${serverId}/members`,
           icon: <Users size={20} />,
         },
         {
@@ -179,7 +169,7 @@ export function ServerSidebar({ server }: ServerSidebarProps) {
                           href={item.href}
                           onClick={() => {
                             // Only close on mobile
-                            if (window.innerWidth < 768) closeSidebar();
+                            closeSidebar();
                           }}
                           className={cn(
                             "group relative flex items-center rounded-md px-3 py-2.5 text-sm font-medium transition-all duration-200",

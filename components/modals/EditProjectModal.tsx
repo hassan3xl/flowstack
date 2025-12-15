@@ -92,7 +92,6 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
           register={register}
           name="description"
           placeholder="Enter a description for your project"
-          required
           field="input"
           label="Project Description"
         />

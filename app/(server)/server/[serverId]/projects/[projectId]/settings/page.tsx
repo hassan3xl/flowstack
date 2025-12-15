@@ -44,7 +44,6 @@ const ProjectSettingsPage = () => {
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const router = useRouter();
 
   const params = useParams();
   const { projectId } = params;
@@ -76,17 +75,6 @@ const ProjectSettingsPage = () => {
   return (
     <div className="min-h-screen">
       <div className="space-y-6">
-        {/* Header */}
-        <div className="bg-card p-6 rounded-xl shadow-lg border border-border">
-          <div className="flex items-center gap-3 mb-2">
-            <Settings className="w-8 h-8 text-blue-400" />
-            <h1 className="text-lg sm:text-3xl font-bold">Project Settings</h1>
-          </div>
-          <p className="text-muted-foreground">
-            Manage your project details, collaborators, and settings
-          </p>
-        </div>
-
         {/* Project Information Card */}
         <div className="bg-card rounded-xl border border-border shadow-lg overflow-hidden">
           <div className=" p-6 border-b border-border">
@@ -116,49 +104,7 @@ const ProjectSettingsPage = () => {
               </Button>
             </div>
           </div>
-
-          {/* Project Stats */}
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6">
-            <div className="bg-accent p-4 rounded-lg border border-border text-center">
-              <div className="text-3xl font-bold text-blue-400">
-                {project.item_count}
-              </div>
-              <div className="text-sm text-gray-400 mt-1 flex items-center justify-center gap-1">
-                <CheckCircle2 className="w-3 h-3" />
-                Total Tasks
-              </div>
-            </div>
-            <div className="bg-accent p-4 rounded-lg border border-border text-center">
-              <div className="text-3xl font-bold text-green-400">
-                {project.completed_count}
-              </div>
-              <div className="text-sm text-gray-400 mt-1">Completed</div>
-              <div className="text-xs text-green-400 mt-1">
-                {/* {completionRate}% done */}
-              </div>
-            </div>
-            <div className="bg-accent p-4 rounded-lg border border-border text-center">
-              <div className="text-3xl font-bold text-red-400">
-                {project.project_items.filter((item) => item.due_date).length}
-              </div>
-              <div className="text-sm text-gray-400 mt-1 flex items-center justify-center gap-1">
-                <Clock className="w-3 h-3" />
-                Overdue
-              </div>
-            </div>
-            <div className="bg-accent p-4 rounded-lg border border-border text-center">
-              <div className="text-3xl font-bold text-purple-400">
-                {project.collaborators.length}
-              </div>
-              <div className="text-sm text-gray-400 mt-1 flex items-center justify-center gap-1">
-                <Users className="w-3 h-3" />
-                Collaborators
-              </div>
-            </div>
-          </div>
         </div>
-
         {/* Collaborators Management */}
         <div className="bg-card rounded-xl border border-border shadow-lg overflow-hidden">
           <div className="p-6 border-b border-border">
@@ -167,7 +113,7 @@ const ProjectSettingsPage = () => {
                 <Users className="w-6 h-6 text-purple-400" />
                 <h2 className="text-xl font-semibold">Collaborators</h2>
                 <Badge className="bg-purple-100 text-purple-800">
-                  {project.collaborators.length + 1}
+                  {project.collaborators.length}
                 </Badge>
               </div>
               <Button
@@ -334,16 +280,6 @@ const ProjectSettingsPage = () => {
         onClose={() => setShowDeleteModal(false)}
         projectId={projectId as string}
       />
-
-      {/* <DeleteCollaboratorModal
-        isOpen={showDeleteCollaboratorModal.isOpen}
-        onClose={() =>
-          setShowCollaboratorDeleteModal({ isOpen: false, userId: null })
-        }
-        projectId={projectId as string}
-        userId={showDeleteCollaboratorModal.userId}
-        onSuccess={handleDeleteCollaboratorSuccess}
-      /> */}
       <EditProjectModal
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}

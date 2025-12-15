@@ -8,7 +8,9 @@ type FeedCommentType = {
 export type FeedType = {
   id: string;
   author: string;
+  author_avatar: string;
   server: string;
+  isPinned: boolean;
   server_id: string;
   content: string;
   comment_count: number;

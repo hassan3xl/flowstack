@@ -26,7 +26,7 @@ export interface UserType {
 export interface AuthUserType {
   id: string;
   user: ProfileUserType;
-  fullname?: string;
+  full_name?: string;
   username: string;
   avatar?: string;
 }

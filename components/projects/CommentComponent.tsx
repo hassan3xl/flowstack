@@ -1,24 +1,38 @@
 "use client";
 
 import React from "react";
-import { Button } from "../ui/button";
-import { Edit3, Send, Trash2, X } from "lucide-react";
-import { formatDate } from "@/lib/utils";
+import { useForm } from "react-hook-form";
+import {
+  Send,
+  Trash2,
+  X,
+  MessageSquare,
+  MoreHorizontal,
+  Edit2,
+} from "lucide-react";
 import { toast } from "sonner";
+
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { FormInput } from "@/components/input/formInput";
+import { formatDate } from "@/lib/utils";
 import { useCommentTask } from "@/lib/hooks/project.hook";
-import { FormInput } from "../input/formInput";
-import { useForm, SubmitHandler } from "react-hook-form";
 import { CommentsType } from "@/lib/types/project.types";
+import { useAuth } from "@/contexts/AuthContext";
 
 type FormData = {
   content: string;
 };
 
 interface CommentComponentProps {
-  onClose: () => void;
   comments: CommentsType[];
   isOpen: boolean;
-
   itemId: string;
   projectId: string;
   serverId: string;
@@ -26,28 +40,21 @@ interface CommentComponentProps {
 
 const CommentComponent = ({
   comments,
-  onClose,
   isOpen,
   itemId,
   projectId,
   serverId,
 }: CommentComponentProps) => {
-  // 1. Hook Integration
+  // Hook Integration
   const { mutateAsync: postComment, isPending } = useCommentTask();
+  const { user } = useAuth();
 
-  // 2. RHF Setup
-  const {
-    register,
-    handleSubmit,
-    reset,
-    watch,
-    formState: { errors },
-  } = useForm<FormData>();
+  // RHF Setup
+  const { register, handleSubmit, reset, watch } = useForm<FormData>();
 
-  // Watch the comment field to disable button if empty
+  // Watch content for UI states
   const commentValue = watch("content");
 
-  // 3. Submit Handler
   const onSubmit = async (data: FormData) => {
     try {
       await postComment({
@@ -56,83 +63,123 @@ const CommentComponent = ({
         itemId,
         commentData: data,
       });
-      toast.success("Comment added successfully");
+      toast.success("Comment posted");
       reset();
     } catch (error: any) {
       console.error(error);
-      toast.error(error?.detail || "Failed to add comment");
+      toast.error(error?.detail || "Failed to post comment");
     }
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="ml-14 space-y-4">
-      {/* 4. Form Section (Only wraps the input) */}
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
-        <FormInput
-          name="content"
-          register={register}
-          field="textarea"
-          placeholder="Write a comment..."
-          rows={3}
-        />
+    <div className="pt-2">
+      {/* Section Header */}
+      <div className="flex items-center gap-2 mb-4 text-sm font-semibold text-muted-foreground">
+        <MessageSquare className="w-4 h-4" />
+        <span>Discussion ({comments.length})</span>
+      </div>
 
-        <div className="flex justify-end gap-2 mt-2">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={onClose}
-            disabled={isPending}
-          >
-            <X className="w-4 h-4 mr-2" /> Cancel
-          </Button>
+      <div className="flex gap-4">
+        {/* User Avatar (Current User Placeholder) */}
+        <Avatar className="w-8 h-8 hidden sm:block">
+          <AvatarImage src={user?.avatar || ""} />
 
-          <Button type="submit" disabled={isPending || !commentValue?.trim()}>
-            <Send className="w-4 h-4 mr-2" />
-            {isPending ? "Posting..." : "Post"}
-          </Button>
-        </div>
-      </form>
+          <AvatarFallback className="bg-blue-600 text-white text-xs"></AvatarFallback>
+        </Avatar>
 
-      {/* 5. Comments List Section (Outside the form) */}
-      <div className="space-y-3">
-        {comments.length > 0 &&
-          comments.map((comment) => (
-            <div
-              key={comment.id}
-              className="bg-tertiary/50 rounded-xl border border-slate-700/50 p-4"
-            >
-              <div className="flex justify-between">
-                <div>
-                  <p className="text-sm text-white font-medium">
-                    {comment.author.username}
-                  </p>
-                  <p className="text-gray-400 text-xs">
-                    {formatDate(comment.created_at)}
-                  </p>
+        {/* Input Form Area */}
+        <div className="flex-1">
+          <form onSubmit={handleSubmit(onSubmit)} className="relative group">
+            <div className="relative rounded transition-all">
+              <FormInput
+                name="content"
+                register={register}
+                field="textarea"
+                placeholder="Add to the discussion..."
+                rows={2}
+                className="border-0 focus-visible:ring-0 resize-none bg-transparent min-h-[60px] p-3 text-sm"
+              />
+
+              <div className="flex justify-between items-center p-2">
+                <div className="text-xs text-muted-foreground pl-2"></div>
+                <div className="flex gap-2">
+                  <Button
+                    type="submit"
+                    size="sm"
+                    disabled={isPending || !commentValue?.trim()}
+                    className="h-8 px-4 bg-blue-600 hover:bg-blue-700 text-white transition-all"
+                  >
+                    {isPending ? "Sending..." : "Comment"}{" "}
+                    <Send className="w-3 h-3 ml-2" />
+                  </Button>
                 </div>
               </div>
+            </div>
+          </form>
+        </div>
+      </div>
 
-              <p className="text-gray-300 text-sm mt-2">{comment.content}</p>
+      {/* Timeline List */}
+      <div className="mt-8 space-y-6 relative ml-4 sm:ml-12">
+        {/* Vertical connector line */}
+        {comments.length > 0 && (
+          <div className="absolute left-[-25px] sm:left-[-34px] top-2 bottom-4 w-px bg-border/50" />
+        )}
 
-              <div className="mt-2 flex gap-2">
-                <Button
-                  size="sm"
-                  className="inline-flex items-center gap-2 px-3 py-1 rounded-lg text-xs font-medium bg-slate-700/50 hover:bg-slate-700 text-white border border-slate-600/50 hover:border-slate-500 transition-all"
-                >
-                  <Edit3 className="w-3 h-3" />
-                </Button>
+        {comments.map((comment) => (
+          <div key={comment.id} className="relative group/comment">
+            {/* Avatar Node */}
+            <div className="absolute left-[-42px] sm:left-[-50px] top-0 bg-background rounded-full p-1 border border-border">
+              <Avatar className="w-6 h-6 sm:w-8 sm:h-8">
+                <AvatarImage src={comment.author.avatar || ""} />
+                <AvatarFallback className="text-[10px] sm:text-xs bg-secondary font-bold text-muted-foreground">
+                  {comment.author.username?.[0]?.toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+            </div>
 
-                <Button
-                  size="sm"
-                  className="bg-red-500/10 text-red-400 hover:bg-red-500/20 px-3 py-1 h-8"
-                >
-                  <Trash2 className="w-3 h-3" />
-                </Button>
+            {/* Comment Bubble */}
+            <div className="bg-card hover:bg-card/80 border border-border/60 rounded-lg p-4 transition-colors">
+              <div className="flex items-start justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-sm text-foreground">
+                    {comment.author.username}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {formatDate(comment.created_at)}
+                  </span>
+                </div>
+
+                {/* Dropdown for Actions (Cleaner than visible buttons) */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 opacity-0 group-hover/comment:opacity-100 transition-opacity"
+                    >
+                      <MoreHorizontal className="w-3 h-3 text-muted-foreground" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem>
+                      <Edit2 className="w-3 h-3 mr-2" /> Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="text-red-500 hover:text-red-600 focus:text-red-600">
+                      <Trash2 className="w-3 h-3 mr-2" /> Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              <div className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap">
+                {comment.content}
               </div>
             </div>
-          ))}
+          </div>
+        ))}
       </div>
     </div>
   );

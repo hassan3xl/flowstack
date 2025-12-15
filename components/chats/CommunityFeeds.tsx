@@ -20,7 +20,7 @@ export default function CommunityFeeds() {
   const { data: feeds } = useGetFeed();
 
   return (
-    <div className="mbg-zinc-50 dark:bg-zinc-950">
+    <div className="">
       {/* Header */}
 
       {/* Main Content */}

@@ -21,7 +21,7 @@ export function ServerNavbar({ server }: ServerNavbarProps) {
   return (
     <nav className="fixed top-0 left-0 border-b right-0 z-50">
       <div className="w-full">
-        <div className="flex justify-between h-12 bg-sidebar px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="flex justify-between h-12 bg-background px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
           <div className="flex mt-1">
             <Button
               onClick={toggleSidebar}

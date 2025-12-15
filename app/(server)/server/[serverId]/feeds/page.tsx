@@ -80,7 +80,6 @@ export default function ServerFeeds({}: ServerFeedsProps) {
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <FormInput
             field="textarea"
-            label="Content"
             placeholder="What’s happening?"
             name="content"
             register={register}

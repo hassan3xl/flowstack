@@ -1,27 +1,28 @@
 "use client";
 
-import { formatDate } from "@/lib/utils";
-import React, { useRef } from "react";
-import {
-  Calendar,
-  Users,
-  CheckCircle2,
-  Clock,
-  AlertTriangle,
-  Target,
-  Settings,
-  TrendingUp,
-  CircleChevronRight,
-  Settings2Icon,
-} from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
-import { Badge } from "@/components/ui/badge";
+import React from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "../ui/button";
-import { apiService } from "@/lib/services/apiService";
+import {
+  MoreVertical,
+  CalendarDays,
+  Target,
+  CheckCircle2,
+  Users,
+  ArrowUpRight,
+} from "lucide-react";
 import { ProjectType } from "@/lib/types/project.types";
-import { toast } from "sonner";
+import { formatDate } from "@/lib/utils";
 import { useServer } from "@/contexts/ServerContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 interface ProjectCardProps {
   project: ProjectType;
@@ -30,182 +31,169 @@ interface ProjectCardProps {
 
 const ProjectCard = ({ project, serverId }: ProjectCardProps) => {
   const router = useRouter();
-
   const { userRole } = useServer();
 
-  // 🔹 Handle "Open Project" or "Request Collaboration"
-  const handleProjectClick = () => {
+  const handleOpenProject = () => {
     router.push(`/server/${serverId}/projects/${project.id}`);
   };
 
-  const projectSettings = () => {
+  const handleSettings = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
     router.push(`/server/${serverId}/projects/${project.id}/settings/`);
   };
 
-  // Calculate completion percentage
+  const handleRequest = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // apiService.requestCollaboration(project.id)
+  };
+
+  // Calculations
   const completionPercentage =
     project.item_count > 0
       ? Math.round((project.completed_count / project.item_count) * 100)
       : 0;
 
-  // Priority styling
-  const getPriorityStyle = (priority: string) => {
+  // Visual Helpers
+  const getPriorityColor = (priority: string) => {
     switch (priority?.toLowerCase()) {
       case "high":
-        return "bg-red-500/20 text-red-300 border-red-500/30";
+        return "border-red-500/50 hover:border-red-500 shadow-red-900/10";
       case "medium":
-        return "bg-yellow-500/20 text-yellow-300 border-yellow-500/30";
+        return "border-yellow-500/50 hover:border-yellow-500 shadow-yellow-900/10";
       case "low":
-        return "bg-green-500/20 text-green-300 border-green-500/30";
+        return "border-green-500/50 hover:border-green-500 shadow-green-900/10";
       default:
-        return "bg-gray-500/20 text-muted-foreground border-gray-500/30";
+        return "border-border hover:border-blue-500 shadow-blue-900/10";
     }
   };
 
-  // Progress color
-  const getProgressColor = () => {
-    if (completionPercentage >= 80) return "bg-green-500";
-    if (completionPercentage >= 50) return "bg-blue-500";
-    if (completionPercentage >= 25) return "bg-yellow-500";
-    return "bg-red-500";
+  const getPriorityBadge = (priority: string) => {
+    switch (priority?.toLowerCase()) {
+      case "high":
+        return "bg-red-500/10 text-red-500 hover:bg-red-500/20";
+      case "medium":
+        return "bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20";
+      case "low":
+        return "bg-green-500/10 text-green-500 hover:bg-green-500/20";
+      default:
+        return "bg-secondary text-muted-foreground";
+    }
   };
 
   return (
     <div
-      className="bg-card rounded-xl p-4 sm:p-6 border border-border
-      hover:border-accent-hover/50 transition-all duration-300 "
+      onClick={handleOpenProject}
+      className={`
+        group relative flex flex-col justify-between
+        bg-card rounded-xl border p-5
+        cursor-pointer transition-all duration-300 ease-out
+        hover:-translate-y-1 hover:shadow-xl
+        ${getPriorityColor(project.priority)}
+      `}
     >
-      {/* Header */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-2">
-            <h3
-              className="font-bold text-md sm:text-lg text-primary cursor-pointer transition-colors truncate max-w-[220px]"
-              title={project.title}
-            >
-              {project.title}
-            </h3>
-          </div>
-
-          {project.priority && (
-            <Badge
-              variant="outline"
-              className={`${getPriorityStyle(
-                project.priority
-              )} text-xs font-medium`}
-            >
-              <Target className="w-3 h-3 mr-1" />
-              {project.priority} Priority
-            </Badge>
-          )}
+      {/* --- Header Section --- */}
+      <div className="flex justify-between items-start mb-3">
+        <div className="space-y-1 pr-8">
+          <h3 className="font-bold text-lg leading-tight group-hover:text-primary transition-colors line-clamp-1">
+            {project.title}
+          </h3>
+          <Badge
+            variant="secondary"
+            className={`text-[10px] px-2 h-5 ${getPriorityBadge(
+              project.priority
+            )}`}
+          >
+            {project.priority || "Normal"} Priority
+          </Badge>
         </div>
-        <div className="flex gap-4 ">
-          {!["owner", "admin"].includes(userRole as string) && (
-            <Button
-              variant="outline"
-              size={"sm"}
-              // onClick={() => apiService.requestCollaboration(project.id)}
-            >
-              Request
-            </Button>
-          )}
-          <Button size={"sm"} onClick={projectSettings}>
-            <Settings2Icon />
-          </Button>
 
-          <Button size={"sm"} onClick={handleProjectClick}>
-            Open
-          </Button>
+        {/* Floating Actions Menu */}
+        <div className="absolute top-4 right-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <MoreVertical className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuItem onClick={handleOpenProject}>
+                <ArrowUpRight className="mr-2 h-4 w-4" /> Open Project
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleSettings}>
+                <Target className="mr-2 h-4 w-4" /> Settings
+              </DropdownMenuItem>
+              {userRole !== "admin" && userRole !== "owner" && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleRequest}>
+                    <Users className="mr-2 h-4 w-4" /> Request Access
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
-      {/* Description */}
-      <p className="text-muted-foreground text-sm leading-relaxed line-clamp-2 mb-4">
-        {project.description}
+      {/* --- Description --- */}
+      <p className="text-sm text-muted-foreground line-clamp-2 mb-6 h-10">
+        {project.description || "No description provided."}
       </p>
 
-      {/* Progress Section */}
-      <div className="bg-accent rounded-lg p-4 border border-tertiary/30 mb-4">
-        <div className="flex justify-between items-center mb-3">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-blue-400" />
-            <span className="text-sm font-medium text-muted-foreground">
-              Progress
-            </span>
-          </div>
-          <span className="text-sm font-bold text-primary bg-tertiary/50 px-2 py-1 rounded-full">
+      {/* --- Progress Section --- */}
+      <div className="mb-6">
+        <div className="flex justify-between text-xs mb-2">
+          <span className="text-muted-foreground font-medium">Progress</span>
+          <span className="font-bold text-primary">
             {completionPercentage}%
           </span>
         </div>
-
-        <div className="w-full bg-slate-700/50 rounded-full h-2.5 overflow-hidden">
+        <div className="h-2 w-full bg-secondary/50 rounded-full overflow-hidden">
           <div
-            className={`h-2.5 rounded-full ${getProgressColor()} transition-all duration-500 relative overflow-hidden`}
+            className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full transition-all duration-500 ease-out relative"
             style={{ width: `${completionPercentage}%` }}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+            {/* Shimmer effect on progress bar */}
+            <div className="absolute inset-0 bg-white/20 w-full animate-[shimmer_2s_infinite] -skew-x-12 translate-x-[-100%]" />
           </div>
         </div>
       </div>
 
-      {/* Tasks and Due Date */}
-      <div className="flex items-center justify-between text-sm mb-4">
-        <div className="flex gap-4">
-          <div className="flex items-center gap-2 bg-tertiary/30 px-3 py-2 rounded-lg">
-            <CheckCircle2 className="w-4 h-4 text-green-400" />
-            <span className="text-muted-foreground">
-              <span className="font-semibold text-primary">
-                {project.completed_count}
-              </span>
-              <span className="text-gray-400">/{project?.item_count}</span>{" "}
-              tasks
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Collaborators + Status */}
-      <div className="flex items-center justify-between pt-2 border-t border-tertiary/30">
-        {/* Collaborators */}
-        <div className="flex items-center gap-2">
-          {project.collaborators && project.collaborators.length > 0 && (
-            <div className="flex -space-x-2">
-              {project.collaborators.slice(0, 3).map((collaborator) => (
-                <div
-                  key={collaborator.id}
-                  className="w-8 h-8 rounded-full bg-muted/30 border-2 border-border 
-                          flex items-center justify-center text-xs font-medium
-                          overflow-hidden
-                          "
-                  title={`${collaborator.user.username}`}
-                >
-                  {collaborator.user.avatar ? (
-                    <img
-                      src={collaborator.user.avatar}
-                      alt={`${collaborator.user.username}`}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <img
-                      src="/pngs/default-avatar.png"
-                      alt="Default avatar"
-                      className="w-full h-full object-cover"
-                    />
-                  )}
-                </div>
-              ))}
-              {project.collaborators.length > 3 && (
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-blue-700 border-2 border-secondary flex items-center justify-center text-xs font-bold text-primary ring-2 ring-blue-500/20">
-                  +{project.collaborators.length - 3}
-                </div>
-              )}
+      {/* --- Footer (Collaborators & Stats) --- */}
+      <div className="flex items-center justify-between pt-4 border-t border-border/50">
+        {/* Collaborators Stack */}
+        <div className="flex items-center -space-x-2">
+          {project.collaborators?.slice(0, 3).map((collab, i) => (
+            <Avatar
+              key={collab.id || i}
+              className="w-7 h-7 border-2 border-card ring-1 ring-border"
+            >
+              <AvatarImage src={collab.user?.avatar} />
+              <AvatarFallback className="text-[9px] bg-secondary font-bold">
+                {collab.user?.username?.[0]?.toUpperCase() || "U"}
+              </AvatarFallback>
+            </Avatar>
+          ))}
+          {(project.collaborators?.length || 0) > 3 && (
+            <div className="w-7 h-7 rounded-full bg-secondary border-2 border-card flex items-center justify-center text-[9px] font-bold text-muted-foreground">
+              +{project.collaborators.length - 3}
             </div>
           )}
         </div>
 
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Calendar className="w-4 h-4" />
-          <span>{formatDate(project.created_at)}</span>
+        {/* Task Stat */}
+        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+          <div className="flex items-center gap-1 bg-secondary/40 px-2 py-1 rounded-md">
+            <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+            <span>
+              {project.completed_count}/{project.item_count}
+            </span>
+          </div>
         </div>
       </div>
     </div>

@@ -15,12 +15,12 @@ import {
   Send,
   Sparkles,
   LayoutDashboard,
+  Badge,
 } from "lucide-react";
 
 // Components
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
 import { FormInput } from "@/components/input/formInput";
 import FeedsCard from "@/components/chats/FeedsCard";
 import ServerHomeMemberCard from "@/components/server/ServerHomeMemberCard";
@@ -32,6 +32,8 @@ import { useGetServer, useGetServerMembers } from "@/lib/hooks/server.hooks";
 import { useCreateFeed, useGetServerFeeds } from "@/lib/hooks/feed.hook";
 import { useGetProjects } from "@/lib/hooks/project.hook";
 import { formatDate } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import Image from "next/image";
 
 interface FeedFormData {
   content: string;
@@ -39,6 +41,7 @@ interface FeedFormData {
 
 const ServerDetails = () => {
   const { serverId } = useServer();
+  const { user } = useAuth();
 
   // Data Fetching
   const { data: server, isLoading: serverLoading } = useGetServer(
@@ -75,28 +78,26 @@ const ServerDetails = () => {
   if (serverLoading) return <Loader variant="ring" />;
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 pb-10">
+    <div className="space-y-8">
       {/* --- HERO SECTION --- */}
-      <div className="relative bg-card rounded-2xl border border-border overflow-hidden shadow-sm group">
-        {/* Abstract Background Header */}
-        <div className="h-32 bg-background w-full relative">
-          <div className="absolute inset-0 bg-grid-white/5 [mask-image:linear-gradient(to_bottom,transparent,black)]" />
-        </div>
-
-        <div className="px-6 pb-6 -mt-12 relative z-10">
+      <div className="relative bg-card rounded-md border border-border overflow-hidden shadow-sm group">
+        <div className="px-2">
           <div className="flex flex-col md:flex-row justify-between items-end gap-6">
-            {/* Server Identity */}
             <div className="flex items-end gap-4">
-              <div className="w-24 h-24 rounded-2xl bg-background p-1 shadow-xl ring-1 ring-border">
-                <div className="w-full h-full rounded-xl flex items-center justify-center text-3xl">
-                  {server?.name?.[0]?.toUpperCase() || "S"}
-                </div>
+              <div className="mt-2">
+                <Image
+                  src={server?.icon || ""}
+                  width={100}
+                  height={100}
+                  alt="icon"
+                  className="rounded-xl object-cover"
+                ></Image>
               </div>
-              <div className="mb-2 space-y-1">
-                <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
+              <div className="space-y-1">
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
                   {server?.name}
                   {/* Optional Verified/Pro Badge */}
-                  {/* <Badge variant="secondary" className="h-5">PRO</Badge> */}
+                  <Badge className="h-5">PRO</Badge>
                 </h1>
                 <p className="text-muted-foreground text-sm max-w-lg line-clamp-1">
                   {server?.description || "Welcome to the workspace."}
@@ -142,8 +143,7 @@ const ServerDetails = () => {
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="flex gap-4">
                 <Avatar className="w-10 h-10 border border-border">
-                  {/* Replace with Current User Avatar */}
-                  <AvatarImage src="/pngs/default-avatar.png" />
+                  <AvatarImage src={user?.avatar} />
                   <AvatarFallback>ME</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 space-y-3">
@@ -154,9 +154,7 @@ const ServerDetails = () => {
                     className="bg-muted/30 border-transparent focus:bg-background transition-all min-h-[50px]"
                   />
                   <div className="flex justify-between items-center">
-                    <div className="flex gap-2 text-muted-foreground">
-                      {/* Optional attachments icons could go here */}
-                    </div>
+                    <div className="flex gap-2 text-muted-foreground"></div>
                     <Button
                       type="submit"
                       disabled={isPosting || !content}
@@ -291,7 +289,7 @@ const ServerDetails = () => {
                 Team Members
               </h3>
               <Link
-                href="members"
+                href={`/server/${serverId}/members`}
                 className="text-xs text-blue-500 hover:underline flex items-center"
               >
                 See All <ArrowRight className="w-3 h-3 ml-1" />

@@ -1,3 +1,5 @@
+import { UserType } from "./user.types";
+
 type FeedCommentType = {
   id: string;
   author: string;
@@ -7,8 +9,7 @@ type FeedCommentType = {
 
 export type FeedType = {
   id: string;
-  author: string;
-  author_avatar: string;
+  author: UserType;
   server: string;
   isPinned: boolean;
   server_id: string;

@@ -47,19 +47,19 @@ export function Sidebar() {
           )}
         >
           {/* --- TOP SECTION (Navigation) --- */}
-          <div className="flex flex-col mt-4 items-center gap-3 py-4 px-2">
+          <div className="flex flex-col mt-4 items-center gap-3 py-2 px-2">
             <HomeCard />
             <MessageCard />
             <Separator className="h-[2px] w-10 bg-accent rounded-full mx-auto" />
           </div>
 
           {/* --- MIDDLE SECTION (Scrollable Servers) --- */}
-          <div className="flex-1 w-full overflow-hidden hover:overflow-y-auto custom-scrollbar px-2 py-2 space-y-2">
+          <div className="flex-1 w-full overflow-hidden hover:overflow-y-auto custom-scrollbar  py-2 space-y-2">
             <ServersPage />
           </div>
 
           {/* --- BOTTOM SECTION (Actions & User) --- */}
-          <div className="flex flex-col items-center gap-3 pb-4 pt-2 px-2 bg-background/50 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-3 pb-4 pt-2 px-2 bg-background/50">
             <Separator className="h-[2px] w-10 bg-accent rounded-full mx-auto" />
 
             {/* Invite Button */}

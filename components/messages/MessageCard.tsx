@@ -15,7 +15,7 @@ export default function HomeCard() {
   const pathname = usePathname();
   const { isOpen, closeSidebar } = useSidebar();
 
-  const isActive = pathname === "/home";
+  const isActive = pathname === "/chats";
 
   const content = (
     <button
@@ -45,7 +45,7 @@ export default function HomeCard() {
 
       {/* Text (Mobile Only) */}
       <div className={cn("md:hidden font-medium", !isOpen && "hidden")}>
-        Home
+        Chats
       </div>
 
       {/* Active Indicator Strip (Desktop) */}
@@ -60,7 +60,7 @@ export default function HomeCard() {
     <Tooltip>
       <TooltipTrigger asChild>{content}</TooltipTrigger>
       <TooltipContent side="right" className="font-semibold">
-        Home
+        Chats
       </TooltipContent>
     </Tooltip>
   );

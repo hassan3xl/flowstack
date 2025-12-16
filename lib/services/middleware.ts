@@ -1,19 +1,14 @@
-import { NextResponse } from "next/server";
-
-export function middleware(req: any) {
-  const token = req.cookies.get("session_access_token");
-
-  // If no token -> redirect
-  if (!token) {
-    return NextResponse.redirect(new URL("/auth/signin", req.url));
-  }
-
-  // Allow request to continue
-  return NextResponse.next();
-}
-
 export const config = {
   matcher: [
-    "/((?!_next|static|favicon.ico|robots.txt|images|public|auth|api/auth).*)",
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public (public folder)
+     * - auth (auth pages)
+     * - api (API routes - LET THESE PASS so the backend can return 401 JSON)
+     */
+    "/((?!_next|static|favicon.ico|robots.txt|images|public|auth|api).*)",
   ],
 };

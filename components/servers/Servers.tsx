@@ -40,7 +40,7 @@ export default function ServersPage() {
           </div>
         )}
       </div>
-      {hoveredServer &&
+      {/* {hoveredServer &&
         createPortal(
           <div
             className="absolute left-28 w-80 p-4 rounded-lg shadow-xl bg-accent border border-border z-50"
@@ -49,22 +49,22 @@ export default function ServersPage() {
             <HoverInfo server={hoveredServer} />
           </div>,
           document.body
-        )}
+        )} */}
     </div>
   );
 }
 
-function HoverInfo({ server }: { server: any }) {
-  return (
-    <div>
-      <h2 className="text-xl font-semibold mb-2">{server.name}</h2>
+// function HoverInfo({ server }: { server: any }) {
+//   return (
+//     <div>
+//       <h2 className="text-xl font-semibold mb-2">{server.name}</h2>
 
-      {/* Add your custom details */}
-      <div className="text-gray-300 text-sm space-y-1">
-        <p>Members: {server.members_count}</p>
-        <p>Created: {formatDate(server.created_at)}</p>
-        <p>{server.server_type} server</p>
-      </div>
-    </div>
-  );
-}
+//       {/* Add your custom details */}
+//       <div className="text-gray-300 text-sm space-y-1">
+//         <p>Members: {server.members_count}</p>
+//         <p>Created: {formatDate(server.created_at)}</p>
+//         <p>{server.server_type} server</p>
+//       </div>
+//     </div>
+//   );
+// }

@@ -22,7 +22,6 @@ interface FeedsCardProps {
 
 const FeedsCard = ({ post }: FeedsCardProps) => {
   // Generate a fallback initial for the avatar based on username string
-  const authorInitial = post.author ? post.author[0].toUpperCase() : "U";
   console.log("post", post);
 
   return (
@@ -45,11 +44,9 @@ const FeedsCard = ({ post }: FeedsCardProps) => {
         <div className="flex-shrink-0">
           <Avatar className="w-10 h-10 ring-2 ring-transparent group-hover:ring-border transition-all cursor-pointer">
             {/* If you have an image URL in the future, use AvatarImage. For now, using Fallback with string author */}
-            <AvatarImage
-              src={`https://avatar.vercel.sh/${post.author_avatar}`}
-            />
+            <AvatarImage src={post.author.avatar} />
             <AvatarFallback className="bg-secondary text-secondary-foreground font-semibold">
-              {authorInitial}
+              {post.author.username?.[0]}
             </AvatarFallback>
           </Avatar>
         </div>
@@ -73,7 +70,7 @@ const FeedsCard = ({ post }: FeedsCardProps) => {
             {/* Author & Time */}
             <div className="flex items-center gap-1 text-muted-foreground text-xs">
               <span className="hover:text-foreground transition-colors cursor-pointer">
-                u/{post.author}
+                u/{post.author.username}
               </span>
               <span>•</span>
               <span>{formatDate(post.created_at)}</span>

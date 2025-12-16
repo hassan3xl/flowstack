@@ -106,7 +106,7 @@ const ServerSettingsPage = () => {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="">
       <div className="space-y-6">
         {/* Project Information Card */}
         <div className="bg-card rounded-xl border border-border shadow-lg overflow-hidden">
@@ -216,23 +216,23 @@ const ServerSettingsPage = () => {
           {activeTab === "members" && (
             <div>
               <div className="p-6 border-b border-border">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div className="flex flex-row justify-between items-start sm:items-center gap-4">
                   <div className="flex items-center gap-3">
                     <Users className="w-6 h-6 text-primary" />
                     <h2 className="text-xl font-semibold">Members</h2>
                   </div>
-                  <Button onClick={() => setOpenInviteModal(true)}>
+                  <Button size={"sm"} onClick={() => setOpenInviteModal(true)}>
                     <UserPlus className="w-4 h-4 mr-2" />
                     Invite
                   </Button>
                 </div>
               </div>
 
-              <div className="p-6 space-y-3">
+              <div className="p-2 sm:p-4 md:p-6 space-y-3">
                 {server.members.map((member) => (
                   <div
                     key={member.id}
-                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors"
+                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:p-1 py-4 rounded-lg border-b border-border hover:bg-accent/50 transition-colors"
                   >
                     <div className="flex items-center gap-3 flex-1 w-full">
                       <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-semibold text-primary flex-shrink-0">
@@ -318,7 +318,7 @@ const ServerSettingsPage = () => {
                 </div>
               </div>
 
-              <div className="p-6 space-y-3">
+              <div className="p-2 sm:p-6 space-y-3">
                 {dummyPendingInvites.length > 0 ? (
                   dummyPendingInvites.map((invite) => (
                     <div

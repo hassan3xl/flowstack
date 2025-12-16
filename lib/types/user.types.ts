@@ -18,7 +18,7 @@ export interface ProfilePType {
 export interface UserType {
   id: string;
   email: string;
-  fullname?: string;
+  full_name?: string;
   username: string;
   avatar?: string;
 }

@@ -23,11 +23,6 @@ async function fetchWithCatch(
       data = await response.json();
     }
 
-    if (response.status === 401) {
-      // Optional: Add logic to clear local storage if needed
-      window.location.href = "/auth/signin/";
-    }
-
     if (!response.ok) {
       throw {
         status: response.status,

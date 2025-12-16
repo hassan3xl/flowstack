@@ -39,8 +39,7 @@ export default function UserCard() {
             src={user?.avatar || "/userIcon.png"}
             alt="user"
             fill
-            className="object-cover"
-            unoptimized
+            className="object-cover rounded-xl"
           />
         </div>
         <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-background rounded-full"></div>

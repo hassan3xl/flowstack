@@ -11,10 +11,10 @@ import {
   MessageCircleReply,
   X,
 } from "lucide-react";
-import { AccountDropdown } from "./AccountDropdown";
+import { AccountDropdown } from "./components/AccountDropdown";
 import { useSidebar } from "@/contexts/SidebarContext";
-import { NotificationDropdown } from "./NotificationDropdown";
-import { MessagesDropdown } from "./InboxDropdown";
+import { NotificationDropdown } from "./components/NotificationDropdown";
+import { MessagesDropdown } from "./components/InboxDropdown";
 
 export function Navbar() {
   const { isOpen, closeSidebar, toggleSidebar } = useSidebar();

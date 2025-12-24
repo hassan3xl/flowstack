@@ -161,14 +161,14 @@ function FormInput<T extends FieldValues>({
               >
                 <Check
                   size={16}
-                  className="text-primary-foreground opacity-0 peer-checked:opacity-100"
+                  className="text-primary opacity-0 peer-checked:opacity-100"
                 />
               </div>
             </label>
             {label && (
               <label
                 htmlFor={name}
-                className="text-sm text-foreground select-none cursor-pointer"
+                className="text-sm select-none cursor-pointer"
               >
                 {label}
               </label>

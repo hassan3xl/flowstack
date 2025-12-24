@@ -1,19 +1,22 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { projectApi } from "../api/project.api";
+workspaceApi;
 import { ProjectType } from "../types/project.types";
 import { apiService } from "../services/apiService";
+import { workspaceApi } from "../api/workspace.api";
+import { toast } from "sonner";
 
-export function useGetProjects(serverId: string) {
+export function useGetProjects(workspaceId: string) {
   return useQuery<ProjectType[]>({
     queryKey: ["projects"],
-    queryFn: () => projectApi.getProjects(serverId),
+    queryFn: () => projectApi.getProjects(workspaceId),
   });
 }
 
-export function useGetProject(serverId: string, projectId: string) {
+export function useGetProject(workspaceId: string, projectId: string) {
   return useQuery<ProjectType>({
     queryKey: ["project", projectId],
-    queryFn: () => projectApi.getProject(serverId, projectId),
+    queryFn: () => projectApi.getProject(workspaceId, projectId),
     enabled: !!projectId,
   });
 }
@@ -24,11 +27,11 @@ export const useAddproject = () => {
   return useMutation({
     mutationFn: ({
       projectData,
-      serverId,
+      workspaceId,
     }: {
       projectData: any;
-      serverId: string;
-    }) => projectApi.addProject(projectData, serverId),
+      workspaceId: string;
+    }) => projectApi.addProject(projectData, workspaceId),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
@@ -42,13 +45,13 @@ export const useUpdateproject = () => {
   return useMutation({
     mutationFn: ({
       projectData,
-      serverId,
+      workspaceId,
       projectId,
     }: {
       projectData: any;
-      serverId: string;
+      workspaceId: string;
       projectId: string;
-    }) => projectApi.updateProject(projectData, serverId, projectId),
+    }) => projectApi.updateProject(projectData, workspaceId, projectId),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["project"] });
@@ -62,13 +65,13 @@ export function useAddProjectCollab() {
   return useMutation({
     mutationFn: ({
       collabData,
-      serverId,
+      workspaceId,
       projectId,
     }: {
       collabData: any;
-      serverId: string;
+      workspaceId: string;
       projectId: string;
-    }) => projectApi.addProjectCollab(collabData, serverId, projectId),
+    }) => projectApi.addProjectMember(collabData, workspaceId, projectId),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
@@ -77,42 +80,42 @@ export function useAddProjectCollab() {
   });
 }
 
-export function useAddProjectItem() {
+export function useAddTask() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({
       projectData,
-      serverId,
+      workspaceId,
       projectId,
     }: {
       projectData: any;
-      serverId: string;
+      workspaceId: string;
       projectId: string;
-    }) => projectApi.addProjectItem(projectData, serverId, projectId),
+    }) => projectApi.addTask(projectData, workspaceId, projectId),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
       queryClient.invalidateQueries({ queryKey: ["project"] });
+      toast.success("Task created successfully");
     },
   });
 }
-export function useUpdateProjectItem() {
+export function useUpdateTask() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({
       projectData,
-      serverId,
+      workspaceId,
       projectId,
       itemId,
     }: {
       projectData: any;
-      serverId: string;
+      workspaceId: string;
       projectId: string;
       itemId: string;
-    }) =>
-      projectApi.updateProjectItem(projectData, serverId, projectId, itemId),
+    }) => projectApi.updateTask(projectData, workspaceId, projectId, itemId),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
@@ -121,19 +124,19 @@ export function useUpdateProjectItem() {
   });
 }
 
-export const useDeleteProjectItem = () => {
+export const useDeleteTask = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({
-      serverId,
+      workspaceId,
       projectId,
       itemId,
     }: {
-      serverId: string;
+      workspaceId: string;
       projectId: string;
       itemId: string;
-    }) => projectApi.deleteProjectItem(serverId, projectId, itemId),
+    }) => projectApi.deleteTask(workspaceId, projectId, itemId),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
@@ -147,14 +150,14 @@ export const useStartTask = () => {
 
   return useMutation({
     mutationFn: ({
-      serverId,
+      workspaceId,
       projectId,
       taskId,
     }: {
-      serverId: string;
+      workspaceId: string;
       projectId: string;
       taskId: string;
-    }) => projectApi.startTask(serverId, projectId, taskId),
+    }) => projectApi.startTask(workspaceId, projectId, taskId),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
@@ -168,14 +171,14 @@ export const useCompleteTask = () => {
 
   return useMutation({
     mutationFn: ({
-      serverId,
+      workspaceId,
       projectId,
       taskId,
     }: {
-      serverId: string;
+      workspaceId: string;
       projectId: string;
       taskId: string;
-    }) => projectApi.completeTask(serverId, projectId, taskId),
+    }) => projectApi.completeTask(workspaceId, projectId, taskId),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
@@ -189,20 +192,21 @@ export const useCommentTask = () => {
 
   return useMutation({
     mutationFn: ({
-      serverId,
+      workspaceId,
       projectId,
       itemId,
       commentData,
     }: {
-      serverId: string;
+      workspaceId: string;
       projectId: string;
       itemId: string;
       commentData: any;
-    }) => projectApi.commentTask(serverId, projectId, itemId, commentData),
+    }) => projectApi.commentTask(workspaceId, projectId, itemId, commentData),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
       queryClient.invalidateQueries({ queryKey: ["project"] });
+      toast.success("Comment added successfully");
     },
   });
 };

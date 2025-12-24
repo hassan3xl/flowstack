@@ -18,7 +18,6 @@ const AuthContext = createContext<AuthContextType>({
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { data: user, isLoading: loading, refetch } = useGetProfile();
-  console.log("user", user);
 
   return (
     <AuthContext.Provider

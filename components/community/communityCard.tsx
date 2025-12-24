@@ -1,103 +1,121 @@
 "use client";
 
 import React from "react";
-import { Shield, Users, Circle } from "lucide-react";
+import {
+  Crown,
+  MoreVertical,
+  Settings,
+  LogOut,
+  Users,
+  Globe,
+  Lock,
+} from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import Image from "next/image";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import Link from "next/link";
 
-interface CommunityCardProps {
-  community: any;
-  onJoin?: (id: string) => void;
-}
+const CommunityCard = ({ community }: { community: any }) => {
+  const isOwner = community.is_owner;
 
-const CommunityCard = ({ community, onJoin }: CommunityCardProps) => {
   return (
-    <div className="group relative bg-card border border-border rounded-xl overflow-hidden hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1 h-[300px] flex flex-col">
-      {/* --- Banner Area --- */}
-      <div className="h-28 w-full relative overflow-hidden bg-muted">
-        {community.banner ? (
-          <Image
-            src={community.banner}
-            alt="banner"
-            fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        ) : (
-          // Fallback Gradient
-          <div
-            className={`w-full h-full bg-gradient-to-br ${
-              community.color || "from-blue-600 to-indigo-600"
-            }`}
-          />
-        )}
+    <div className="group bg-card border border-border rounded-2xl overflow-hidden hover:shadow-xl hover:border-blue-500/40 transition-all duration-300">
+      {/* Decorative Top Bar based on Visibility */}
+      <div
+        className={`h-1.5 w-full ${
+          community.visibility === "public" ? "bg-green-500" : "bg-slate-500"
+        }`}
+      />
 
-        {/* Verified Badge Overlay */}
-        {community.verified && (
-          <div className="absolute top-2 right-2 bg-black/50 backdrop-blur-md px-2 py-1 rounded-full flex items-center gap-1">
-            <Shield className="w-3 h-3 text-green-400 fill-green-400" />
-            <span className="text-[10px] font-bold text-white uppercase tracking-wider">
-              Verified
-            </span>
-          </div>
-        )}
-      </div>
+      <div className="p-5">
+        <div className="flex items-start justify-between mb-4">
+          <Link href={`/communities/${community.id}`}>
+            <Avatar className="w-16 h-16 rounded-2xl border-2 border-background shadow-md group-hover:scale-105 transition-transform">
+              <AvatarImage src={community.icon} alt={community.name} />
+              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-bold text-xl">
+                {community.name[0]}
+              </AvatarFallback>
+            </Avatar>
+          </Link>
 
-      {/* --- Server Icon (Floating) --- */}
-      <div className="absolute top-20 left-4">
-        <div className="w-14 h-14 rounded-2xl border-4 border-card bg-background flex items-center justify-center overflow-hidden shadow-sm group-hover:scale-105 transition-transform">
-          {community.icon ? (
-            <Image
-              src={community.icon}
-              alt={community.name}
-              width={56}
-              height={56}
-            />
-          ) : (
-            <div className="text-lg font-bold text-muted-foreground">
-              {community.name.substring(0, 2).toUpperCase()}
-            </div>
-          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground"
+              >
+                <MoreVertical className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              {isOwner ? (
+                <>
+                  <DropdownMenuItem asChild>
+                    <Link href={`/communities/${community.id}/settings`}>
+                      <Settings className="w-4 h-4 mr-2" /> Settings
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              ) : (
+                <DropdownMenuItem className="text-destructive">
+                  <LogOut className="w-4 h-4 mr-2" /> Leave Community
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-      </div>
 
-      {/* --- Card Body --- */}
-      <div className="pt-8 p-4 flex flex-col flex-1">
-        <h3 className="font-bold text-lg text-foreground truncate mb-1 pr-2">
-          {community.name}
-        </h3>
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <h3 className="font-bold text-lg truncate">{community.name}</h3>
+            {isOwner && (
+              <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 border-none px-1.5 h-5 text-[10px] font-bold">
+                OWNER
+              </Badge>
+            )}
+          </div>
 
-        <p className="text-sm text-muted-foreground line-clamp-2 mb-4 h-10 leading-relaxed">
-          {community.description || "No description provided."}
-        </p>
+          <div className="flex items-center gap-2 text-xs font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wider">
+            {community.category_name || "General"}
+          </div>
 
-        {/* Footer Stats & Action */}
-        <div className="mt-auto pt-4 border-t border-border/50 flex items-center justify-between">
-          <div className="flex flex-col gap-0.5 text-xs text-muted-foreground">
-            <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              <span className="font-medium text-foreground">
-                {community.online || 0}
-              </span>{" "}
-              Online
+          <p className="text-sm text-muted-foreground line-clamp-2 min-h-[40px] mt-2">
+            {community.description || "No description provided."}
+          </p>
+        </div>
+
+        <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1">
+              <Users className="w-3.5 h-3.5" />
+              {community.member_count || 0}
             </div>
-            <div className="flex items-center gap-1.5 ml-0.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-gray-500" />
-              <span>{community.members || 0} Members</span>
+            <div className="flex items-center gap-1">
+              {community.visibility === "public" ? (
+                <Globe className="w-3.5 h-3.5" />
+              ) : (
+                <Lock className="w-3.5 h-3.5" />
+              )}
+              <span className="capitalize">{community.visibility}</span>
             </div>
           </div>
 
-          {/* Hidden Button that slides in or stays visible depending on preference. Here it's solid. */}
           <Button
+            asChild
             size="sm"
             variant="secondary"
-            className="opacity-0 group-hover:opacity-100 transition-opacity"
-            onClick={(e) => {
-              e.stopPropagation();
-              onJoin?.(community.id);
-            }}
+            className="rounded-lg px-4 h-8 text-xs font-bold"
           >
-            View
+            <Link href={`/communities/${community.id}`}>View</Link>
           </Button>
         </div>
       </div>

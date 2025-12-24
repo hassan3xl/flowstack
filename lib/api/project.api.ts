@@ -2,9 +2,9 @@ import { apiService } from "../services/apiService";
 
 export const projectApi = {
   // projects
-  getProjects: async (serverId: string) => {
+  getProjects: async (workspaceId: string) => {
     try {
-      const res = await apiService.get(`/servers/${serverId}/projects/`);
+      const res = await apiService.get(`/workspaces/${workspaceId}/projects/`);
       return res;
     } catch (error) {
       console.error("Error fetching projects:", error);
@@ -12,10 +12,10 @@ export const projectApi = {
     }
   },
 
-  getProject: async (serverId: string, projectId: string) => {
+  getProject: async (workspaceId: string, projectId: string) => {
     try {
       const res = await apiService.get(
-        `/servers/${serverId}/projects/${projectId}/`
+        `/workspaces/${workspaceId}/projects/${projectId}/`
       );
       return res;
     } catch (error) {
@@ -24,10 +24,10 @@ export const projectApi = {
     }
   },
 
-  addProject: async (projectData: any, serverId: string) => {
+  addProject: async (projectData: any, workspaceId: string) => {
     try {
       const res = await apiService.post(
-        `/servers/${serverId}/projects/`,
+        `/workspaces/${workspaceId}/projects/`,
         projectData
       );
       return res;
@@ -38,12 +38,12 @@ export const projectApi = {
   },
   updateProject: async (
     projectData: any,
-    serverId: string,
+    workspaceId: string,
     projectId: string
   ) => {
     try {
       const res = await apiService.patch(
-        `/servers/${serverId}/projects/${projectId}/`,
+        `/workspaces/${workspaceId}/projects/${projectId}/`,
         projectData
       );
       return res;
@@ -53,39 +53,35 @@ export const projectApi = {
     }
   },
 
-  addProjectCollab: async (
+  addProjectMember: async (
     collabData: any,
-    serverId: string,
+    workspaceId: string,
     projectId: string
   ) => {
     const res = await apiService.post(
-      `/servers/${serverId}/projects/${projectId}/add-collab/`,
+      `/workspaces/${workspaceId}/projects/${projectId}/add-collab/`,
       collabData
     );
     return res;
   },
 
-  removeProjectCollab: async (
+  removeProjectMember: async (
     collabData: any,
-    serverId: string,
+    workspaceId: string,
     projectId: string
   ) => {
     const res = await apiService.post(
-      `/servers/${serverId}/projects/${projectId}/remove-collab/`,
+      `/workspaces/${workspaceId}/projects/${projectId}/remove-collab/`,
       collabData
     );
     return res;
   },
 
   // tasks/items
-  addProjectItem: async (
-    projectData: any,
-    serverId: string,
-    projectId: string
-  ) => {
+  addTask: async (projectData: any, workspaceId: string, projectId: string) => {
     try {
       const res = await apiService.post(
-        `/servers/${serverId}/projects/${projectId}/items/`,
+        `/workspaces/${workspaceId}/projects/${projectId}/tasks/`,
         projectData
       );
       return res;
@@ -95,15 +91,15 @@ export const projectApi = {
     }
   },
 
-  updateProjectItem: async (
+  updateTask: async (
     projectData: any,
-    serverId: string,
+    workspaceId: string,
     projectId: string,
     itemId: string
   ) => {
     try {
       const res = await apiService.patch(
-        `/servers/${serverId}/projects/${projectId}/items/${itemId}/`,
+        `/workspaces/${workspaceId}/projects/${projectId}/tasks/${itemId}/`,
         projectData
       );
       return res;
@@ -113,37 +109,37 @@ export const projectApi = {
     }
   },
 
-  deleteProjectItem: async (
-    serverId: string,
-    projectId: string,
-    itemId: string
-  ) =>
+  deleteTask: async (workspaceId: string, projectId: string, itemId: string) =>
     apiService.delete(
-      `/servers/${serverId}/projects/${projectId}/items/${itemId}/`
+      `/workspaces/${workspaceId}/projects/${projectId}/tasks/${itemId}/`
     ),
 
-  startTask: async (serverId: string, projectId: string, itemId: string) => {
+  startTask: async (workspaceId: string, projectId: string, itemId: string) => {
     const res = await apiService.post(
-      `/servers/${serverId}/projects/${projectId}/items/${itemId}/start/`
+      `/workspaces/${workspaceId}/projects/${projectId}/tasks/${itemId}/start/`
     );
     return res;
   },
 
-  completeTask: async (serverId: string, projectId: string, itemId: string) => {
+  completeTask: async (
+    workspaceId: string,
+    projectId: string,
+    itemId: string
+  ) => {
     const res = await apiService.post(
-      `/servers/${serverId}/projects/${projectId}/items/${itemId}/complete/`
+      `/workspaces/${workspaceId}/projects/${projectId}/tasks/${itemId}/complete/`
     );
     return res;
   },
 
   commentTask: async (
-    serverId: string,
+    workspaceId: string,
     projectId: string,
     itemId: string,
     commentData: any
   ) => {
     const res = await apiService.post(
-      `/servers/${serverId}/projects/${projectId}/items/${itemId}/comment/`,
+      `/workspaces/${workspaceId}/projects/${projectId}/tasks/${itemId}/comment/`,
       commentData
     );
     return res;

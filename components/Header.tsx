@@ -15,8 +15,6 @@ interface StatCardData {
 interface HeaderProps {
   title?: string;
   subtitle?: string;
-  onRefresh?: () => void;
-  showRefresh?: boolean;
   stats?: StatCardData[];
   actions?: React.ReactNode;
 }
@@ -51,15 +49,13 @@ const StatCard = ({ title, value, icon, trend }: StatCardData) => {
 export const Header: React.FC<HeaderProps> = ({
   title,
   subtitle,
-  onRefresh,
-  showRefresh = true,
   stats,
   actions,
 }) => {
   return (
     <div className="mb-8">
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+      <div className="flex flex-row justify-between items-center gap-4 mb-6">
         {/* Left side - title/subtitle */}
         <div>
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">
@@ -75,17 +71,6 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Right side - actions */}
         <div className="flex items-center gap-2">
           {actions && <div className="flex items-center gap-2">{actions}</div>}
-          {showRefresh && onRefresh && (
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={onRefresh}
-              title="Refresh"
-              className="hover:bg-accent hover:text-foreground transition-colors"
-            >
-              <RefreshCw className="h-4 w-4" />
-            </Button>
-          )}
         </div>
       </div>
 

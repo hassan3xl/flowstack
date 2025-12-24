@@ -1,6 +1,6 @@
 import { UserType } from "./user.types";
 
-type CollaboratorsType = {
+type MembersType = {
   id: string;
   permission: "read" | "write";
   user: UserType;
@@ -14,7 +14,7 @@ export type CommentsType = {
   created_by: string;
 };
 
-export type ProjectItemType = {
+export type TaskType = {
   id: string;
   project_id: string;
   title: string;
@@ -37,12 +37,13 @@ export type ProjectType = {
   title: string;
   priority: string;
   description: string;
-  project_items: ProjectItemType[];
+  tasks: TaskType[];
   status: "planning" | "active" | "on_hold" | "completed" | "archived";
   item_count: any;
   visibility: string;
   created_at: string;
+  updated_at: string;
   created_by: string;
   completed_count: number;
-  collaborators: CollaboratorsType[];
+  collaborators: MembersType[];
 };

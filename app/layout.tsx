@@ -36,8 +36,10 @@ export const viewport = {
 
 export default function RootLayout({
   children,
+  modal,
 }: Readonly<{
   children: React.ReactNode;
+  modal: React.ReactNode;
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -48,7 +50,10 @@ export default function RootLayout({
               <ServiceWorkerRegistration />
               <SidebarProvider>
                 <Toaster richColors position="top-right" />
-                <>{children}</>
+                <>
+                  {children}
+                  {modal}
+                </>
               </SidebarProvider>{" "}
             </AuthProvider>
           </QueryProvider>

@@ -10,15 +10,17 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import WorkspaceCard from "@/components/workspace/WorkspaceCard";
 import { useGetWorkspaces } from "@/lib/hooks/workspace.hook";
 import Header from "@/components/Header";
+import { useAuth } from "@/contexts/AuthContext";
 
 const pendingInvites = 2;
 
 const Home = () => {
   const { data: workspaces } = useGetWorkspaces();
+  const { user } = useAuth();
   const recentWorkspaces = workspaces?.slice(0, 4); // Increased to 4 since we have room now
 
   // You can fetch user data here to personalize the greeting
-  const userName = "SANTOS";
+  const userName = user?.username || "User";
   const timeOfDay =
     new Date().getHours() < 12 ? "Good morning" : "Good afternoon";
 
@@ -77,12 +79,6 @@ const Home = () => {
         <div className="w-full lg:w-[400px] shrink-0 space-y-6">
           {/* Community Widget */}
           <Card className="h-[600px] flex flex-col border-border shadow-sm overflow-hidden">
-            <CardHeader className="pb-3 border-b border-border/50 bg-muted/20">
-              <CardTitle className="text-base font-semibold flex items-center gap-2">
-                <Users className="w-4 h-4 text-orange-500" />
-                Community Pulse
-              </CardTitle>
-            </CardHeader>
             <CardContent className="p-0 flex-1 relative min-h-0">
               <ScrollArea className="h-full">
                 <div className="p-4">

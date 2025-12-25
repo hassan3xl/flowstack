@@ -201,20 +201,20 @@ const ProjectDetailPage = () => {
 
               {/* mebmers Stack */}
               <div className="flex items-center gap-4 pt-2">
-                {project.collaborators?.length > 0 && (
+                {project.members?.length > 0 && (
                   <div className="flex -space-x-3 hover:space-x-1 transition-all duration-300">
-                    {project.collaborators.slice(0, 5).map((c) => (
+                    {project.members.slice(0, 5).map((member) => (
                       <Avatar
-                        key={c.user.id}
+                        key={member.user.id}
                         className="border-2 border-background ring-2 ring-border/50 w-8 h-8 cursor-pointer"
                       >
-                        <AvatarImage src={c.user.avatar} />
-                        <AvatarFallback>{c.user.username[0]}</AvatarFallback>
+                        <AvatarImage src={member.user.avatar} />
+                        <AvatarFallback>{"?"}</AvatarFallback>
                       </Avatar>
                     ))}
-                    {project.collaborators.length > 5 && (
+                    {project.members.length > 5 && (
                       <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold border-2 border-background z-10">
-                        +{project.collaborators.length - 5}
+                        +{project.members.length - 5}
                       </div>
                     )}
                   </div>

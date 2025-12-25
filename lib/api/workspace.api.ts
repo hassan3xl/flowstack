@@ -15,6 +15,11 @@ export const workspaceApi = {
     return res;
   },
 
+  getWorkspaceDashboard: async (workspaceId: string) => {
+    const res = await apiService.get(`/workspaces/${workspaceId}/dashboard/`);
+    return res;
+  },
+
   updateWorkspace: async (workspaceId: string, workspaceData: any) => {
     const res = await apiService.patch(
       `/workspaces/${workspaceId}/`,

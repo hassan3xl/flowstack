@@ -1,3 +1,4 @@
+import { get } from "http";
 import { apiService } from "../services/apiService";
 
 export const projectApi = {
@@ -59,19 +60,25 @@ export const projectApi = {
     projectId: string
   ) => {
     const res = await apiService.post(
-      `/workspaces/${workspaceId}/projects/${projectId}/add-collab/`,
+      `/workspaces/${workspaceId}/projects/${projectId}/collaborators/`,
       collabData
     );
     return res;
   },
 
+  getProjectMembers: async (workspaceId: string, projectId: string) => {
+    const res = await apiService.get(
+      `/workspaces/${workspaceId}/projects/${projectId}/collaborators/`
+    );
+    return res;
+  },
   removeProjectMember: async (
     collabData: any,
     workspaceId: string,
     projectId: string
   ) => {
     const res = await apiService.post(
-      `/workspaces/${workspaceId}/projects/${projectId}/remove-collab/`,
+      `/workspaces/${workspaceId}/projects/${projectId}/collaborators/`,
       collabData
     );
     return res;

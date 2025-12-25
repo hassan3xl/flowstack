@@ -59,6 +59,16 @@ export const useUpdateproject = () => {
   });
 };
 
+export const useGetProjectCollaborators = (
+  workspaceId: string,
+  projectId: string
+) => {
+  return useQuery({
+    queryKey: ["projectCollaborators"],
+    queryFn: () => projectApi.getProjectMembers(workspaceId, projectId),
+  });
+};
+
 export function useAddProjectCollab() {
   const queryClient = useQueryClient();
 

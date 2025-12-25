@@ -18,6 +18,7 @@ interface AddProjectModalProps {
 interface FormData {
   title: string;
   description: string;
+  visibility: "public" | "private";
 }
 
 const AddProjectModal: React.FC<AddProjectModalProps> = ({
@@ -69,6 +70,17 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
           placeholder="Enter a description for your project"
           field="textarea"
           label="Project Description"
+        />
+        <FormInput
+          field="select"
+          placeholder="Visibility"
+          name="visibility"
+          label="Visibility"
+          register={register}
+          options={[
+            { value: "public", label: "Public" },
+            { value: "private", label: "Private" },
+          ]}
         />
 
         {/* Actions */}

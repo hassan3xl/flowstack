@@ -168,7 +168,7 @@ const ProjectCard = ({ project, workspaceId }: ProjectCardProps) => {
       <div className="flex items-center justify-between pt-4 border-t border-border/50">
         {/* Collaborators Stack */}
         <div className="flex items-center -space-x-2">
-          {project.collaborators?.slice(0, 3).map((collab, i) => (
+          {project.members?.slice(0, 3).map((collab, i) => (
             <Avatar
               key={collab.id || i}
               className="w-7 h-7 border-2 border-card ring-1 ring-border"
@@ -179,9 +179,9 @@ const ProjectCard = ({ project, workspaceId }: ProjectCardProps) => {
               </AvatarFallback>
             </Avatar>
           ))}
-          {(project.collaborators?.length || 0) > 3 && (
+          {(project.members?.length || 0) > 3 && (
             <div className="w-7 h-7 rounded-full bg-secondary border-2 border-card flex items-center justify-center text-[9px] font-bold text-muted-foreground">
-              +{project.collaborators.length - 3}
+              +{project.members.length - 3}
             </div>
           )}
         </div>

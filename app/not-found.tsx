@@ -1,22 +1,42 @@
 // app/not-found.tsx
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle } from "lucide-react";
+import { FileQuestion, ArrowLeft } from "lucide-react";
 
 export default function NotFound() {
+  const router = useRouter();
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center text-center text-primary">
-      <AlertTriangle className="w-16 h-16 text-red-500 mb-4" />
-      <h1 className="text-xl sm:text-3xl font-bold mb-2">Page Not Found</h1>
-      <p className="text-gray-400 mb-6">
-        The page you’re looking for doesn’t exist or has been moved.
+    <div className="h-screen w-full flex flex-col items-center justify-center bg-background px-4">
+      {/* Icon with a subtle background circle */}
+      <div className="mb-6 rounded-full bg-muted p-4">
+        <FileQuestion className="h-10 w-10 text-muted-foreground" />
+      </div>
+
+      {/* Modern Typography */}
+      <h1 className="mb-2 text-3xl font-bold tracking-tight lg:text-5xl">
+        404
+      </h1>
+      <h2 className="mb-4 text-xl font-semibold text-foreground">
+        Page Not Found
+      </h2>
+      <p className="mb-8 max-w-[500px] text-center text-muted-foreground">
+        The page you are looking for doesn&apos;t exist or has been moved.
+        Please check the URL or head back.
       </p>
 
-      <Link href="/home" className="gap-3">
-        <Button className="">Go Back Home</Button>
-      </Link>
+      {/* Back Button Logic */}
+      <Button
+        onClick={() => router.back()}
+        variant="default"
+        size="lg"
+        className="gap-2"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Go Back
+      </Button>
     </div>
   );
 }

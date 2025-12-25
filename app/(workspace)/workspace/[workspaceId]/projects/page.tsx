@@ -30,6 +30,7 @@ const ProjectPage = () => {
   const filteredProjects = projects?.filter((p) =>
     p.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  console.log(filteredProjects);
 
   return (
     <div className="space-y-8 w-full">

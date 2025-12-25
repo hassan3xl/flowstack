@@ -23,8 +23,11 @@ const WorkspaceHomeMemberCard = ({ member }: WorkspaceHomeMemberCardProps) => {
 
         <div className="flex-1 min-w-0">
           <p className="font-medium text-white text-sm truncate">
-            {member.user.username}
+            {member.user.email}
           </p>{" "}
+          <p className="font-medium text-white text-sm truncate">
+            {member.user.username}
+          </p>
           <p className="text-xs text-gray-400">{member.role}</p>
         </div>
 

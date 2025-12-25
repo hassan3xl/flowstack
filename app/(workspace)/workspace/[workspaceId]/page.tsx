@@ -26,28 +26,19 @@ import Loader from "@/components/Loader";
 import Image from "next/image";
 
 // Hooks & Context
-import { useGetProjects } from "@/lib/hooks/project.hook";
 import { formatDate } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
-import {
-  useGetWorkspace,
-  useGetWorkspaceMembers,
-} from "@/lib/hooks/workspace.hook";
+import { useGetWorkspaceDashboard } from "@/lib/hooks/workspace.hook";
 import { useWorkspace } from "@/contexts/WorkspaceContext";
+import { ProjectType } from "@/lib/types/project.types";
 
 const ServerDetails = () => {
   const { user } = useAuth();
   const { workspaceId } = useWorkspace();
 
-  // Data Fetching
-  const { data: workspace, isLoading: workspaceLoading } =
-    useGetWorkspace(workspaceId);
-  const { data: members } = useGetWorkspaceMembers(workspaceId);
-  const { data: projects } = useGetProjects(workspaceId);
-
-  // Derived Data
-  const recentMembers = members?.slice(0, 5) || [];
-  const activeProjects = projects?.filter((p) => p.status !== "archived") || [];
+  const { data: dashboard, isLoading: dashboardLoading } =
+    useGetWorkspaceDashboard(workspaceId);
+  console.log("dashboard", dashboard);
 
   // Mock Tasks Data (In real app, fetch from useGetMyTasks)
   const myTasks = [
@@ -74,7 +65,7 @@ const ServerDetails = () => {
     },
   ];
 
-  if (workspaceLoading) return <Loader variant="ring" />;
+  if (dashboardLoading) return <Loader variant="ring" />;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -85,7 +76,7 @@ const ServerDetails = () => {
             <div className="flex items-center gap-5">
               <div className="relative shrink-0">
                 <Image
-                  src={workspace?.logo || "/placeholder-logo.png"}
+                  src={dashboard.workspace_logo || "/placeholder-logo.png"}
                   width={80}
                   height={80}
                   alt="icon"
@@ -95,26 +86,17 @@ const ServerDetails = () => {
               </div>
               <div className="space-y-1">
                 <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                  {workspace?.name}
+                  {dashboard.workspace_name}
                   {/* Optional Verified/Pro Badge */}
                   <Badge variant="secondary" className="text-xs font-normal">
                     PRO
                   </Badge>
                 </h1>
                 <p className="text-muted-foreground text-sm max-w-lg">
-                  {workspace?.description ||
+                  {dashboard?.workspace_description ||
                     "Welcome to your workspace dashboard."}
                 </p>
               </div>
-            </div>
-
-            <div className="flex gap-2 w-full md:w-auto">
-              <Button variant="outline" className="flex-1 md:flex-none">
-                <Settings className="w-4 h-4 mr-2" /> Settings
-              </Button>
-              <Button className="flex-1 md:flex-none">
-                <UserPlus className="w-4 h-4 mr-2" /> Invite
-              </Button>
             </div>
           </div>
         </div>
@@ -125,17 +107,17 @@ const ServerDetails = () => {
             <StatItem
               icon={<Folder className="w-4 h-4 text-blue-500" />}
               label="Active Projects"
-              value={workspace?.total_projects || 0}
+              value={dashboard.total_projects || 0}
             />
             <StatItem
               icon={<Users className="w-4 h-4 text-purple-500" />}
               label="Team Members"
-              value={workspace?.members?.length || 0}
+              value={dashboard.total_members || 0}
             />
             <StatItem
               icon={<CheckCircle2 className="w-4 h-4 text-green-500" />}
-              label="Tasks Done"
-              value="128" // Mock
+              label="Total Tasks "
+              value={dashboard.total_tasks || 0} // Mock
             />
             <StatItem
               icon={<TrendingUp className="w-4 h-4 text-orange-500" />}
@@ -242,7 +224,7 @@ const ServerDetails = () => {
                 Active Projects
               </h2>
               <Link
-                href={`workspaces/${workspaceId}/projects`}
+                href={`/workspace/${workspaceId}/projects`}
                 className="text-sm text-primary hover:underline"
               >
                 View All
@@ -250,7 +232,7 @@ const ServerDetails = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {activeProjects.slice(0, 4).map((project) => (
+              {dashboard.active_projects.map((project: ProjectType) => (
                 <div
                   key={project.id}
                   className="bg-card border border-border rounded-xl p-5 hover:shadow-md transition-all cursor-pointer group"
@@ -274,9 +256,9 @@ const ServerDetails = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between text-xs text-muted-foreground">
                       <span>Progress</span>
-                      <span>65%</span>
+                      <span>{dashboard.progress}%</span>
                     </div>
-                    <Progress value={65} className="h-1.5" />
+                    <Progress value={dashboard.progress} className="h-1.5" />
                   </div>
 
                   <div className="flex items-center -space-x-2 mt-4 pt-4 border-t border-border/50">
@@ -298,7 +280,7 @@ const ServerDetails = () => {
                   </div>
                 </div>
               ))}
-              {activeProjects.length === 0 && (
+              {dashboard.active_projects.length === 0 && (
                 <div className="col-span-full p-8 border border-dashed border-border rounded-xl text-center">
                   <p className="text-muted-foreground mb-2">
                     No active projects
@@ -320,18 +302,19 @@ const ServerDetails = () => {
               <h3 className="font-semibold text-sm">Recent Activity</h3>
             </div>
             <div className="p-4 space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex gap-3 text-sm">
+              {dashboard.activities?.slice(0, 5).map((activity: any) => (
+                <div key={activity.id} className="flex gap-3 text-sm">
                   <div className="mt-0.5 w-2 h-2 rounded-full bg-blue-500 shrink-0" />
                   <div>
                     <p className="text-foreground">
-                      <span className="font-medium">Sarah</span> completed task{" "}
+                      <span className="font-medium">{activity.actor_name}</span>{" "}
+                      {activity.action_type}
                       <span className="text-muted-foreground">
-                        "Fix login bug"
+                        {activity.target_text}
                       </span>
                     </p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      2 hours ago
+                      {formatDate(activity.created_at)}
                     </p>
                   </div>
                 </div>
@@ -355,21 +338,16 @@ const ServerDetails = () => {
                 Team Members
               </h3>
               <Link
-                href={`/server/${workspaceId}/members`}
+                href={`/workspace/${workspaceId}/members`}
                 className="text-xs text-blue-500 hover:underline flex items-center"
               >
                 See All <ArrowRight className="w-3 h-3 ml-1" />
               </Link>
             </div>
             <div className="p-4 space-y-4">
-              {recentMembers.map((member: any) => (
+              {dashboard.recent_members.slice(0, 3).map((member: any) => (
                 <CommunityHomeMemberCard member={member} key={member.id} />
               ))}
-              {(!recentMembers || recentMembers.length === 0) && (
-                <div className="text-center text-sm text-muted-foreground">
-                  No members found.
-                </div>
-              )}
             </div>
           </div>
         </div>

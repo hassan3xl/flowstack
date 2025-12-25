@@ -1,13 +1,44 @@
 "use client";
 
-import React from "react";
-import { toast } from "sonner";
-import { useAddTask } from "@/lib/hooks/project.hook";
-import { useForm } from "react-hook-form";
-import { Calendar, Flag, ChevronDown, AlignLeft, Plus } from "lucide-react";
+import React, { useState } from "react";
+import {
+  useAddTask,
+  useGetProjectCollaborators,
+} from "@/lib/hooks/project.hook";
+import { useForm, Controller } from "react-hook-form"; // Added Controller
+import {
+  Calendar,
+  Flag,
+  ChevronDown,
+  Plus,
+  Check,
+  ChevronsUpDown,
+  Search,
+} from "lucide-react";
 import BaseModal from "@/components/modals/BaseModal";
 import { FormInput } from "@/components/input/formInput";
 import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface AddTaskModalProps {
   isOpen: boolean;
@@ -19,6 +50,7 @@ interface AddTaskModalProps {
 interface FormData {
   title: string;
   description: string;
+  collaborator: string; // Storing the User ID here
   priority: "high" | "medium" | "low";
   due_date?: string | null;
 }
@@ -30,13 +62,20 @@ const AddTaskModal = ({
   workspaceId,
 }: AddTaskModalProps) => {
   const { mutateAsync: addTask, isPending: addingItem } = useAddTask();
+  const [openCombobox, setOpenCombobox] = useState(false);
 
   const {
     register,
+    control, // Needed for the Controller
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm<FormData>();
+
+  // Fetch members
+  const { data: members, isLoading: isLoadingMembers } =
+    useGetProjectCollaborators(workspaceId, projectId);
+  console.log("members", members);
 
   const onSubmit = async (data: FormData) => {
     const payload = { ...data };
@@ -46,120 +85,186 @@ const AddTaskModal = ({
       await addTask({ projectData: payload, workspaceId, projectId });
       reset();
       onClose();
-    } catch (error) {}
+    } catch (error) {
+      // Error is handled by hook usually, or add toast.error here
+    }
   };
 
   return (
-    <BaseModal
-      isOpen={isOpen}
-      onClose={onClose}
-      title="Create New Task"
-      description="Add a new item to your project board. Fill in the details below."
-    >
-      <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
-        {/* Title Input */}
-        <div className="space-y-1">
-          <FormInput
-            register={register}
-            name="title"
-            label="Task Title"
-            type="text"
-            placeholder="e.g., Redesign homepage hero section"
-            required
-          />
-        </div>
-
-        {/* Grid for Priority & Date */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Custom Styled Select for Priority */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2">
-              <Flag className="w-3.5 h-3.5 text-muted-foreground" /> Priority
-            </label>
-            <div className="relative">
-              <select
-                {...register("priority", { required: true })}
-                className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 appearance-none cursor-pointer hover:bg-accent/50 transition-colors"
-              >
-                <option value="" disabled selected>
-                  Select Level
-                </option>
-                <option value="high">High Priority</option>
-                <option value="medium">Medium Priority</option>
-                <option value="low">Low Priority</option>
-              </select>
-              {/* Custom Chevron to hide ugly browser arrow */}
-              <ChevronDown className="absolute right-3 top-3 h-4 w-4 opacity-50 pointer-events-none" />
-            </div>
-            {errors.priority && (
-              <p className="text-[0.8rem] font-medium text-destructive">
-                Priority is required
-              </p>
-            )}
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogHeader>
+        <DialogTitle>Add New Task</DialogTitle>
+      </DialogHeader>
+      <DialogContent>
+        <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+          {/* Title Input */}
+          <div className="space-y-1">
+            <FormInput
+              register={register}
+              name="title"
+              label="Task Title"
+              type="text"
+              placeholder="e.g., Redesign homepage hero section"
+              required
+            />
           </div>
 
-          {/* Custom Styled Date Input */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2">
-              <Calendar className="w-3.5 h-3.5 text-muted-foreground" /> Due
-              Date
-            </label>
-            <div className="relative">
+          {/* Priority and Due Date Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Priority Select */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium flex items-center gap-2">
+                <Flag className="w-3.5 h-3.5 text-muted-foreground" /> Priority
+              </label>
+              <div className="relative">
+                <select
+                  {...register("priority", { required: true })}
+                  className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 appearance-none cursor-pointer hover:bg-accent/50 transition-colors"
+                  defaultValue=""
+                >
+                  <option value="" disabled>
+                    Select Level
+                  </option>
+                  <option value="high">High Priority</option>
+                  <option value="medium">Medium Priority</option>
+                  <option value="low">Low Priority</option>
+                </select>
+                <ChevronDown className="absolute right-3 top-3 h-4 w-4 opacity-50 pointer-events-none" />
+              </div>
+              {errors.priority && (
+                <p className="text-[0.8rem] font-medium text-destructive">
+                  Required
+                </p>
+              )}
+            </div>
+
+            {/* Date Input */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium flex items-center gap-2">
+                <Calendar className="w-3.5 h-3.5 text-muted-foreground" /> Due
+                Date
+              </label>
               <input
                 type="date"
                 {...register("due_date")}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50
-                uppercase tracking-wider text-muted-foreground focus:text-foreground
-                "
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 uppercase tracking-wider text-muted-foreground focus:text-foreground"
               />
-              {/* CSS trick to make date picker icon white/dark mode compatible is handled by browser, but we can rely on standard border/bg here */}
             </div>
           </div>
-        </div>
 
-        {/* Description Textarea */}
-        <div className="space-y-2">
+          {/* Description */}
           <FormInput
             register={register}
             name="description"
             label="Description"
             field="textarea"
-            placeholder="Describe the acceptance criteria or add notes..."
+            placeholder="Add notes..."
             required
-            rows={4}
+            rows={3}
           />
-        </div>
 
-        {/* Footer Actions */}
-        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-4 border-t border-border/40">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={onClose}
-            disabled={addingItem}
-            className="w-full sm:w-auto"
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            disabled={addingItem}
-            className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white min-w-[120px]"
-          >
-            {addingItem ? (
-              <div className="flex items-center gap-2">
-                <span className="h-4 w-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                Adding...
-              </div>
-            ) : (
-              <>
-                <Plus className="w-4 h-4 mr-2" /> Create Task
-              </>
-            )}
-          </Button>
-        </div>
-      </form>
-    </BaseModal>
+          {/* RICH COLLABORATOR SELECT (Combobox) */}
+          <div className="space-y-2 flex flex-col">
+            <label className="text-sm font-medium">Assign to</label>
+            <Controller
+              name="collaborator"
+              control={control}
+              render={({ field }) => (
+                <Popover open={openCombobox} onOpenChange={setOpenCombobox}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={openCombobox}
+                      className="w-full justify-between font-normal text-muted-foreground hover:text-foreground"
+                    >
+                      {field.value
+                        ? members?.find(
+                            (member: any) => member.id === field.value
+                          )?.username || "Unknown User"
+                        : "Select collaborator..."}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className="w-[var(--radix-popover-trigger-width)] p-0"
+                    align="start"
+                  >
+                    <Command>
+                      <CommandInput placeholder="Search team members..." />
+                      <CommandList>
+                        <CommandEmpty>No member found.</CommandEmpty>
+                        <CommandGroup>
+                          {members?.map((member: any) => (
+                            <CommandItem
+                              key={member.id}
+                              value={member.username} // Helps with search filtering
+                              onSelect={() => {
+                                field.onChange(member.id); // Update RHF value
+                                setOpenCombobox(false);
+                              }}
+                              className="flex items-center gap-2 cursor-pointer"
+                            >
+                              {/* Visual Avatar */}
+                              <Avatar className="h-6 w-6">
+                                <AvatarImage src={member.avatar} />
+                                <AvatarFallback className="text-[10px]">
+                                  {/* {member.user.username
+                                    .substring(0, 2)
+                                    .toUpperCase()} */}
+                                </AvatarFallback>
+                              </Avatar>
+
+                              <span>{member.user.username}</span>
+                              <span>{member.user.email}</span>
+                              <span>{member.permission}</span>
+
+                              <Check
+                                className={cn(
+                                  "ml-auto h-4 w-4",
+                                  field.value === member.id
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                )}
+                              />
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              )}
+            />
+          </div>
+
+          {/* Footer Actions */}
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-4 border-t border-border/40">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={onClose}
+              disabled={addingItem}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={addingItem}
+              className="bg-blue-600 hover:bg-blue-700 text-white min-w-[120px]"
+            >
+              {addingItem ? (
+                "Adding..."
+              ) : (
+                <>
+                  <Plus className="w-4 h-4 mr-2" /> Create Task
+                </>
+              )}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 

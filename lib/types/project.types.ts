@@ -1,6 +1,6 @@
 import { UserType } from "./user.types";
 
-type MembersType = {
+type ProjectMembersType = {
   id: string;
   permission: "read" | "write";
   user: UserType;
@@ -45,5 +45,6 @@ export type ProjectType = {
   updated_at: string;
   created_by: string;
   completed_count: number;
-  collaborators: MembersType[];
+  members: ProjectMembersType[];
+  collaborators: ProjectMembersType[];
 };

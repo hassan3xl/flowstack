@@ -53,6 +53,7 @@ const ProjectSettingsPage = () => {
     workspaceId,
     projectId as string
   );
+  console.log("project", project);
 
   if (loading) {
     return <Loader variant="dots" title="Loading Settings" />;
@@ -113,7 +114,7 @@ const ProjectSettingsPage = () => {
                 <Users className="w-6 h-6 text-purple-400" />
                 <h2 className="text-xl font-semibold">Collaborators</h2>
                 <Badge className="bg-purple-100 text-purple-800">
-                  {project.collaborators.length}
+                  {project?.members?.length}
                 </Badge>
               </div>
               <Button
@@ -129,7 +130,7 @@ const ProjectSettingsPage = () => {
           </div>
 
           <div className="space-y-3">
-            {project.collaborators.map((collab) => (
+            {project.members?.map((collab) => (
               <div
                 key={collab.id}
                 className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-zinc-900/50 border border-zinc-800 p-4 rounded-xl gap-4 hover:border-yellow-600/30 transition-colors"

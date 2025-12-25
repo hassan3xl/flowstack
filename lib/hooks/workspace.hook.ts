@@ -41,6 +41,15 @@ export function useGetWorkspace(workspaceId: string) {
     enabled: !!workspaceId,
   });
 }
+// get workspace dashboard
+export function useGetWorkspaceDashboard(workspaceId: string) {
+  return useQuery({
+    queryKey: ["workspace-dashboard", workspaceId],
+    queryFn: () => workspaceApi.getWorkspaceDashboard(workspaceId),
+    enabled: !!workspaceId,
+  });
+}
+
 // update workspace
 export const useUpdateWorkspace = () => {
   const queryClient = useQueryClient();

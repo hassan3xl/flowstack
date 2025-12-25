@@ -61,3 +61,40 @@ export const getVisibilityBadge = (visibility: string) => {
     colors[visibility as keyof typeof colors] || "bg-gray-100 text-gray-800"
   );
 };
+
+export function timeAgo(date: string | number | Date): string {
+  // 1. Parse the date to ensure we have a valid Date object
+  const timestamp = new Date(date).getTime();
+  const now = Date.now();
+
+  // 2. Calculate difference in seconds
+  const secondsPast = (now - timestamp) / 1000;
+
+  // 3. Define time intervals in seconds
+  const intervals = {
+    year: 31536000,
+    month: 2592000,
+    week: 604800,
+    day: 86400,
+    hour: 3600,
+    minute: 60,
+  };
+
+  // 4. Handle "Just now" for very recent updates
+  if (secondsPast < 30) {
+    return "just now";
+  }
+
+  // 5. Iterate through intervals to find the correct unit
+  for (const [unit, seconds] of Object.entries(intervals)) {
+    const intervalCount = Math.floor(secondsPast / seconds);
+
+    if (intervalCount >= 1) {
+      // Handle pluralization (e.g., "1 day" vs "2 days")
+      const suffix = intervalCount === 1 ? "" : "s";
+      return `${intervalCount} ${unit}${suffix} ago`;
+    }
+  }
+
+  return "just now";
+}

@@ -1,4 +1,11 @@
+import { id } from "date-fns/locale";
 import { UserType } from "./user.types";
+
+export type CategoryType = {
+  name: string;
+  id: string;
+  description: string;
+};
 
 export type MembersType = {
   id: string;
@@ -7,7 +14,7 @@ export type MembersType = {
   joined_at: string;
 };
 
-export type ServerType = {
+export type CommunityType = {
   id: string;
   name: string;
   description: string;

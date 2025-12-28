@@ -20,7 +20,7 @@ import { useWorkspace } from "@/contexts/WorkspaceContext";
 
 const ProjectPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { workspaceId, userRole } = useWorkspace();
+  const { workspaceId, isAdminOrOwner } = useWorkspace();
   const { data: projects, isLoading } = useGetProjects(workspaceId);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -65,7 +65,7 @@ const ProjectPage = () => {
             Create your first project to start tracking tasks, managing files,
             and collaborating with your team.
           </p>
-          {userRole !== "member" && (
+          {isAdminOrOwner && (
             <Button
               size="lg"
               onClick={() => setIsModalOpen(true)}
@@ -79,9 +79,9 @@ const ProjectPage = () => {
         // --- Content State ---
         <div className="space-y-6">
           {/* Toolbar */}
-          <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-card p-4 rounded-xl border border-border shadow-sm">
+          <div className="flex flex-col lg:flex-row gap-4 justify-between items-center bg-card p-4 rounded-xl border border-border shadow-sm">
             {/* Search */}
-            <div className="relative w-full md:w-96">
+            <div className="relative w-full lg:w-96">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Search projects..."
@@ -92,20 +92,34 @@ const ProjectPage = () => {
             </div>
 
             {/* Actions */}
-            <div className="flex gap-3 w-full md:w-auto">
+            <div className="flex gap-3 w-full lg:w-auto">
               <Button variant="outline" asChild className="flex-1 md:flex-none">
                 <Link href="projects/archives/">
                   <Archive className="w-4 h-4 mr-2" />
                   Archives
                 </Link>
               </Button>
-              <Button
-                onClick={() => setIsModalOpen(true)}
-                className="flex-1 md:flex-none"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                New Project
-              </Button>
+              {isAdminOrOwner && (
+                <>
+                  <Button
+                    variant="outline"
+                    asChild
+                    className="flex-1 md:flex-none"
+                  >
+                    <Link href="projects/settings/">
+                      <SlidersHorizontal className="w-4 h-4 mr-2" />
+                      Settings
+                    </Link>
+                  </Button>
+                  <Button
+                    onClick={() => setIsModalOpen(true)}
+                    className="flex-1 md:flex-none"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    New Project
+                  </Button>
+                </>
+              )}
             </div>
           </div>
 

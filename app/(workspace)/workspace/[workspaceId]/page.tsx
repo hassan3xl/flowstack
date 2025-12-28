@@ -15,6 +15,7 @@ import {
   ClipboardList,
   Clock,
   MoreHorizontal,
+  Sparkles,
 } from "lucide-react";
 
 // Components
@@ -26,15 +27,15 @@ import Loader from "@/components/Loader";
 import Image from "next/image";
 
 // Hooks & Context
-import { formatDate } from "@/lib/utils";
+import { formatDate, timeAgo } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useGetWorkspaceDashboard } from "@/lib/hooks/workspace.hook";
 import { useWorkspace } from "@/contexts/WorkspaceContext";
 import { ProjectType } from "@/lib/types/project.types";
 
-const ServerDetails = () => {
+const WorkspaceDetails = () => {
   const { user } = useAuth();
-  const { workspaceId } = useWorkspace();
+  const { workspaceId, userRole, isAdminOrOwner } = useWorkspace();
 
   const { data: dashboard, isLoading: dashboardLoading } =
     useGetWorkspaceDashboard(workspaceId);
@@ -70,92 +71,41 @@ const ServerDetails = () => {
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* --- HERO SECTION --- */}
-      <div className="relative bg-card rounded-xl border border-border overflow-hidden shadow-sm">
-        <div className="p-6">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-            <div className="flex items-center gap-5">
-              <div className="relative shrink-0">
-                <Image
-                  src={dashboard.workspace_logo || "/placeholder-logo.png"}
-                  width={80}
-                  height={80}
-                  alt="icon"
-                  className="rounded-2xl object-cover border-2 border-border shadow-sm"
-                />
-                <div className="absolute -bottom-2 -right-2 bg-green-500 w-4 h-4 rounded-full border-2 border-card" />
-              </div>
-              <div className="space-y-1">
-                <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                  {dashboard.workspace_name}
-                  {/* Optional Verified/Pro Badge */}
-                  <Badge variant="secondary" className="text-xs font-normal">
-                    PRO
-                  </Badge>
-                </h1>
-                <p className="text-muted-foreground text-sm max-w-lg">
-                  {dashboard?.workspace_description ||
-                    "Welcome to your workspace dashboard."}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* --- STATS BAR --- */}
-        <div className="border-t border-border bg-muted/20 px-6 py-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <StatItem
-              icon={<Folder className="w-4 h-4 text-blue-500" />}
-              label="Active Projects"
-              value={dashboard.total_projects || 0}
-            />
-            <StatItem
-              icon={<Users className="w-4 h-4 text-purple-500" />}
-              label="Team Members"
-              value={dashboard.total_members || 0}
-            />
-            <StatItem
-              icon={<CheckCircle2 className="w-4 h-4 text-green-500" />}
-              label="Total Tasks "
-              value={dashboard.total_tasks || 0} // Mock
-            />
-            <StatItem
-              icon={<TrendingUp className="w-4 h-4 text-orange-500" />}
-              label="Velocity"
-              value="+12%"
-            />
-          </div>
-        </div>
-      </div>
+      <WorkspaceHeader dashboard={dashboard} />
 
       {/* --- MAIN GRID LAYOUT --- */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
         {/* LEFT COLUMN: Main Dashboard (8 cols) */}
+
         <div className="xl:col-span-8 space-y-8">
           {/* 1. Quick Actions Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <QuickActionCard
-              title="New Project"
-              desc="Start a new initiative"
-              icon={Folder}
-              color="text-blue-600"
-              bgColor="bg-blue-50 dark:bg-blue-950/30"
-            />
-            <QuickActionCard
-              title="Create Task"
-              desc="Assign work to team"
-              icon={ClipboardList}
-              color="text-orange-600"
-              bgColor="bg-orange-50 dark:bg-orange-950/30"
-            />
-            <QuickActionCard
-              title="Add Member"
-              desc="Grow your team"
-              icon={UserPlus}
-              color="text-purple-600"
-              bgColor="bg-purple-50 dark:bg-purple-950/30"
-            />
-          </div>
+          {isAdminOrOwner && (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <>
+                <QuickActionCard
+                  title="New Project"
+                  desc="Start a new initiative"
+                  icon={Folder}
+                  color="text-blue-600"
+                  bgColor="bg-blue-50 dark:bg-blue-950/30"
+                />
+                <QuickActionCard
+                  title="Create Task"
+                  desc="Assign work to team"
+                  icon={ClipboardList}
+                  color="text-orange-600"
+                  bgColor="bg-orange-50 dark:bg-orange-950/30"
+                />
+                <QuickActionCard
+                  title="Add Member"
+                  desc="Grow your team"
+                  icon={UserPlus}
+                  color="text-purple-600"
+                  bgColor="bg-purple-50 dark:bg-purple-950/30"
+                />
+              </>
+            </div>
+          )}
 
           {/* 2. My Priorities (Replacing Feed) */}
           <div className="space-y-4">
@@ -173,8 +123,9 @@ const ServerDetails = () => {
               </Button>
             </div>
 
+            {/* user priorities */}
             <div className="bg-card border border-border rounded-xl shadow-sm divide-y divide-border">
-              {myTasks.map((task) => (
+              {dashboard?.my_tasks?.slice(0, 5).map((task: any) => (
                 <div
                   key={task.id}
                   className="p-4 flex items-center justify-between hover:bg-muted/30 transition-colors group cursor-pointer"
@@ -182,29 +133,27 @@ const ServerDetails = () => {
                   <div className="flex items-center gap-4">
                     <div
                       className={`w-2 h-2 rounded-full ${
-                        task.priority === "high" ? "bg-red-500" : "bg-blue-500"
+                        task.priority === "high"
+                          ? "bg-red-500"
+                          : task.priority === "medium"
+                          ? "bg-yellow-500"
+                          : "bg-blue-500"
                       }`}
                     />
                     <div>
                       <p className="font-medium text-sm text-foreground">
-                        {task.title}
+                        {task.title.slice(0, 30) + "..."}
                       </p>
                       <p className="text-xs text-muted-foreground flex items-center gap-2 mt-0.5">
-                        <Folder className="w-3 h-3" /> {task.project}
+                        <Folder className="w-3 h-3" />{" "}
+                        {task.project_title.slice(0, 20) + "..."}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
                     <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded-md flex items-center gap-1">
-                      <Clock className="w-3 h-3" /> {task.due}
+                      <Clock className="w-3 h-3" /> {formatDate(task?.due_date)}
                     </span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 opacity-0 group-hover:opacity-100"
-                    >
-                      <MoreHorizontal className="w-4 h-4" />
-                    </Button>
                   </div>
                 </div>
               ))}
@@ -216,7 +165,7 @@ const ServerDetails = () => {
             </div>
           </div>
 
-          {/* 3. Active Projects (Moved from sidebar to main for better visibility) */}
+          {/* 3. Active */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold flex items-center gap-2">
@@ -231,6 +180,7 @@ const ServerDetails = () => {
               </Link>
             </div>
 
+            {/* recent projects  */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {dashboard.active_projects.map((project: ProjectType) => (
                 <div
@@ -305,16 +255,16 @@ const ServerDetails = () => {
               {dashboard.activities?.slice(0, 5).map((activity: any) => (
                 <div key={activity.id} className="flex gap-3 text-sm">
                   <div className="mt-0.5 w-2 h-2 rounded-full bg-blue-500 shrink-0" />
-                  <div>
+                  <div className="flex-1">
                     <p className="text-foreground">
                       <span className="font-medium">{activity.actor_name}</span>{" "}
                       {activity.action_type}
-                      <span className="text-muted-foreground">
+                      <span className="pl-1 text-muted-foreground">
                         {activity.target_text}
                       </span>
                     </p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      {formatDate(activity.created_at)}
+                      {timeAgo(activity.created_at)}
                     </p>
                   </div>
                 </div>
@@ -356,25 +306,6 @@ const ServerDetails = () => {
   );
 };
 
-// --- Helper Components ---
-
-const StatItem = ({
-  icon,
-  label,
-  value,
-}: {
-  icon: any;
-  label: string;
-  value: string | number;
-}) => (
-  <div className="flex flex-col gap-1">
-    <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium uppercase tracking-wide">
-      {icon} {label}
-    </div>
-    <div className="text-2xl font-bold text-foreground">{value}</div>
-  </div>
-);
-
 const QuickActionCard = ({ title, desc, icon: Icon, color, bgColor }: any) => (
   <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-4 hover:border-primary/50 cursor-pointer transition-all hover:shadow-sm group">
     <div
@@ -391,4 +322,103 @@ const QuickActionCard = ({ title, desc, icon: Icon, color, bgColor }: any) => (
   </div>
 );
 
-export default ServerDetails;
+export default WorkspaceDetails;
+
+const WorkspaceHeader = ({ dashboard }: any) => {
+  return (
+    <div className="relative bg-card rounded-2xl border border-border shadow-sm overflow-hidden group">
+      {/* 1. Decorative Header Gradient/Banner */}
+      <div className="h-32 bg-gradient-to-r from-zinc-600/20 via-gray-500/20 to-slate-500/20 border-b border-border/50 relative">
+        {/* Optional: Abstract Pattern Overlay */}
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+      </div>
+
+      <div className="px-6 pb-6 md:px-8">
+        <div className="relative -mt-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+          {/* 2. Main Identity Section */}
+          <div className="flex items-end gap-5">
+            <div className="relative shrink-0">
+              <div className="p-1.5 bg-card rounded-2xl shadow-sm border border-border/50">
+                <Image
+                  src={dashboard.workspace_logo || "/placeholder-logo.png"}
+                  width={88}
+                  height={88}
+                  alt="workspace icon"
+                  className="rounded-xl object-cover bg-background"
+                />
+              </div>
+            </div>
+
+            <div className="mb-1 space-y-1">
+              <div className="flex items-center gap-3">
+                <h1 className="text-3xl font-bold tracking-tight text-foreground">
+                  {dashboard.workspace_name}
+                </h1>
+                <Badge
+                  variant="secondary"
+                  className="bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 border-blue-200"
+                >
+                  <Sparkles className="w-3 h-3 mr-1" /> PRO
+                </Badge>
+              </div>
+              <p className="text-muted-foreground font-medium text-sm max-w-lg line-clamp-1">
+                {dashboard?.workspace_description ||
+                  "Manage your projects and team in one place."}
+              </p>
+            </div>
+          </div>
+
+          {/* 3. Action / Context Area (Optional) */}
+          {/* You could put an 'Invite Member' button here */}
+        </div>
+
+        {/* 4. Stats Grid - Clean & Separated */}
+        <div className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard
+            icon={<Folder className="w-5 h-5 text-blue-500" />}
+            label="Active Projects"
+            value={dashboard.total_projects || 0}
+          />
+          <StatCard
+            icon={<Users className="w-5 h-5 text-purple-500" />}
+            label="Team Members"
+            value={dashboard.total_members || 0}
+          />
+          <StatCard
+            icon={<CheckCircle2 className="w-5 h-5 text-emerald-500" />}
+            label="Completed Tasks"
+            value={dashboard.total_tasks || 0}
+          />
+          <StatCard
+            icon={<TrendingUp className="w-5 h-5 text-orange-500" />}
+            label="Velocity"
+            value="+12%"
+            subtext="vs last week"
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Helper Component for consistency
+function StatCard({ icon, label, value, subtext }: any) {
+  return (
+    <div className="flex flex-col p-4 rounded-xl bg-muted/30 border border-border/50 hover:bg-muted/50 transition-colors">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-sm font-medium text-muted-foreground">
+          {label}
+        </span>
+        <div className="p-2 bg-background rounded-lg shadow-sm border border-border/50">
+          {icon}
+        </div>
+      </div>
+      <div className="flex items-baseline gap-2">
+        <span className="text-2xl font-bold text-foreground">{value}</span>
+        {subtext && (
+          <span className="text-xs text-green-600 font-medium">{subtext}</span>
+        )}
+      </div>
+    </div>
+  );
+}

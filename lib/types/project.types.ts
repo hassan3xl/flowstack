@@ -32,6 +32,11 @@ export type TaskType = {
   status: string;
 };
 
+export type UserPermissionType = {
+  permission: "read" | "write";
+  joined_at: string;
+};
+
 export type ProjectType = {
   id: string;
   title: string;
@@ -47,4 +52,5 @@ export type ProjectType = {
   completed_count: number;
   members: ProjectMembersType[];
   collaborators: ProjectMembersType[];
+  user_permission: UserPermissionType;
 };

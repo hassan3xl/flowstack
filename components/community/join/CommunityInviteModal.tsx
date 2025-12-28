@@ -7,7 +7,7 @@ import { Button } from "../../ui/button";
 import BaseModal from "../../modals/BaseModal";
 
 import { formatDate } from "@/lib/utils";
-import { InvitesType } from "@/lib/types/server.types";
+import { InvitesType } from "@/lib/types/category.types";
 import { toast } from "sonner";
 import {
   useAcceptCommuityInvites,

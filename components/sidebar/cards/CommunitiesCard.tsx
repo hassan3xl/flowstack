@@ -1,7 +1,7 @@
 "use client";
 
 import { useSidebar } from "@/contexts/SidebarContext";
-import { Home, Server } from "lucide-react";
+import { Group, Home, Server, User, Users, Users2 } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
@@ -37,7 +37,7 @@ export default function CommunitiesCard() {
     >
       {/* Icon */}
       <div className="flex items-center justify-center w-8 h-8 md:w-12 md:h-12 shrink-0">
-        <Server
+        <Group
           size={24}
           className={cn("transition-all", isActive && "fill-current")}
         />

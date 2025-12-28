@@ -117,159 +117,154 @@ export function MessagesDropdown() {
 
   return (
     <div>
-      {!loading && (
-        <>
-          {user && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="relative hover:bg-accent"
-                >
-                  <MessageSquare className="h-5 w-5" />
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center font-semibold">
-                      {unreadCount > 9 ? "9+" : unreadCount}
-                    </span>
-                  )}
-                </Button>
-              </DropdownMenuTrigger>
+      <>
+        {user && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative hover:bg-accent"
+              >
+                <MessageSquare className="h-5 w-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center font-semibold">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
+              </Button>
+            </DropdownMenuTrigger>
 
-              <DropdownMenuContent align="end" className="w-[380px] p-0">
-                {/* Header */}
-                <div className="flex items-center justify-between p-4 border-b">
-                  <div>
-                    <h3 className="font-semibold text-base">Messages</h3>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {unreadCount > 0
-                        ? `${unreadCount} unread ${
-                            unreadCount === 1 ? "message" : "messages"
-                          }`
-                        : "No unread messages"}
-                    </p>
-                  </div>
-                  <Link href="/messages/compose">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-xs h-7 px-2"
-                    >
-                      New
-                    </Button>
-                  </Link>
+            <DropdownMenuContent align="end" className="w-[380px] p-0">
+              {/* Header */}
+              <div className="flex items-center justify-between p-4 border-b">
+                <div>
+                  <h3 className="font-semibold text-base">Messages</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {unreadCount > 0
+                      ? `${unreadCount} unread ${
+                          unreadCount === 1 ? "message" : "messages"
+                        }`
+                      : "No unread messages"}
+                  </p>
                 </div>
+                <Link href="/messages/compose">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs h-7 px-2"
+                  >
+                    New
+                  </Button>
+                </Link>
+              </div>
 
-                {/* Messages List */}
-                <div className="max-h-[450px] overflow-y-auto">
-                  {messages.map((dm, index) => (
-                    <div key={dm.id}>
-                      <Link href={`/messages/${dm.userId}`}>
-                        <div
-                          onClick={() => markAsRead(dm.id)}
-                          className={`p-4 hover:bg-accent cursor-pointer transition-colors ${
-                            dm.unread > 0 ? "bg-blue-50/50" : ""
-                          }`}
-                        >
-                          <div className="flex gap-3">
-                            {/* Avatar with online status */}
-                            <div className="relative flex-shrink-0">
-                              <Avatar className="h-12 w-12">
-                                <AvatarImage src={dm.avatar} alt={dm.name} />
-                                <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white">
-                                  {dm.name
-                                    .split(" ")
-                                    .map((n) => n[0])
-                                    .join("")}
-                                </AvatarFallback>
-                              </Avatar>
-                              {dm.online && (
-                                <div className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full bg-green-500 border-2 border-white" />
-                              )}
+              {/* Messages List */}
+              <div className="max-h-[450px] overflow-y-auto">
+                {messages.map((dm, index) => (
+                  <div key={dm.id}>
+                    <Link href={`/messages/${dm.userId}`}>
+                      <div
+                        onClick={() => markAsRead(dm.id)}
+                        className={`p-4 hover:bg-accent cursor-pointer transition-colors ${
+                          dm.unread > 0 ? "bg-blue-50/50" : ""
+                        }`}
+                      >
+                        <div className="flex gap-3">
+                          {/* Avatar with online status */}
+                          <div className="relative flex-shrink-0">
+                            <Avatar className="h-12 w-12">
+                              <AvatarImage src={dm.avatar} alt={dm.name} />
+                              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white">
+                                {dm.name
+                                  .split(" ")
+                                  .map((n) => n[0])
+                                  .join("")}
+                              </AvatarFallback>
+                            </Avatar>
+                            {dm.online && (
+                              <div className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full bg-green-500 border-2 border-white" />
+                            )}
+                          </div>
+
+                          {/* Content */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2 mb-1">
+                              <h4
+                                className={`text-sm truncate ${
+                                  dm.unread > 0
+                                    ? "font-semibold text-foreground"
+                                    : "font-medium text-foreground"
+                                }`}
+                              >
+                                {dm.name}
+                              </h4>
+                              <div className="flex items-center gap-2 flex-shrink-0">
+                                <span className="text-xs text-muted-foreground">
+                                  {dm.time}
+                                </span>
+                                {dm.unread > 0 && (
+                                  <div className="min-w-[20px] h-5 rounded-full bg-blue-500 text-white text-xs flex items-center justify-center font-semibold px-1.5">
+                                    {dm.unread}
+                                  </div>
+                                )}
+                              </div>
                             </div>
 
-                            {/* Content */}
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-start justify-between gap-2 mb-1">
-                                <h4
-                                  className={`text-sm truncate ${
-                                    dm.unread > 0
-                                      ? "font-semibold text-foreground"
-                                      : "font-medium text-foreground"
-                                  }`}
-                                >
-                                  {dm.name}
-                                </h4>
-                                <div className="flex items-center gap-2 flex-shrink-0">
-                                  <span className="text-xs text-muted-foreground">
-                                    {dm.time}
+                            <div className="flex items-center gap-2">
+                              {dm.unread === 0 && dm.seen && (
+                                <CheckCheck className="h-3.5 w-3.5 text-blue-500 flex-shrink-0" />
+                              )}
+                              {dm.unread === 0 && !dm.seen && (
+                                <Check className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+                              )}
+                              {getMessageIcon(dm.messageType) && (
+                                <span className="text-muted-foreground flex-shrink-0">
+                                  {getMessageIcon(dm.messageType)}
+                                </span>
+                              )}
+                              <p
+                                className={`text-sm truncate ${
+                                  dm.unread > 0
+                                    ? "font-medium text-foreground"
+                                    : "text-muted-foreground"
+                                }`}
+                              >
+                                {dm.typing ? (
+                                  <span className="text-blue-500 italic">
+                                    typing...
                                   </span>
-                                  {dm.unread > 0 && (
-                                    <div className="min-w-[20px] h-5 rounded-full bg-blue-500 text-white text-xs flex items-center justify-center font-semibold px-1.5">
-                                      {dm.unread}
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-
-                              <div className="flex items-center gap-2">
-                                {dm.unread === 0 && dm.seen && (
-                                  <CheckCheck className="h-3.5 w-3.5 text-blue-500 flex-shrink-0" />
+                                ) : (
+                                  dm.message
                                 )}
-                                {dm.unread === 0 && !dm.seen && (
-                                  <Check className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
-                                )}
-                                {getMessageIcon(dm.messageType) && (
-                                  <span className="text-muted-foreground flex-shrink-0">
-                                    {getMessageIcon(dm.messageType)}
-                                  </span>
-                                )}
-                                <p
-                                  className={`text-sm truncate ${
-                                    dm.unread > 0
-                                      ? "font-medium text-foreground"
-                                      : "text-muted-foreground"
-                                  }`}
-                                >
-                                  {dm.typing ? (
-                                    <span className="text-blue-500 italic">
-                                      typing...
-                                    </span>
-                                  ) : (
-                                    dm.message
-                                  )}
-                                </p>
-                              </div>
+                              </p>
                             </div>
                           </div>
                         </div>
-                      </Link>
-                      {index < messages.length - 1 && (
-                        <div className="border-b mx-4" />
-                      )}
-                    </div>
-                  ))}
-                </div>
+                      </div>
+                    </Link>
+                    {index < messages.length - 1 && (
+                      <div className="border-b mx-4" />
+                    )}
+                  </div>
+                ))}
+              </div>
 
-                {/* Footer */}
-                <div className="border-t p-2">
-                  <Link href="/messages">
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-center text-sm font-medium"
-                    >
-                      View All Messages
-                    </Button>
-                  </Link>
-                </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-        </>
-      )}
-      {loading && (
-        <div className="h-10 w-10 bg-accent/50 rounded-md animate-pulse" />
-      )}
+              {/* Footer */}
+              <div className="border-t p-2">
+                <Link href="/messages">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-center text-sm font-medium"
+                  >
+                    View All Messages
+                  </Button>
+                </Link>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+      </>
     </div>
   );
 }

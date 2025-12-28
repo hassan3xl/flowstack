@@ -9,16 +9,10 @@ import {
   CheckCircle2,
   Users,
   ArrowUpRight,
+  Settings2,
 } from "lucide-react";
 import { ProjectType } from "@/lib/types/project.types";
-import { formatDate } from "@/lib/utils";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -31,7 +25,7 @@ interface ProjectCardProps {
 
 const ProjectCard = ({ project, workspaceId }: ProjectCardProps) => {
   const router = useRouter();
-  const { userRole } = useWorkspace();
+  const { isAdminOrOwner } = useWorkspace();
 
   const handleOpenProject = () => {
     router.push(`/workspace/${workspaceId}/projects/${project.id}`);
@@ -49,8 +43,8 @@ const ProjectCard = ({ project, workspaceId }: ProjectCardProps) => {
 
   // Calculations
   const completionPercentage =
-    project.item_count > 0
-      ? Math.round((project.completed_count / project.item_count) * 100)
+    project.tasks.length > 0
+      ? Math.round((project.completed_count / project.tasks.length) * 100)
       : 0;
 
   // Visual Helpers
@@ -97,47 +91,13 @@ const ProjectCard = ({ project, workspaceId }: ProjectCardProps) => {
           <h3 className="font-bold text-lg leading-tight group-hover:text-primary transition-colors line-clamp-1">
             {project.title}
           </h3>
-          <Badge
-            variant="secondary"
-            className={`text-[10px] px-2 h-5 ${getPriorityBadge(
-              project.priority
-            )}`}
-          >
-            {project.priority || "Normal"} Priority
-          </Badge>
         </div>
-
-        {/* Floating Actions Menu */}
-        <div className="absolute top-4 right-4">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <MoreVertical className="w-4 h-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
-              <DropdownMenuItem onClick={handleOpenProject}>
-                <ArrowUpRight className="mr-2 h-4 w-4" /> Open Project
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleSettings}>
-                <Target className="mr-2 h-4 w-4" /> Settings
-              </DropdownMenuItem>
-              {userRole !== "admin" && userRole !== "owner" && (
-                <>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleRequest}>
-                    <Users className="mr-2 h-4 w-4" /> Request Access
-                  </DropdownMenuItem>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        {isAdminOrOwner && (
+          <Settings2
+            className="text-muted-foreground hover:text-primary"
+            onClick={handleSettings}
+          />
+        )}
       </div>
 
       {/* --- Description --- */}
@@ -191,7 +151,7 @@ const ProjectCard = ({ project, workspaceId }: ProjectCardProps) => {
           <div className="flex items-center gap-1 bg-secondary/40 px-2 py-1 rounded-md">
             <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
             <span>
-              {project.completed_count}/{project.item_count}
+              {project.completed_count}/{project.tasks.length}
             </span>
           </div>
         </div>

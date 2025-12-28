@@ -50,7 +50,7 @@ interface AddTaskModalProps {
 interface FormData {
   title: string;
   description: string;
-  collaborator: string; // Storing the User ID here
+  assign_user_id: string;
   priority: "high" | "medium" | "low";
   due_date?: string | null;
 }
@@ -66,7 +66,7 @@ const AddTaskModal = ({
 
   const {
     register,
-    control, // Needed for the Controller
+    control,
     handleSubmit,
     reset,
     formState: { errors },
@@ -79,21 +79,20 @@ const AddTaskModal = ({
 
   const onSubmit = async (data: FormData) => {
     const payload = { ...data };
+    console.log("payload", payload);
     if (!payload.due_date) payload.due_date = null;
 
     try {
       await addTask({ projectData: payload, workspaceId, projectId });
       reset();
       onClose();
-    } catch (error) {
-      // Error is handled by hook usually, or add toast.error here
-    }
+    } catch (error) {}
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogHeader>
-        <DialogTitle>Add New Task</DialogTitle>
+        <DialogTitle></DialogTitle>
       </DialogHeader>
       <DialogContent>
         <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
@@ -167,7 +166,7 @@ const AddTaskModal = ({
           <div className="space-y-2 flex flex-col">
             <label className="text-sm font-medium">Assign to</label>
             <Controller
-              name="collaborator"
+              name="assign_user_id"
               control={control}
               render={({ field }) => (
                 <Popover open={openCombobox} onOpenChange={setOpenCombobox}>
@@ -180,8 +179,8 @@ const AddTaskModal = ({
                     >
                       {field.value
                         ? members?.find(
-                            (member: any) => member.id === field.value
-                          )?.username || "Unknown User"
+                            (member: any) => member.user.id === field.value
+                          )?.user.username || "Select collaborator..."
                         : "Select collaborator..."}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
@@ -198,9 +197,9 @@ const AddTaskModal = ({
                           {members?.map((member: any) => (
                             <CommandItem
                               key={member.id}
-                              value={member.username} // Helps with search filtering
+                              value={member.user?.username || member.user.email} // Helps with search filtering
                               onSelect={() => {
-                                field.onChange(member.id); // Update RHF value
+                                field.onChange(member.user.id); // Update RHF value
                                 setOpenCombobox(false);
                               }}
                               className="flex items-center gap-2 cursor-pointer"
@@ -209,9 +208,7 @@ const AddTaskModal = ({
                               <Avatar className="h-6 w-6">
                                 <AvatarImage src={member.avatar} />
                                 <AvatarFallback className="text-[10px]">
-                                  {/* {member.user.username
-                                    .substring(0, 2)
-                                    .toUpperCase()} */}
+                                  {member.user?.email[0]?.toUpperCase() || "U"}
                                 </AvatarFallback>
                               </Avatar>
 
@@ -242,17 +239,13 @@ const AddTaskModal = ({
           <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-4 border-t border-border/40">
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               onClick={onClose}
               disabled={addingItem}
             >
               Cancel
             </Button>
-            <Button
-              type="submit"
-              disabled={addingItem}
-              className="bg-blue-600 hover:bg-blue-700 text-white min-w-[120px]"
-            >
+            <Button type="submit" disabled={addingItem}>
               {addingItem ? (
                 "Adding..."
               ) : (

@@ -211,6 +211,7 @@ const ProfileForm = () => {
             <Input
               {...register("username")}
               defaultValue={profile?.username}
+              required
               className="pl-7"
             />
           </div>

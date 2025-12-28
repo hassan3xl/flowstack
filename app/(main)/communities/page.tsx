@@ -15,7 +15,10 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import Loader from "@/components/Loader";
 import Header from "@/components/Header";
-import { useGetCommunities } from "@/lib/hooks/community.hooks";
+import {
+  useGetCommuitiesCateories,
+  useGetCommunities,
+} from "@/lib/hooks/community.hooks";
 import {
   Dialog,
   DialogContent,
@@ -29,6 +32,7 @@ import CommunityCard from "@/components/community/communityCard";
 
 const CommunitiesPage = () => {
   const { data: communities, isLoading } = useGetCommunities();
+  const { data: categories } = useGetCommuitiesCateories();
 
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "owned">("all");
@@ -38,7 +42,7 @@ const CommunitiesPage = () => {
   // Premium Check: Only allow 1 community on free tier
   const handleCreateRequest = () => {
     const ownedCount = communities?.filter((c: any) => c.is_owner).length || 0;
-    if (ownedCount >= 1) {
+    if (ownedCount >= 3) {
       setShowPremiumModal(true);
     } else {
       setOpenAddModal(true);
@@ -57,13 +61,13 @@ const CommunitiesPage = () => {
   if (isLoading) return <Loader />;
 
   return (
-    <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-6">
+    <div className=" space-y-6">
       <Header
         title="Communities"
         subtitle="Connect, share, and grow with others."
         actions={
           <div className="flex gap-2">
-            <Button variant="outline" asChild className="hidden sm:flex">
+            <Button variant="outline" asChild className="sm:flex">
               <Link href="/communities/explore">
                 <Globe2 className="w-4 h-4 mr-2" /> Explore
               </Link>
@@ -72,7 +76,10 @@ const CommunitiesPage = () => {
               onClick={handleCreateRequest}
               className="bg-blue-600 hover:bg-blue-700 shadow-md"
             >
-              <Plus className="w-4 h-4 mr-2" /> Create Community
+              <div className="flex gap-2">
+                <Plus className="w-4 h-4 mr-2" />
+                <p className="hidden md:block">Create or join a community</p>
+              </div>
             </Button>
           </div>
         }
@@ -111,11 +118,6 @@ const CommunitiesPage = () => {
           >
             Owned
           </Button>
-          <div className="relative">
-            <Button size="sm" variant="ghost" className="flex-1 md:flex-none">
-              Invites
-            </Button>
-          </div>
         </div>
       </div>
 
@@ -142,6 +144,7 @@ const CommunitiesPage = () => {
       <AddCommunityModal
         isOpen={openAddModal}
         onClose={() => setOpenAddModal(false)}
+        categories={categories}
       />
 
       {/* Premium Modal */}

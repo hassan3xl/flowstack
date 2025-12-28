@@ -16,6 +16,8 @@ import {
   ChevronDown,
   ChevronUp,
   ListTodo,
+  Shield,
+  Settings2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -52,11 +54,13 @@ import { ProjectType } from "@/lib/types/project.types";
 import { useWorkspace } from "@/contexts/WorkspaceContext";
 import AddTaskModal from "@/components/workspace/task/AddTaskModal";
 import EditTaskModal from "@/components/workspace/task/EditTaskModal";
+import { canPerformProjectAction } from "@/lib/utils/permissions";
+import Link from "next/link";
 
 const ProjectDetailPage = () => {
   const params = useParams();
   const { projectId } = params;
-  const { workspaceId } = useWorkspace();
+  const { workspaceId, isAdminOrOwner, userRole } = useWorkspace();
 
   // Local State
   const [isProjectModalOpen, setProjectModalOpen] = useState(false);
@@ -123,6 +127,8 @@ const ProjectDetailPage = () => {
   };
 
   const handleDeleteItem = async (itemId: string) => {
+    if (!workspaceId || !projectId) return;
+
     try {
       await deleteItem({
         workspaceId: workspaceId as string,
@@ -180,84 +186,22 @@ const ProjectDetailPage = () => {
   ).length;
   const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
 
+  const canEdit = canPerformProjectAction(
+    userRole,
+    project.user_permission,
+    "write"
+  );
   return (
     <div className="max-w-7xl mx-auto space-y-6 pb-20">
       {/* --- HEADER SECTION --- */}
-      <div className="relative overflow-hidden bg-card rounded-2xl border border-border shadow-2xl">
-        {/* Background Gradient Mesh */}
-        <div className="absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-
-        <div className="relative p-6 sm:p-8">
-          <div className="flex flex-col md:flex-row justify-between gap-6">
-            <div className="space-y-4 flex-1">
-              <div className="space-y-2">
-                <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
-                  {project.title}
-                </h1>
-                <p className="text-muted-foreground text-lg max-w-2xl leading-relaxed">
-                  {project.description}
-                </p>
-              </div>
-
-              {/* mebmers Stack */}
-              <div className="flex items-center gap-4 pt-2">
-                {project.members?.length > 0 && (
-                  <div className="flex -space-x-3 hover:space-x-1 transition-all duration-300">
-                    {project.members.slice(0, 5).map((member) => (
-                      <Avatar
-                        key={member.user.id}
-                        className="border-2 border-background ring-2 ring-border/50 w-8 h-8 cursor-pointer"
-                      >
-                        <AvatarImage src={member.user.avatar} />
-                        <AvatarFallback>{"?"}</AvatarFallback>
-                      </Avatar>
-                    ))}
-                    {project.members.length > 5 && (
-                      <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold border-2 border-background z-10">
-                        +{project.members.length - 5}
-                      </div>
-                    )}
-                  </div>
-                )}
-                <div className="h-4 w-px bg-border mx-2"></div>
-                <div className="text-xs text-muted-foreground flex items-center gap-2">
-                  <Calendar className="w-3.5 h-3.5" />
-                  <span>
-                    Created{" "}
-                    {format(new Date(project.created_at), "MMM d, yyyy")}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Stats Dashboard */}
-            <div className="grid grid-cols-2 gap-3 min-w-[300px]">
-              <div className="bg-background/50 backdrop-blur-sm p-4 rounded-xl border border-border/50 flex flex-col justify-center items-center text-center">
-                <span className="text-3xl font-bold text-blue-500">
-                  {percentage}%
-                </span>
-                <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
-                  Complete
-                </span>
-              </div>
-              <div className="bg-background/50 backdrop-blur-sm p-4 rounded-xl border border-border/50 flex flex-col justify-center items-center text-center">
-                <span className="text-3xl font-bold text-foreground">
-                  {total}
-                </span>
-                <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
-                  Total Tasks
-                </span>
-              </div>
-              <Button
-                onClick={() => setProjectModalOpen(true)}
-                className="col-span-2 h-12 text-md shadow-lg shadow-blue-500/20"
-              >
-                <Plus className="w-5 h-5 mr-2" /> Add New Task
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <ProjectHeader
+        project={project}
+        percentage={percentage}
+        total={total}
+        isAdminOrOwner={isAdminOrOwner}
+        setProjectModalOpen={setProjectModalOpen}
+        workspaceId={workspaceId}
+      />
 
       {/* --- TASKS SECTION --- */}
       <div className="space-y-4">
@@ -309,7 +253,6 @@ const ProjectDetailPage = () => {
                       <Clock className="w-5 h-5 text-muted-foreground" />
                     )}
                   </div>
-
                   {/* Title & Mobile Meta */}
                   <div className="flex-1 min-w-0">
                     <h3
@@ -336,36 +279,42 @@ const ProjectDetailPage = () => {
                       )}
                     </div>
                   </div>
-
                   {/* Desktop Meta & Expand Icon */}
-                  <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-                    {/* Priority Badge */}
-                    {item.priority && (
-                      <Badge
-                        variant="outline"
-                        className="text-[10px] h-5 uppercase tracking-wide"
-                      >
-                        {item.priority}
-                      </Badge>
-                    )}
-
-                    {/* Comment Count */}
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <MessageSquare className="w-3.5 h-3.5" />
-                      <span>{item.comments?.length || 0}</span>
-                    </div>
-
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-muted-foreground"
-                    >
-                      {expandedTaskId === item.id ? (
-                        <ChevronUp className="w-4 h-4" />
-                      ) : (
-                        <ChevronDown className="w-4 h-4" />
+                  <div className="flex flex-col  sm:justify-end">
+                    <div className="flex items-center gap-3 w-full sm:w-auto justify-between">
+                      {/* Priority Badge */}
+                      {item.priority && (
+                        <Badge
+                          variant="outline"
+                          className="text-[10px] h-5 uppercase tracking-wide"
+                        >
+                          {item.priority}
+                        </Badge>
                       )}
-                    </Button>
+
+                      {/* Comment Count */}
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <MessageSquare className="w-3.5 h-3.5" />
+                        <span>{item.comments?.length || 0}</span>
+                      </div>
+
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground"
+                      >
+                        {expandedTaskId === item.id ? (
+                          <ChevronUp className="w-4 h-4" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4" />
+                        )}
+                      </Button>
+                    </div>
+                    {item.assigned_to && (
+                      <div className="text-xs text-muted-foreground">
+                        Assign to: {item.assigned_to}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -385,8 +334,8 @@ const ProjectDetailPage = () => {
                         </div>
 
                         {item.started_by && (
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground bg-card p-2 rounded-md border inline-block">
-                            <User className="w-3 h-3" /> Started by{" "}
+                          <div className="items-center gap-2 text-xs text-muted-foreground bg-card p-2 rounded-md border inline-block">
+                            Started by:
                             <span className="text-foreground font-medium">
                               {item.started_by}
                             </span>
@@ -395,58 +344,62 @@ const ProjectDetailPage = () => {
                       </div>
 
                       {/* Right: Actions */}
-                      <div className="flex flex-col gap-2">
-                        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                          Actions
-                        </h4>
 
-                        {item.status !== "completed" && (
-                          <>
-                            {item.status !== "in_progress" && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="justify-start border-blue-500/30 text-blue-500 hover:bg-blue-500/10"
-                                onClick={() => handleStartTask(item.id)}
-                                disabled={startingTask}
-                              >
-                                <PlayCircle className="w-4 h-4 mr-2" /> Start
-                                Task
-                              </Button>
-                            )}
-                            {item.status === "in_progress" && (
-                              <Button
-                                size="sm"
-                                className="justify-start bg-green-600 hover:bg-green-700 text-white"
-                                onClick={() => handleCompleteTask(item.id)}
-                                disabled={completingTask}
-                              >
-                                <CheckCircle2 className="w-4 h-4 mr-2" /> Mark
-                                Complete
-                              </Button>
-                            )}
-                          </>
-                        )}
+                      {canEdit && (
+                        <div className="flex flex-col gap-2">
+                          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                            Actions
+                          </h4>
 
-                        <div className="flex gap-2 mt-2">
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            className="flex-1"
-                            onClick={() => openEditModal(item.id)}
-                          >
-                            <Edit3 className="w-4 h-4 mr-2" /> Edit
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            className="flex-1"
-                            onClick={() => setDeleteTarget(item.id)}
-                          >
-                            <Trash2 className="w-4 h-4 mr-2" /> Delete
-                          </Button>
+                          {item.status !== "completed" && (
+                            <>
+                              {item.status !== "in_progress" && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="justify-start border-blue-500/30 text-blue-500 hover:bg-blue-500/10"
+                                  onClick={() => handleStartTask(item.id)}
+                                  disabled={startingTask}
+                                >
+                                  <PlayCircle className="w-4 h-4 mr-2" /> Start
+                                  Task
+                                </Button>
+                              )}
+                              {item.status === "in_progress" && (
+                                <Button
+                                  size="sm"
+                                  className="justify-start bg-green-600 hover:bg-green-700 text-white"
+                                  onClick={() => handleCompleteTask(item.id)}
+                                  disabled={completingTask}
+                                >
+                                  <CheckCircle2 className="w-4 h-4 mr-2" /> Mark
+                                  Complete
+                                </Button>
+                              )}
+                            </>
+                          )}
+
+                          <div className="flex gap-2 mt-2">
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              className="flex-1"
+                              onClick={() => openEditModal(item.id)}
+                            >
+                              <Edit3 className="w-4 h-4 mr-2" /> edit
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              className="flex-1"
+                              onClick={() => setDeleteTarget(item.id)}
+                            >
+                              <Trash2 className="w-4 h-4 mr-2" />{" "}
+                              {deletingItem ? "deleting" : "delete"}
+                            </Button>
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
 
                     {/* Comments Section integrated in expand */}
@@ -511,3 +464,128 @@ const ProjectDetailPage = () => {
 };
 
 export default ProjectDetailPage;
+
+const ProjectHeader = ({
+  project,
+  percentage,
+  total,
+  isAdminOrOwner,
+  setProjectModalOpen,
+  workspaceId,
+}: any) => {
+  return (
+    <div className="relative overflow-hidden bg-card rounded-xl border border-border shadow-sm group">
+      {/* Decorative Background Elements */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+
+      <div className="relative p-6 sm:p-8 flex flex-col lg:flex-row gap-8 justify-between">
+        {/* Left Side: Info */}
+        <div className="flex-1 space-y-6">
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 flex-wrap">
+              {isAdminOrOwner && (
+                <Link
+                  href={`/workspace/${workspaceId}/projects/${project.id}/settings/`}
+                  className="bg-accent "
+                >
+                  <Settings2 />
+                </Link>
+              )}
+              {/* Improved Role Display */}
+              <Badge className="h-6 gap-1 bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 border-blue-200 shadow-none">
+                <Shield className="w-3 h-3" />
+                {project?.user_permission?.permission}
+              </Badge>
+            </div>
+
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
+              {project.title}
+            </h1>
+            <p className="text-muted-foreground text-lg leading-relaxed max-w-2xl">
+              {project.description}
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-y-4 gap-x-6 pt-2">
+            {/* Members */}
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-medium text-muted-foreground">
+                Team
+              </span>
+              {project.members?.length > 0 && (
+                <div className="flex -space-x-2">
+                  {project.members.slice(0, 5).map((member: any) => (
+                    <Avatar
+                      key={member.user.id}
+                      className="border-2 border-background w-8 h-8 ring-1 ring-border"
+                    >
+                      <AvatarImage src={member.user.avatar} />
+                      <AvatarFallback className="text-xs bg-muted text-muted-foreground">
+                        {member.user?.username?.[0]?.toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  ))}
+                  {project.members.length > 5 && (
+                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-medium border-2 border-background">
+                      +{project.members.length - 5}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="h-4 w-px bg-border hidden sm:block" />
+
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Calendar className="w-4 h-4" />
+              <span>
+                Started {format(new Date(project.created_at), "MMMM d, yyyy")}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Side: Stats & Action */}
+        <div className="flex flex-col gap-4 min-w-[280px]">
+          <div className="bg-muted/30 rounded-xl p-4 border border-border/50 space-y-4">
+            <div className="flex justify-between items-end">
+              <div>
+                <span className="text-sm font-medium text-muted-foreground block mb-1">
+                  Progress
+                </span>
+                <span className="text-2xl font-bold">{percentage}%</span>
+              </div>
+              <div className="text-right">
+                <span className="text-sm font-medium text-muted-foreground block mb-1">
+                  Tasks
+                </span>
+                <div className="flex items-baseline gap-1 justify-end">
+                  <span className="text-2xl font-bold text-foreground">
+                    {total}
+                  </span>
+                  <span className="text-sm text-muted-foreground">total</span>
+                </div>
+              </div>
+            </div>
+            {/* Visual Progress Bar */}
+            <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+              <div
+                className="h-full bg-blue-500 rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${percentage}%` }}
+              />
+            </div>
+          </div>
+
+          {isAdminOrOwner && (
+            <Button
+              onClick={() => setProjectModalOpen(true)}
+              className="w-full h-11 shadow-md hover:shadow-lg transition-all"
+            >
+              <Plus className="w-4 h-4 mr-2" /> Create New Task
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};

@@ -72,7 +72,9 @@ const CommunityCard = ({ community }: { community: any }) => {
 
         {/* Join Button */}
         <button
-          onClick={() => router.push(`/invite/${community.invite_code}`)}
+          onClick={() =>
+            router.push(`/communities/join/${community.invite_code}`)
+          }
           className="mt-3 w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors"
         >
           Join

@@ -11,11 +11,14 @@ import WorkspaceCard from "@/components/workspace/WorkspaceCard";
 import { useGetWorkspaces } from "@/lib/hooks/workspace.hook";
 import Header from "@/components/Header";
 import { useAuth } from "@/contexts/AuthContext";
+import { useGetCommunities } from "@/lib/hooks/community.hooks";
 
 const pendingInvites = 2;
 
 const Home = () => {
   const { data: workspaces } = useGetWorkspaces();
+  const { data: communitites } = useGetCommunities();
+
   const { user } = useAuth();
   const recentWorkspaces = workspaces?.slice(0, 4); // Increased to 4 since we have room now
 
@@ -36,7 +39,7 @@ const Home = () => {
           },
           {
             title: "Active Communities",
-            value: 8,
+            value: communitites?.length || 0,
           },
         ]}
       />
@@ -46,7 +49,7 @@ const Home = () => {
         {/* LEFT COLUMN: Main Content (Fluid Width) */}
         {/* min-w-0 prevents child elements from overflowing the flex container */}
         <div className="flex-1 w-full min-w-0 space-y-8">
-          <div className="border border-border rounded-xl p-6 bg-card/50">
+          <div className="border border-border rounded-xl p-4 row-end-4 md:p-6 bg-card/50">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-semibold flex items-center gap-2">
                 <Layout className="w-5 h-5 text-primary" />
@@ -99,27 +102,27 @@ const Home = () => {
             </div>
           </Card>
 
-          {/* Pending Invitations Widget */}
-          {pendingInvites > 0 && (
-            <Card className="bg-blue-50/50 dark:bg-blue-950/10 border-blue-200 dark:border-blue-900">
-              <CardContent className="p-4 flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 shrink-0">
-                  <Briefcase className="w-5 h-5" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">
-                    Workspace Invites
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {pendingInvites} pending invitations
-                  </p>
-                </div>
-                <Button size="sm" variant="outline" className="h-8 shrink-0">
-                  Review
-                </Button>
-              </CardContent>
-            </Card>
-          )}
+          {/* Pending Invitations Widget
+          // {pendingInvites > 0 && (
+          //   <Card className="bg-blue-50/50 dark:bg-blue-950/10 border-blue-200 dark:border-blue-900">
+          //     <CardContent className="p-4 flex items-center gap-4">
+          //       <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 shrink-0">
+          //         <Briefcase className="w-5 h-5" />
+          //       </div>
+          //       <div className="flex-1 min-w-0">
+          //         <p className="text-sm font-medium truncate">
+          //           Workspace Invites
+          //         </p>
+          //         <p className="text-xs text-muted-foreground">
+          //           {pendingInvites} pending invitations
+          //         </p>
+          //       </div>
+          //       <Button size="sm" variant="outline" className="h-8 shrink-0">
+          //         Review
+          //       </Button>
+          //     </CardContent>
+          //   </Card>
+          // )} */}
         </div>
       </div>
     </div>

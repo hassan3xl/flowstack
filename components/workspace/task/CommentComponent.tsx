@@ -79,10 +79,12 @@ const CommentComponent = ({
 
       <div className="flex gap-4">
         {/* User Avatar (Current User Placeholder) */}
-        <Avatar className="w-8 h-8 hidden sm:block">
+        <Avatar className="w-8 h-8 ">
           <AvatarImage src={user?.avatar || ""} />
 
-          <AvatarFallback className="bg-blue-600 text-white text-xs"></AvatarFallback>
+          <AvatarFallback className="bg-blue-600 text-white text-xs">
+            {user?.username?.[0] || "U"}
+          </AvatarFallback>
         </Avatar>
 
         {/* Input Form Area */}
@@ -118,7 +120,7 @@ const CommentComponent = ({
       </div>
 
       {/* Timeline List */}
-      <div className="mt-8 space-y-6 relative ml-4 sm:ml-12">
+      <div className="mt-8 space-y-6 relative ml-8 sm:ml-12">
         {/* Vertical connector line */}
         {comments.length > 0 && (
           <div className="absolute left-[-25px] sm:left-[-34px] top-2 bottom-4 w-px bg-border/50" />

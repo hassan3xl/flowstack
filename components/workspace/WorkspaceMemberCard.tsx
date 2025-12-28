@@ -10,7 +10,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { format } from "date-fns"; // Optional: for nicer date formatting
+import { formatDate } from "@/lib/utils";
 
+type WorkspaceMemberType = {
+  joined_at: string;
+};
 interface WorkspaceMemberCardProps {
   member: any; // Type this properly with your Prisma/DB types later
 }
@@ -36,7 +40,7 @@ const WorkspaceMemberCard = ({ member }: WorkspaceMemberCardProps) => {
   return (
     <div className="group relative bg-card hover:bg-gradient-to-br hover:from-card hover:to-accent/50 border border-border rounded-xl p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
       {/* Top Actions (Absolute positioned) */}
-      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="absolute top-4 right-4  transition-opacity">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -45,9 +49,6 @@ const WorkspaceMemberCard = ({ member }: WorkspaceMemberCardProps) => {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem>View Profile</DropdownMenuItem>
-            <DropdownMenuItem className="text-red-500">
-              Kick Member
-            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -94,7 +95,7 @@ const WorkspaceMemberCard = ({ member }: WorkspaceMemberCardProps) => {
           </div>
           <div className="flex items-center justify-center gap-2">
             <CalendarDays className="w-3 h-3" />
-            <span>Joined {new Date(member.joinedAt).toLocaleDateString()}</span>
+            <span>Joined {formatDate(member?.joined_at)}</span>
           </div>
         </div>
       </div>

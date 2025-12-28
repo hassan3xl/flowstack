@@ -31,7 +31,7 @@ import {
   useUpdateWorkspaceMemberRole,
   useUploadWorkspaceImage,
 } from "@/lib/hooks/workspace.hook";
-import { useWorkspace } from "@/contexts/WorkspaceContext";
+
 import InviteWorkspaceMember from "@/components/modals/InviteWorkspaceMember";
 import { toast } from "sonner";
 import {
@@ -44,6 +44,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useRouter } from "next/navigation";
+import { useWorkspace } from "@/contexts/WorkspaceContext";
 
 // Dummy data for new features
 const dummyPendingInvites = [
@@ -68,8 +69,9 @@ const dummyPendingInvites = [
 ];
 
 const WorkspaceSettingsPage = () => {
-  const { workspaceId, userRole } = useWorkspace();
-  const { data: server, isLoading: loading } = useGetWorkspace(workspaceId);
+  const { workspaceId, userRole, isAdminOrOwner } = useWorkspace();
+
+  const { data: workspace, isLoading: loading } = useGetWorkspace(workspaceId);
   const [openInviteModal, setOpenInviteModal] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [activeTab, setActiveTab] = useState("members");
@@ -120,10 +122,13 @@ const WorkspaceSettingsPage = () => {
     return <Loader variant="dots" title="Loading Settings" />;
   }
 
-  if (!server) {
+  if (!workspace) {
     return;
   }
 
+  if (!isAdminOrOwner) {
+    router.push(`/workspace/${workspaceId}`);
+  }
   return (
     <div className="">
       <div className="space-y-6">
@@ -135,8 +140,8 @@ const WorkspaceSettingsPage = () => {
               <div className="flex flex-col items-center gap-3 shrink-0">
                 <div className="relative group">
                   <Image
-                    src={server.logo}
-                    alt={`${server.name} logo`}
+                    src={workspace.logo}
+                    alt={`${workspace.name} logo`}
                     width={100}
                     height={100}
                     className="rounded-lg object-cover border border-border"
@@ -161,16 +166,16 @@ const WorkspaceSettingsPage = () => {
                 />
               </div>
 
-              {/* Middle Column: Server Info */}
+              {/* Middle Column: workspace Info */}
               <div className="flex-1 space-y-3 w-full">
                 <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                   <div>
                     <h2 className="text-2xl font-semibold tracking-tight">
-                      {server.name}
+                      {workspace.name}
                     </h2>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                       <Calendar className="w-4 h-4" />
-                      <span>Created: {formatDate(server.created_at)}</span>
+                      <span>Created: {formatDate(workspace.created_at)}</span>
                     </div>
                   </div>
 
@@ -224,7 +229,7 @@ const WorkspaceSettingsPage = () => {
                 </div>
 
                 <p className="text-muted-foreground leading-relaxed text-sm sm:text-base">
-                  {server.description || "No description provided."}
+                  {workspace.description || "No description provided."}
                 </p>
               </div>
             </div>
@@ -271,7 +276,7 @@ const WorkspaceSettingsPage = () => {
               </div>
 
               <div className="p-2 sm:p-4 md:p-6 space-y-3">
-                {server.members.map((member: any) => (
+                {workspace.members.map((member: any) => (
                   <div
                     key={member.id}
                     className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:p-1 py-4 rounded-lg border-b border-border hover:bg-accent/50 transition-colors"
@@ -305,7 +310,9 @@ const WorkspaceSettingsPage = () => {
                           </span>
                           <span className="text-xs text-muted-foreground">
                             Joined{" "}
-                            {formatDate(member.joined_at || server.created_at)}
+                            {formatDate(
+                              member.joined_at || workspace.created_at
+                            )}
                           </span>
                         </div>
                       </div>

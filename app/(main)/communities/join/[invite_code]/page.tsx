@@ -30,7 +30,7 @@ const InvitePage = () => {
 
     join.mutate(invite_code as string);
 
-    router.push(`/server/${invite.server_id}`);
+    router.push(`/communities/${invite.server_id}`);
   };
 
   if (loading || authLoading)
@@ -41,7 +41,7 @@ const InvitePage = () => {
       <div className="p-8 text-center text-red-500">
         <p>{error}</p>
         <button
-          onClick={() => router.push("/explore")}
+          onClick={() => router.push("/communities/explore")}
           className="mt-4 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg"
         >
           Back to Explore

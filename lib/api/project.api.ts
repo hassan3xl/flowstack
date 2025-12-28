@@ -4,54 +4,34 @@ import { apiService } from "../services/apiService";
 export const projectApi = {
   // projects
   getProjects: async (workspaceId: string) => {
-    try {
-      const res = await apiService.get(`/workspaces/${workspaceId}/projects/`);
-      return res;
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-      throw error;
-    }
+    const res = await apiService.get(`/workspaces/${workspaceId}/projects/`);
+    return res;
   },
 
   getProject: async (workspaceId: string, projectId: string) => {
-    try {
-      const res = await apiService.get(
-        `/workspaces/${workspaceId}/projects/${projectId}/`
-      );
-      return res;
-    } catch (error) {
-      console.error("Error fetching project:", error);
-      throw error;
-    }
+    const res = await apiService.get(
+      `/workspaces/${workspaceId}/projects/${projectId}/`
+    );
+    return res;
   },
 
   addProject: async (projectData: any, workspaceId: string) => {
-    try {
-      const res = await apiService.post(
-        `/workspaces/${workspaceId}/projects/`,
-        projectData
-      );
-      return res;
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-      throw error;
-    }
+    const res = await apiService.post(
+      `/workspaces/${workspaceId}/projects/`,
+      projectData
+    );
+    return res;
   },
   updateProject: async (
     projectData: any,
     workspaceId: string,
     projectId: string
   ) => {
-    try {
-      const res = await apiService.patch(
-        `/workspaces/${workspaceId}/projects/${projectId}/`,
-        projectData
-      );
-      return res;
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-      throw error;
-    }
+    const res = await apiService.patch(
+      `/workspaces/${workspaceId}/projects/${projectId}/`,
+      projectData
+    );
+    return res;
   },
 
   addProjectMember: async (
@@ -86,16 +66,11 @@ export const projectApi = {
 
   // tasks/items
   addTask: async (projectData: any, workspaceId: string, projectId: string) => {
-    try {
-      const res = await apiService.post(
-        `/workspaces/${workspaceId}/projects/${projectId}/tasks/`,
-        projectData
-      );
-      return res;
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-      throw error;
-    }
+    const res = await apiService.post(
+      `/workspaces/${workspaceId}/projects/${projectId}/tasks/`,
+      projectData
+    );
+    return res;
   },
 
   updateTask: async (
@@ -104,16 +79,11 @@ export const projectApi = {
     projectId: string,
     itemId: string
   ) => {
-    try {
-      const res = await apiService.patch(
-        `/workspaces/${workspaceId}/projects/${projectId}/tasks/${itemId}/`,
-        projectData
-      );
-      return res;
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-      throw error;
-    }
+    const res = await apiService.patch(
+      `/workspaces/${workspaceId}/projects/${projectId}/tasks/${itemId}/`,
+      projectData
+    );
+    return res;
   },
 
   deleteTask: async (workspaceId: string, projectId: string, itemId: string) =>

@@ -28,6 +28,7 @@ import {
   useDeleteWorkspace,
   useGetWorkspace,
   useKickUser,
+  useUpdateWorkspace,
   useUpdateWorkspaceMemberRole,
   useUploadWorkspaceImage,
 } from "@/lib/hooks/workspace.hook";
@@ -45,7 +46,14 @@ import {
 } from "@/components/ui/dialog";
 import { useRouter } from "next/navigation";
 import { useWorkspace } from "@/contexts/WorkspaceContext";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { FormInput } from "@/components/input/formInput";
+import { useForm } from "react-hook-form";
 
+type EditForm = {
+  name: string;
+  description: string;
+};
 // Dummy data for new features
 const dummyPendingInvites = [
   {
@@ -72,30 +80,63 @@ const WorkspaceSettingsPage = () => {
   const { workspaceId, userRole, isAdminOrOwner } = useWorkspace();
 
   const { data: workspace, isLoading: loading } = useGetWorkspace(workspaceId);
+  const updateWorkspace = useUpdateWorkspace();
+  console.log("workspace", workspace);
   const [openInviteModal, setOpenInviteModal] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [openEditModal, setOpenEditModal] = useState(false);
   const [activeTab, setActiveTab] = useState("members");
 
   // hooks
-  const { mutateAsync: uploadIcon } = useUploadWorkspaceImage();
-  const { mutate: updateRole } = useUpdateWorkspaceMemberRole();
+  const { mutateAsync: uploadlogo } = useUploadWorkspaceImage();
+  const { mutateAsync: updateRoleAsync } = useUpdateWorkspaceMemberRole();
   const deleteWorkspace = useDeleteWorkspace();
   const kickUser = useKickUser();
 
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const handleUploadIcon = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    console.log("file", file);
 
-    const formData = new FormData();
-    formData.append("icon", file);
-    uploadIcon({ workspaceId, formData });
+  const { register, handleSubmit, formState } = useForm<EditForm>({
+    defaultValues: {
+      name: workspace?.name || "",
+      description: workspace?.description || "",
+    },
+  });
+
+  const onSubmit = async (data: EditForm) => {
+    try {
+      await updateWorkspace.mutateAsync({ workspaceId, workspaceData: data });
+      toast.success("Workspace updated successfully");
+      setOpenEditModal(false);
+    } catch (error) {}
   };
 
-  const handleRoleChange = (memberId: string, role: string) => {
-    updateRole({ workspaceId: workspaceId, userId: memberId, data: { role } });
+  const handleUploadIcon = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("logo", file);
+
+    await toast.promise(uploadlogo({ workspaceId, formData }), {
+      loading: "Updating workspace logo...",
+      success: "Workspace logo updated",
+      error: "Failed to update workspace logo",
+    });
+
+    // Reset input so the same file can be selected again
+    e.target.value = "";
+  };
+
+  const handleRoleChange = async (memberId: string, role: string) => {
+    await toast.promise(
+      updateRoleAsync({ workspaceId, userId: memberId, data: { role } }),
+      {
+        loading: "Updating role...",
+        success: "Role updated",
+        error: "Failed to update role",
+      }
+    );
   };
 
   const handleRemoveMember = (memberId: any) => {
@@ -114,7 +155,7 @@ const WorkspaceSettingsPage = () => {
     try {
       console.log(`Deleting workspace ${workspaceId}`);
       await deleteWorkspace.mutateAsync(workspaceId);
-      router.push("/workspace"); // 4. Use router.push for smoother navigation
+      router.push("/workspace");
     } catch (error) {}
   };
 
@@ -139,13 +180,10 @@ const WorkspaceSettingsPage = () => {
               {/* Left Column: Logo & Upload */}
               <div className="flex flex-col items-center gap-3 shrink-0">
                 <div className="relative group">
-                  <Image
-                    src={workspace.logo}
-                    alt={`${workspace.name} logo`}
-                    width={100}
-                    height={100}
-                    className="rounded-lg object-cover border border-border"
-                  />
+                  <Avatar className="w-30 h-30 rounded-md">
+                    <AvatarImage src={workspace.logo} />
+                    <AvatarFallback>WS</AvatarFallback>
+                  </Avatar>
                 </div>
 
                 <Button
@@ -153,15 +191,16 @@ const WorkspaceSettingsPage = () => {
                   size="sm"
                   type="button"
                   className="w-full"
+                  onClick={() => fileInputRef.current?.click()}
                 >
                   <Upload className="w-3 h-3 mr-2" />
                   Change Icon
                 </Button>
                 <input
-                  ref={fileInputRef}
                   type="file"
                   accept="image/*"
                   className="hidden"
+                  ref={fileInputRef}
                   onChange={handleUploadIcon}
                 />
               </div>
@@ -182,10 +221,47 @@ const WorkspaceSettingsPage = () => {
                   {/* Desktop Actions (Positioned Top Right) */}
                   <div className="flex items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0">
                     {["owner", "admin"].includes(userRole) && (
-                      <Button variant="outline" size="sm">
-                        <Pencil className="w-4 h-4 mr-2" />
-                        Edit
-                      </Button>
+                      <>
+                        <Dialog
+                          open={openEditModal}
+                          onOpenChange={setOpenEditModal}
+                        >
+                          <DialogTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              <Pencil className="w-4 h-4 mr-2" />
+                              Edit
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Edit Workspace</DialogTitle>
+                            </DialogHeader>
+                            <form onSubmit={handleSubmit(onSubmit)}>
+                              <div className="gap-4 py-4">
+                                <FormInput
+                                  register={register}
+                                  name="name"
+                                  label="Workspace Name"
+                                  placeholder="Enter workspace name"
+                                  type="text"
+                                />
+                                <FormInput
+                                  register={register}
+                                  name="description"
+                                  label="Workspace Description"
+                                  placeholder="Enter workspace description"
+                                  type="text"
+                                />
+                                <Button type="submit">
+                                  {updateWorkspace.isPending
+                                    ? "Saving..."
+                                    : "Save"}
+                                </Button>
+                              </div>
+                            </form>
+                          </DialogContent>
+                        </Dialog>
+                      </>
                     )}
 
                     {userRole === "owner" && (

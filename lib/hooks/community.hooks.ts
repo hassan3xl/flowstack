@@ -9,6 +9,14 @@ export function useGetCommunities() {
     queryFn: () => communityApi.getCommunities(),
   });
 }
+// GET A SINGLE community
+export function useGetCommunity(communityId: string) {
+  return useQuery({
+    queryKey: ["community", communityId],
+    queryFn: () => communityApi.getCommunity(communityId),
+    enabled: !!communityId,
+  });
+}
 
 export function useGetPublicCommuities() {
   return useQuery({
@@ -41,15 +49,6 @@ export function useGetCommuityInviteCode(inviteCode: string) {
   return useQuery({
     queryKey: ["invite-codes"],
     queryFn: () => communityApi.getCommunityInviteCode(inviteCode),
-  });
-}
-
-// GET A SINGLE community
-export function useGetCommuity(communityId: string) {
-  return useQuery({
-    queryKey: ["community", communityId],
-    queryFn: () => communityApi.getCommunity(communityId),
-    enabled: !!communityId,
   });
 }
 

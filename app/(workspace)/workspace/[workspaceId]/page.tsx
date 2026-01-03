@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import {
   Users,
@@ -24,7 +24,6 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import CommunityHomeMemberCard from "@/components/workspace/WorkspaceHomeMemberCard";
 import Loader from "@/components/Loader";
-import Image from "next/image";
 
 // Hooks & Context
 import { formatDate, timeAgo } from "@/lib/utils";
@@ -32,40 +31,21 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useGetWorkspaceDashboard } from "@/lib/hooks/workspace.hook";
 import { useWorkspace } from "@/contexts/WorkspaceContext";
 import { ProjectType } from "@/lib/types/project.types";
+import AddProjectModal from "@/components/workspace/projects/AddProjectModal";
+import { AvatarFallback, AvatarImage, Avatar } from "@/components/ui/avatar";
 
 const WorkspaceDetails = () => {
   const { user } = useAuth();
   const { workspaceId, userRole, isAdminOrOwner } = useWorkspace();
+  const [isAddProjectModalOpen, setIsAddProjectModalOpen] = useState(false);
 
   const { data: dashboard, isLoading: dashboardLoading } =
     useGetWorkspaceDashboard(workspaceId);
   console.log("dashboard", dashboard);
 
-  // Mock Tasks Data (In real app, fetch from useGetMyTasks)
-  const myTasks = [
-    {
-      id: 1,
-      title: "Review Pull Request #42",
-      due: "Today",
-      priority: "high",
-      project: "Backend API",
-    },
-    {
-      id: 2,
-      title: "Update documentation",
-      due: "Tomorrow",
-      priority: "medium",
-      project: "Frontend",
-    },
-    {
-      id: 3,
-      title: "Deploy to staging",
-      due: "In 2 days",
-      priority: "low",
-      project: "DevOps",
-    },
-  ];
-
+  // if (dashboard === null || dashboard === undefined) {
+  //   return;
+  // }
   if (dashboardLoading) return <Loader variant="ring" />;
 
   return (
@@ -157,11 +137,6 @@ const WorkspaceDetails = () => {
                   </div>
                 </div>
               ))}
-              {myTasks.length === 0 && (
-                <div className="p-8 text-center text-muted-foreground text-sm">
-                  No pending tasks. You're all caught up!
-                </div>
-              )}
             </div>
           </div>
 
@@ -182,7 +157,7 @@ const WorkspaceDetails = () => {
 
             {/* recent projects  */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {dashboard.active_projects.map((project: ProjectType) => (
+              {dashboard?.active_projects?.map((project: ProjectType) => (
                 <div
                   key={project.id}
                   className="bg-card border border-border rounded-xl p-5 hover:shadow-md transition-all cursor-pointer group"
@@ -230,14 +205,27 @@ const WorkspaceDetails = () => {
                   </div>
                 </div>
               ))}
-              {dashboard.active_projects.length === 0 && (
+              {dashboard?.active_projects.length === 0 && (
                 <div className="col-span-full p-8 border border-dashed border-border rounded-xl text-center">
                   <p className="text-muted-foreground mb-2">
                     No active projects
                   </p>
-                  <Button variant="outline" size="sm">
-                    Create Project
-                  </Button>
+                  {isAdminOrOwner && (
+                    <>
+                      <Button
+                        onClick={() => setIsAddProjectModalOpen(true)}
+                        variant="outline"
+                        size="sm"
+                      >
+                        Create Project
+                      </Button>
+                      <AddProjectModal
+                        isOpen={isAddProjectModalOpen}
+                        onClose={() => setIsAddProjectModalOpen(false)}
+                        workspaceId={workspaceId}
+                      />
+                    </>
+                  )}
                 </div>
               )}
             </div>
@@ -252,7 +240,7 @@ const WorkspaceDetails = () => {
               <h3 className="font-semibold text-sm">Recent Activity</h3>
             </div>
             <div className="p-4 space-y-4">
-              {dashboard.activities?.slice(0, 5).map((activity: any) => (
+              {dashboard?.activities?.slice(0, 5).map((activity: any) => (
                 <div key={activity.id} className="flex gap-3 text-sm">
                   <div className="mt-0.5 w-2 h-2 rounded-full bg-blue-500 shrink-0" />
                   <div className="flex-1">
@@ -328,7 +316,7 @@ const WorkspaceHeader = ({ dashboard }: any) => {
   return (
     <div className="relative bg-card rounded-2xl border border-border shadow-sm overflow-hidden group">
       {/* 1. Decorative Header Gradient/Banner */}
-      <div className="h-32 bg-gradient-to-r from-zinc-600/20 via-gray-500/20 to-slate-500/20 border-b border-border/50 relative">
+      <div className="h-32 bg-gradient-to-r from-zinc-800/90 via-gray-800/20 to-slate-800/90 border-b border-border/50 relative">
         {/* Optional: Abstract Pattern Overlay */}
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
       </div>
@@ -337,17 +325,12 @@ const WorkspaceHeader = ({ dashboard }: any) => {
         <div className="relative -mt-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
           {/* 2. Main Identity Section */}
           <div className="flex items-end gap-5">
-            <div className="relative shrink-0">
-              <div className="p-1.5 bg-card rounded-2xl shadow-sm border border-border/50">
-                <Image
-                  src={dashboard.workspace_logo || "/placeholder-logo.png"}
-                  width={88}
-                  height={88}
-                  alt="workspace icon"
-                  className="rounded-xl object-cover bg-background"
-                />
-              </div>
-            </div>
+            <Avatar className="w-30 h-30 rounded-xl">
+              <AvatarImage
+                src={dashboard.workspace_logo || "/placeholder-logo.png"}
+              />
+              <AvatarFallback>{dashboard.workspace_name?.[0]}</AvatarFallback>
+            </Avatar>
 
             <div className="mb-1 space-y-1">
               <div className="flex items-center gap-3">
@@ -386,7 +369,7 @@ const WorkspaceHeader = ({ dashboard }: any) => {
           />
           <StatCard
             icon={<CheckCircle2 className="w-5 h-5 text-emerald-500" />}
-            label="Completed Tasks"
+            label="Total Tasks"
             value={dashboard.total_tasks || 0}
           />
           <StatCard

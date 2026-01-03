@@ -34,6 +34,13 @@ export const projectApi = {
     return res;
   },
 
+  deleteProject: async (workspaceId: string, projectId: string) => {
+    const res = await apiService.delete(
+      `/workspaces/${workspaceId}/projects/${projectId}/`
+    );
+    return res;
+  },
+
   addProjectMember: async (
     collabData: any,
     workspaceId: string,

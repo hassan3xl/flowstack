@@ -43,14 +43,11 @@ export default function CommunityLayout({
         <CommunityNavbar />
 
         <div className="flex pt-12">
-          <div className="left-0 top-12 h-[calc(100vh-4rem)]">
-            <CommunitySidebar />
-          </div>
+          <CommunitySidebar />
 
-          {/* Main content area */}
-          <div className="flex-1 sm:ml-2 md:ml-24 transition-all">
+          <div className="flex-1 lg:ml-[250px]">
             <main className="px-4 py-4 sm:px-6 lg:px-8 min-h-[calc(100vh-4rem)]">
-              <div className="max-w-7xl py-2 mx-auto">{children}</div>
+              <div className="max-w-7xl mx-auto">{children}</div>
             </main>
           </div>
         </div>

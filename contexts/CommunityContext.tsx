@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetWorkspace } from "@/lib/hooks/workspace.hook";
+import { useGetCommunity } from "@/lib/hooks/community.hooks";
 import React, { createContext, useContext } from "react";
 
 // 1. Update the interface to include userRole
@@ -22,13 +22,14 @@ export const CommunityContextProvider = ({
   communityId,
   children,
 }: CommunityContextProviderProps) => {
-  const { data: workspace, isLoading: loading } = useGetWorkspace(communityId);
+  const { data: community, isLoading: loading } = useGetCommunity(communityId);
+  console.log("commuity", community);
 
   // This variable was already here, now we just use it
-  const userRole = workspace?.user_role;
+  const userRole = community?.user_role;
   const isAdminOrOwner =
-    workspace?.user_role === "admin" || workspace?.user_role === "owner";
-  const isMember = workspace?.user_role === "member";
+    community?.user_role === "admin" || community?.user_role === "owner";
+  const isMember = community?.user_role === "member";
 
   return (
     // 2. Pass userRole into the Provider value

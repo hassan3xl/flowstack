@@ -280,6 +280,7 @@ const ProjectSettingsPage = () => {
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         projectId={projectId as string}
+        workspaceId={workspaceId}
       />
       <EditProjectModal
         isOpen={showEditModal}

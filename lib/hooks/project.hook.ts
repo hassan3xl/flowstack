@@ -59,6 +59,25 @@ export const useUpdateproject = () => {
   });
 };
 
+export const useDeleteProject = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      workspaceId,
+      projectId,
+    }: {
+      workspaceId: string;
+      projectId: string;
+    }) => projectApi.deleteProject(workspaceId, projectId),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: ["project"] });
+    },
+  });
+};
+
 export const useGetProjectCollaborators = (
   workspaceId: string,
   projectId: string

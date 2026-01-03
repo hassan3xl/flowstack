@@ -55,12 +55,16 @@ export const useUpdateWorkspace = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (workspaceId: string, workspaceData: any) =>
-      workspaceApi.updateWorkspace(workspaceId, workspaceData),
+    mutationFn: ({
+      workspaceId,
+      workspaceData,
+    }: {
+      workspaceId: string;
+      workspaceData: any;
+    }) => workspaceApi.updateWorkspace(workspaceId, workspaceData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["workspaces"] });
       queryClient.invalidateQueries({ queryKey: ["workspace"] });
-      toast.success("workspace updated successfully!");
     },
   });
 };
@@ -94,7 +98,6 @@ export const useUploadWorkspaceImage = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["workspaces"] });
       queryClient.invalidateQueries({ queryKey: ["workspace"] });
-      toast.success("Icon uploaded successfully!");
     },
   });
 };
@@ -207,8 +210,6 @@ export const useUpdateWorkspaceMemberRole = () => {
       queryClient.invalidateQueries({ queryKey: ["workspaces"] });
       queryClient.invalidateQueries({ queryKey: ["workspace"] });
       queryClient.invalidateQueries({ queryKey: ["servers"] });
-
-      toast.success("Role updated successfully");
     },
   });
 };

@@ -23,11 +23,13 @@ import { Button } from "../ui/button";
 import { useSidebar } from "@/contexts/SidebarContext";
 import { ThemeSwitcher } from "@/providers/theme-switcher";
 import { Separator } from "@/components/ui/separator";
+import { useCommunity } from "@/contexts/CommunityContext";
 
 export function CommunitySidebar() {
   const pathname = usePathname();
   const params = useParams();
   const { isOpen, closeSidebar, toggleSidebar } = useSidebar();
+  const {} = useCommunity();
 
   // Use communityId from params if available, otherwise fallback to community object
   const community = {
@@ -107,22 +109,24 @@ export function CommunitySidebar() {
       {/* Overlay for mobile */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 z-40 lg:z-0 bg-black/60 lg:bg-background backdrop-blur-sm "
           onClick={closeSidebar}
         />
       )}
 
       <aside
         className={cn(
-          "fixed z-[50] left-0 h-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-r border-border transition-all duration-300 ease-in-out shadow-xl md:shadow-none",
-          isOpen
-            ? "w-[280px] translate-x-0"
-            : "w-[80px] -translate-x-full md:translate-x-0"
+          "z-[50] bg-background/95 backdrop-blur mt-12 border-r border-border transition-all duration-300 ease-in-out",
+          // Mobile behavior
+          "fixed inset-y-0 left-0 md:translate-x-0",
+          // Desktop behavior
+          "lg:fixed lg:w64",
+          isOpen ? "w-64" : "hidden lg:block w-0",
+          "lg:!w-64"
         )}
       >
-        <div className="flex flex-col h-full">
-          {/* --- MOBILE ONLY: Community Info Header --- */}
-          <div className="md:hidden p-4 bg-muted/30 border-b">
+        <div className="flex flex-col h-[95vh]">
+          <div className="p-4 bg-muted/30 border-b">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold">
                 {community?.name?.[0] || "C"}
@@ -141,18 +145,6 @@ export function CommunitySidebar() {
             </div>
           </div>
 
-          {/* --- DESKTOP: Navigation Toggle --- */}
-          <div className="hidden md:flex h-16 items-center justify-between px-4">
-            <Button
-              onClick={toggleSidebar}
-              variant="ghost"
-              size="icon"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              {isOpen ? <ChevronLeft size={18} /> : <ArrowRight size={18} />}
-            </Button>
-          </div>
-
           {/* --- LINKS --- */}
           <div className="flex-1 overflow-y-auto py-4">
             <nav className="flex flex-col gap-6 px-3">
@@ -162,15 +154,11 @@ export function CommunitySidebar() {
 
                 return (
                   <div key={groupIndex} className="flex flex-col gap-1">
-                    {isOpen && (
-                      <h4 className="px-2 mb-2 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.1em]">
-                        {group.groupLabel}
-                      </h4>
-                    )}
+                    <h4 className="px-2 mb-2 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.1em]">
+                      {group.groupLabel}
+                    </h4>
 
-                    {!isOpen && groupIndex !== 0 && (
-                      <Separator className="my-2 bg-border/50 w-8 mx-auto" />
-                    )}
+                    <Separator className="my-2 bg-border/50 w-8 mx-auto" />
 
                     {activeItems.map((item) => {
                       const isActive = pathname === item.href;
@@ -183,8 +171,7 @@ export function CommunitySidebar() {
                             "group relative flex items-center rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
                             isActive
                               ? "bg-blue-600/10 text-blue-600 dark:text-blue-400"
-                              : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                            !isOpen && "justify-center px-0 py-3"
+                              : "text-muted-foreground hover:bg-muted hover:text-foreground"
                           )}
                         >
                           {isActive && (
@@ -200,14 +187,7 @@ export function CommunitySidebar() {
                             {item.icon}
                           </span>
 
-                          <span
-                            className={cn(
-                              "ml-3 truncate transition-all duration-300",
-                              isOpen ? "opacity-100" : "opacity-0 hidden"
-                            )}
-                          >
-                            {item.label}
-                          </span>
+                          <span className="ml-4">{item.label}</span>
                         </Link>
                       );
                     })}
@@ -218,21 +198,19 @@ export function CommunitySidebar() {
           </div>
 
           {/* Sidebar Footer (Optional) */}
-          {isOpen && (
-            <div className="p-4 border-t border-border mt-auto">
-              <div className="bg-muted/50 rounded-xl p-3 flex items-center gap-3">
-                <div className="h-8 w-8 rounded-full bg-pink-500 flex items-center justify-center text-white">
-                  <Heart size={14} />
-                </div>
-                <div className="text-[10px] leading-tight text-muted-foreground">
-                  Enjoying the community? <br />
-                  <span className="text-foreground font-bold hover:underline cursor-pointer">
-                    Support us
-                  </span>
-                </div>
+          <div className="p-4 border-t border-border mt-auto">
+            <div className="bg-muted/50 rounded-xl p-3 flex items-center gap-3">
+              <div className="h-8 w-8 rounded-full bg-pink-500 flex items-center justify-center text-white">
+                <Heart size={14} />
+              </div>
+              <div className="text-[10px] leading-tight text-muted-foreground">
+                Enjoying the community? <br />
+                <span className="text-foreground font-bold hover:underline cursor-pointer">
+                  Support us
+                </span>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </aside>
     </>

@@ -178,14 +178,14 @@ export default function LandingPage() {
               <span>Powerful Team Collaboration Platform</span>
             </div>
 
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+            <h1 className="text-2xl sm:text-5xl md:text-7xl font-bold mb-6 leading-tight">
               Where Teams
               <span className="text-primary"> Connect</span>,
               <br />
               <span className="text-primary">Collaborate</span> & Create
             </h1>
 
-            <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
+            <p className="text-md sm:text-xl text-muted-foreground mb-8 leading-relaxed">
               The all-in-one workspace that combines chat, project management,
               and documentation. Built for modern teams who move fast.
             </p>
@@ -206,29 +206,6 @@ export default function LandingPage() {
                   Get Started
                 </button>
               )}
-            </div>
-          </div>
-
-          {/* Hero Image/Dashboard Preview */}
-          <div className="mt-16 relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-blue-500/20 blur-3xl -z-10"></div>
-            <div className="bg-card border rounded-xl shadow-2xl overflow-hidden">
-              <div className="bg-muted p-3 border-b flex items-center space-x-2">
-                <div className="flex space-x-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                </div>
-                <div className="flex-1 text-center text-xs text-muted-foreground">
-                  flowstack.app
-                </div>
-              </div>
-              <div className="aspect-video bg-gradient-to-br from-muted to-accent flex items-center justify-center">
-                <div className="text-center p-8">
-                  <FolderKanban className="w-24 h-24 mx-auto mb-4 text-muted-foreground/50" />
-                  <p className="text-muted-foreground">Dashboard Preview</p>
-                </div>
-              </div>
             </div>
           </div>
         </div>

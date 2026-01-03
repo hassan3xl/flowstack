@@ -7,35 +7,38 @@ import { InputField } from "../../input/InputField";
 import { Folder } from "lucide-react";
 import { toast } from "sonner";
 import { apiService } from "@/lib/services/apiService";
+import { useDeleteProject } from "@/lib/hooks/project.hook";
+import { useRouter } from "next/navigation";
 
 interface DeleteProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess?: () => void;
   projectId: string;
+  workspaceId: string;
 }
 
 const DeleteProjectModal = ({
   isOpen,
   onClose,
-  onSuccess,
   projectId,
+  workspaceId,
 }: DeleteProjectModalProps) => {
-  const [loading, setLoading] = useState(false);
+  const { mutateAsync: deleteProject, isPending: loading } = useDeleteProject();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
 
     try {
-      await apiService.delete(`api/projects/${projectId}/`);
-      if (onSuccess) onSuccess();
-      toast.success("Project Deleted successfully!");
+      await deleteProject({
+        workspaceId,
+        projectId,
+      });
       onClose();
-    } catch (err) {
-      toast.error("Failed to delete project, Please try again.");
+      router.push(`/workspace/${workspaceId}/projects/`);
+    } catch (err: any) {
+      toast.error(err?.detail || "Failed to delete project");
     } finally {
-      setLoading(false);
     }
   };
 

@@ -1,17 +1,38 @@
 import { toast } from "sonner";
-import { getAccessToken } from "../actions/auth.actions";
+import {
+  getAccessToken,
+  getRefreshToken,
+  refreshToken,
+} from "../actions/auth.actions";
 import { extractApiError } from "../utils/api-error";
 
 // development
 export const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-
 async function fetchWithCatch(
   url: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  isRetry: boolean = false
 ): Promise<any> {
   try {
     const response = await fetch(`${BASE_URL}${url}`, options);
 
+    // 401 Handling
+    if (response.status === 401 && !isRetry) {
+      // A. Call the server action and get the STRING back
+      const newToken = await refreshToken();
+
+      // B. If we got a token, retry immediately
+      if (newToken) {
+        const newHeaders = new Headers(options.headers);
+        newHeaders.set("Authorization", `Bearer ${newToken}`);
+
+        return fetchWithCatch(url, { ...options, headers: newHeaders }, true);
+      }
+
+      // If newToken is null, we let it fall through to the error throw below
+    }
+
+    // --- Standard Response Handling ---
     if (response.status === 204) {
       return { detail: "No Content" };
     }
@@ -33,7 +54,10 @@ async function fetchWithCatch(
     return data;
   } catch (error: any) {
     const message = extractApiError(error);
-    toast.error(message);
+    // Only toast if it's not a 401 that we failed to retry (avoids spamming "Unauthorized")
+    if (error?.status !== 401) {
+      toast.error(message);
+    }
     throw error;
   }
 }

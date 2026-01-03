@@ -22,7 +22,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PostsCard from "@/components/community/posts/PostsCard";
 import { useGetCommunityPosts } from "@/lib/hooks/post.hook";
 import { useCommunity } from "@/contexts/CommunityContext";
-import { useGetCommuity } from "@/lib/hooks/community.hooks";
+import { useGetCommunity } from "@/lib/hooks/community.hooks";
 import Loader from "@/components/Loader";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -30,7 +30,7 @@ const CommunityDetailsPage = () => {
   const { communityId } = useCommunity();
   const { user } = useAuth();
   const { data: posts } = useGetCommunityPosts(communityId);
-  const { data: community, isLoading } = useGetCommuity(communityId);
+  const { data: community, isLoading } = useGetCommunity(communityId);
 
   if (isLoading) {
     return <Loader />;

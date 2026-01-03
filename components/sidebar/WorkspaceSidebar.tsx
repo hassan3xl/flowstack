@@ -44,11 +44,11 @@ export function WorkspaceSidebar({ workspace }: WorkspaceSidebarProps) {
           href: `/workspace/${workspaceId}`,
           icon: <Home size={20} />,
         },
-        {
-          label: "Feeds",
-          href: `/workspace/${workspaceId}/feeds`,
-          icon: <Activity size={20} />,
-        },
+        // {
+        //   label: "Feeds",
+        //   href: `/workspace/${workspaceId}/feeds`,
+        //   icon: <Activity size={20} />,
+        // },
       ],
     },
     {

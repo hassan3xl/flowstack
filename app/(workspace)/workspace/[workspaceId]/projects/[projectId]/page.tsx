@@ -199,6 +199,7 @@ const ProjectDetailPage = () => {
         percentage={percentage}
         total={total}
         isAdminOrOwner={isAdminOrOwner}
+        userRole={userRole}
         setProjectModalOpen={setProjectModalOpen}
         workspaceId={workspaceId}
       />
@@ -470,6 +471,7 @@ const ProjectHeader = ({
   percentage,
   total,
   isAdminOrOwner,
+  userRole,
   setProjectModalOpen,
   workspaceId,
 }: any) => {
@@ -576,7 +578,7 @@ const ProjectHeader = ({
             </div>
           </div>
 
-          {isAdminOrOwner && (
+          {["admin", "owner", "member"].includes(userRole) && (
             <Button
               onClick={() => setProjectModalOpen(true)}
               className="w-full h-11 shadow-md hover:shadow-lg transition-all"

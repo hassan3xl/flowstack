@@ -79,7 +79,7 @@ const ProjectPage = () => {
         // --- Content State ---
         <div className="space-y-6">
           {/* Toolbar */}
-          <div className="flex flex-col lg:flex-row gap-4 justify-between items-center bg-card p-4 rounded-xl border border-border shadow-sm">
+          <div className="flex flex-col lg:flex-row gap-4 justify-between items-center py-4 rounded-xl border-b border-t border-border shadow-sm">
             {/* Search */}
             <div className="relative w-full lg:w-96">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />

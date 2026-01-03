@@ -38,7 +38,7 @@ export function Sidebar() {
           <div className="flex flex-col mt-4 items-center gap-3 py-2 px-2">
             <HomeCard />
             <WorkspaceCard />
-            <MessageCard />
+            {/* <MessageCard /> */}
             <CommunitiesCard />
 
             <Separator className="h-[2px] w-10 bg-accent rounded-full mx-auto" />

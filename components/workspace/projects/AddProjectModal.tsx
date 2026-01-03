@@ -78,8 +78,9 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
           label="Visibility"
           register={register}
           options={[
-            { value: "public", label: "Public" },
             { value: "private", label: "Private" },
+
+            { value: "public", label: "Public" },
           ]}
         />
 

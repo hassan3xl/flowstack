@@ -2,21 +2,22 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, Lock, Mail, User, Shield } from "lucide-react";
+import { Lock, Mail, Shield, AlertCircle, Check } from "lucide-react";
 import { useForm } from "react-hook-form";
-
-import { Button } from "@/components/ui/button";
-import HeroSection from "@/components/auth/HeroSection";
-import { apiService } from "@/lib/services/apiService";
+import { useState } from "react";
 import { toast } from "sonner";
 
+import { Button } from "@/components/ui/button";
 import { handleLogin } from "@/lib/actions/auth.actions";
 import { FormInput } from "@/components/input/formInput";
-import { useState } from "react";
+import { GoogleIcon } from "../signin/page";
+import { useSignup } from "@/lib/hooks/auth.hook";
+// Password Validation Regex
+// Min 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char
+const PASSWORD_REGEX =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
 type SignupForm = {
-  first_name: string;
-  last_name: string;
   email: string;
   password1: string;
   password2: string;
@@ -29,109 +30,110 @@ const SignupPage = () => {
     handleSubmit,
     formState: { errors },
     watch,
+    reset,
   } = useForm<SignupForm>();
 
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const password1Val = watch("password1");
 
-  const password1 = watch("password1");
+  const { mutateAsync: signupHook, isPending: loading } = useSignup();
 
   const onSubmit = async (data: SignupForm) => {
-    setLoading(true);
-
     if (!data.agreeToTerms) {
-      toast.error("You must agree to the terms to continue.");
-      setLoading(false);
+      toast.info("Please agree to the Terms of Service.");
       return;
     }
 
-    const payload = {
-      first_name: data.first_name,
-      last_name: data.last_name,
-      email: data.email,
-      password1: data.password1,
-      password2: data.password2,
-    };
-
     try {
-      const response = await apiService.postWithoutToken(
-        "/auth/signup/",
-        payload
-      );
+      const response = await signupHook({
+        email: data.email,
+        password1: data.password1,
+        password2: data.password2,
+      });
 
       if (response.access) {
-        handleLogin(response.user.id, response.access);
-        toast.success("User profile created successfully");
-        router.push("/home");
-      } else {
-        toast.error("Registration failed");
+        await handleLogin(response.user, response.access, response.refresh);
+        reset();
+
+        router.push("/account");
       }
-    } finally {
-      setLoading(false);
+    } catch (error: any) {
+      toast.error(error.message);
     }
   };
 
   return (
-    <div className="min-h-screen flex overflow-hidden">
-      {/* Left side form */}
-      <div className="w-auto mx-auto lg:w-1/2 flex items-center justify-center p-4 sm:p-8">
-        <div className="w-full max-w-md">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Create Account</h1>
-            <p className="text-gray-200">
-              Join us today and start your journey
+    <div className="min-h-screen flex bg-background">
+      {/* Left: Form Section */}
+      <div className="w-full lg:w-[55%] flex flex-col  justify-center  sm:px-12 xl:px-24 py-12">
+        <div className="max-w-[440px] w-full mx-auto border border-border p-6 rounded-md bg-card/30 space-y-8">
+          <div className="space-y-2 items-center text-center">
+            <h1 className="text-3xl font-bold tracking-tight">
+              Create an account
+            </h1>
+            <p className="text-muted-foreground">
+              Enter your email below to create your account
             </p>
           </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* First & last name */}
-            <div className="grid grid-cols-2 gap-4">
-              <FormInput
-                icon={User}
-                name="first_name"
-                placeholder="First name"
-                register={register}
-                rules={{ required: "First name is required" }}
-              />
+          {/* Social Auth */}
+          <div className="grid gap-4">
+            <Button variant="outline" className="w-full gap-2 h-11 font-medium">
+              <GoogleIcon />
+              Continue with Google
+            </Button>
 
-              <FormInput
-                icon={User}
-                name="last_name"
-                placeholder="Last name"
-                register={register}
-                rules={{ required: "Last name is required" }}
-              />
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-border" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with email
+                </span>
+              </div>
             </div>
+          </div>
 
-            {/* Email */}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <FormInput
               icon={Mail}
               type="email"
               name="email"
-              placeholder="Email address"
+              placeholder="name@example.com"
               register={register}
               rules={{
                 required: "Email is required",
                 pattern: {
                   value: /\S+@\S+\.\S+/,
-                  message: "Enter a valid email",
+                  message: "Invalid email address",
                 },
               }}
             />
 
-            {/* Password */}
-            <FormInput
-              icon={Lock}
-              type="password"
-              name="password1"
-              placeholder="Password"
-              register={register}
-              rules={{ required: "Password is required" }}
-            />
+            <div className="space-y-1">
+              <FormInput
+                icon={Lock}
+                type="password"
+                name="password1"
+                placeholder="Create a password"
+                register={register}
+                rules={{
+                  required: "Password is required",
+                  pattern: {
+                    value: PASSWORD_REGEX,
+                    message: "Must have 8+ chars, uppercase, number, & symbol",
+                  },
+                }}
+              />
+              {/* Optional: Password requirements hint */}
+              {errors.password1 && (
+                <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+                  <AlertCircle size={12} /> {errors.password1.message}
+                </p>
+              )}
+            </div>
 
-            {/* Confirm Password */}
             <FormInput
               icon={Lock}
               type="password"
@@ -139,71 +141,78 @@ const SignupPage = () => {
               placeholder="Confirm password"
               register={register}
               rules={{
-                required: "Please confirm your password",
-                validate: (value: any) =>
-                  value === password1 || "Passwords do not match",
+                required: "Confirm password",
+                validate: (val: any) =>
+                  val === password1Val || "Passwords do not match",
               }}
             />
 
-            {/* Agree to terms */}
-            <div className="flex items-start">
+            <div className="flex items-center space-x-2 py-2">
               <input
                 type="checkbox"
+                id="terms"
                 {...register("agreeToTerms")}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mt-1"
+                className="h-4 w-4 rounded border-border text-primary focus:ring-primary accent-primary"
               />
-              <span className="ml-2 text-sm text-gray-600">
+              <label
+                htmlFor="terms"
+                className="text-sm text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
                 I agree to the{" "}
-                <button type="button" className="text-blue-600 hover:underline">
+                <Link
+                  href="#"
+                  className="underline underline-offset-4 hover:text-primary"
+                >
                   Terms of Service
-                </button>{" "}
+                </Link>{" "}
                 and{" "}
-                <button type="button" className="text-blue-600 hover:underline">
+                <Link
+                  href="#"
+                  className="underline underline-offset-4 hover:text-primary"
+                >
                   Privacy Policy
-                </button>
-              </span>
+                </Link>
+              </label>
             </div>
-
             {errors.agreeToTerms && (
-              <p className="text-red-500 text-sm">
-                {errors.agreeToTerms.message as string}
+              <p className="text-destructive text-sm mt-1">
+                You must agree to continue
               </p>
             )}
 
-            {/* Submit */}
-            <Button type="submit" disabled={loading} className="w-full">
-              {loading ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
-                  <span>Loading...</span>
-                </div>
-              ) : (
-                "Sign up"
-              )}
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full h-11 font-medium"
+              size="lg"
+            >
+              {loading ? "Creating account..." : "Create Account"}
             </Button>
           </form>
 
-          {/* Switch to login */}
-          <div className="mt-8 text-center">
-            <p className="text-gray-600">
-              Already have an account?{" "}
-              <Link
-                href="/auth/signin"
-                className="text-blue-600 hover:text-blue-700 font-semibold hover:underline"
-              >
-                Sign in
-              </Link>
-            </p>
-          </div>
+          <p className="px-8 text-center text-sm text-muted-foreground">
+            Already have an account?{" "}
+            <Link
+              href="/auth/signin"
+              className="font-medium text-primary hover:underline underline-offset-4"
+            >
+              Sign in
+            </Link>
+          </p>
         </div>
       </div>
 
-      {/* Right side hero */}
-      <HeroSection
-        title="Join Our Community"
-        subtitle="Create your account and unlock amazing features tailored just for you"
-        image={<Shield size={80} className="text-white/80" />}
-      />
+      {/* Right: Hero/Image Section */}
+      <div className="hidden lg:flex lg:w-[45%] bg-muted/20 border-l border-border relative">
+        <div className="absolute inset-0 bg-zinc-900 text-white flex flex-col items-center justify-center p-12 text-center">
+          <Shield size={60} className="mb-6 text-white/80" />
+          <h2 className="text-3xl font-bold mb-4">Join Our Community</h2>
+          <p className="text-lg text-white/70 max-w-md">
+            Experience a secure, collaborative workspace designed to help your
+            team succeed.
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
